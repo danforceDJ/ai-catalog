@@ -1,19 +1,17 @@
 name: Deploy Site
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: deploy-site
   cancel-in-progress: false
 
 jobs:
-  build-and-commit:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,14 +24,11 @@ jobs:
           uv run --script scripts/generate_marketplace.py
           uv run --script scripts/generate_zips.py
           uv run --script scripts/generate_site.py
-      - name: Commit generated artefacts
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f catalog.json .github/plugin/marketplace.json docs/
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "chore: regenerate catalog [skip ci]"
-          git push
+      - name: Upload generated docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-site
+          path: |
+            catalog.json
+            .github/plugin/marketplace.json
+            docs/
