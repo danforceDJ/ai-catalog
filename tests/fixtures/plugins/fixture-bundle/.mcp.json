@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "bundle-server": {
+      "command": "echo",
+      "args": ["bundle"]
+    }
+  }
+}

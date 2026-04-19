@@ -1,0 +1,5 @@
+{
+  "name": "fixture-marketplace",
+  "owner": {"name": "fixture-owner", "email": ""},
+  "metadata": {"description": "Fixture", "version": "1.0.0"}
+}

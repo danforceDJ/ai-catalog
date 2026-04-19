@@ -1,0 +1,9 @@
+{
+  "name": "fixture-mcp",
+  "description": "A fixture MCP plugin.",
+  "version": "1.0.0",
+  "keywords": ["fixture", "mcp"],
+  "category": "testing",
+  "tags": [],
+  "mcpServers": ".mcp.json"
+}

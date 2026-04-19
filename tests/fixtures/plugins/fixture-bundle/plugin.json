@@ -1,0 +1,10 @@
+{
+  "name": "fixture-bundle",
+  "description": "Bundle fixture: skill + mcp.",
+  "version": "1.0.0",
+  "keywords": ["fixture", "bundle"],
+  "category": "testing",
+  "tags": ["pack"],
+  "skills": "skills",
+  "mcpServers": ".mcp.json"
+}
