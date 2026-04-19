@@ -1,5 +1,7 @@
 # AI Catalog
 
+**🌐 Live Marketplace: [danforceDJ.github.io/ai-catalog](https://danforceDJ.github.io/ai-catalog/)**
+
 A company-wide, agent-agnostic AI configuration marketplace built on three open standards:
 
 - **[AGENTS.md](https://agents.md/)** for agent behavior instructions
@@ -53,7 +55,12 @@ This repository is Git-platform agnostic and is designed to work on GitHub and G
 │   └── jira-ticket-from-code/SKILL.md
 └── scripts/
     ├── generate-catalog.sh
+    ├── generate-site.sh
     └── install.sh
 ```
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) to add new MCP servers, skills, and agent profiles.
+
+## Marketplace
+
+The static marketplace page at **[danforceDJ.github.io/ai-catalog](https://danforceDJ.github.io/ai-catalog/)** is auto-generated from `catalog.json` and published to GitHub Pages on every push to `main`.
