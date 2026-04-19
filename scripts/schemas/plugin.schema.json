@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Copilot CLI plugin.json",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64},
+    "description": {"type": "string", "maxLength": 1024},
+    "version": {"type": "string"},
+    "author": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {"type": "string"},
+        "email": {"type": "string"},
+        "url": {"type": "string"}
+      }
+    },
+    "homepage": {"type": "string"},
+    "repository": {"type": "string"},
+    "license": {"type": "string"},
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "category": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "agents": {"type": ["string", "array"]},
+    "skills": {"type": ["string", "array"]},
+    "commands": {"type": ["string", "array"]},
+    "hooks": {"type": ["string", "object"]},
+    "mcpServers": {"type": ["string", "object"]},
+    "lspServers": {"type": ["string", "object"]}
+  },
+  "additionalProperties": true
+}
