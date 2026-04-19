@@ -12,13 +12,20 @@ Thanks for contributing to the AI catalog.
    - **MCP** — `.mcp.json` in the Copilot `{"servers": {...}}` shape.
 3. Declare the component path(s) in `plugin.json` (`skills`, `agents`, `commands`, `mcpServers`). Defaults are `skills/`, `agents/`, `commands/`, `.mcp.json`.
 4. Run `uv run --script scripts/validate_catalog.py` locally — fix any errors.
-5. Open a PR. CI validates; on merge to `main` the deploy workflow regenerates `.github/plugin/marketplace.json`, `catalog.json`, and `docs/`.
+5. Regenerate tracked artefacts and commit them:
+   ```bash
+   uv run --script scripts/generate_catalog.py
+   uv run --script scripts/generate_marketplace.py
+   git add catalog.json .github/plugin/marketplace.json
+   git commit -m "chore: regenerate catalog"
+   ```
+6. Open a PR. CI validates and checks that the tracked artefacts match the generated output; on merge the deploy workflow publishes `docs/` to GitHub Pages.
 
 ## Adding a template (raw-download only)
 
 1. Create `templates/<kebab-case-name>/TEMPLATE.md` with frontmatter `name`, `description`, `version`, `category`.
 2. Optional supporting assets go alongside the `TEMPLATE.md`.
-3. Run validation + PR as above. Templates are NOT exposed to Copilot CLI; they appear in the web marketplace with download-only affordances.
+3. Run validation, regenerate artefacts, and PR as above. Templates are NOT exposed to Copilot CLI; they appear in the web marketplace with download-only affordances.
 
 ## Creating a bundle plugin
 
