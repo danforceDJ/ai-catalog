@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Catalog Marketplace</title>
+<meta name="description" content="AI configuration marketplace: MCP servers, skills, agents, prompts, templates.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#f6f8fa; --surface:#fff; --border:#d0d7de; --text:#1f2328;
+    --muted:#636c76; --accent:#0969da;
+    --mcp:#7c3aed; --skill:#0969da; --agent:#1a7f37; --prompt:#db2777;
+    --bundle:#0891b2; --template:#b45309;
+  }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:1.25rem 2rem; display:flex; align-items:center; gap:1rem; }
+  header h1 { font-size:1.35rem; }
+  header p { font-size:.9rem; color:var(--muted); }
+  main { max-width:1080px; margin:0 auto; padding:1.5rem; }
+  .search-bar { position:sticky; top:0; background:var(--bg); padding:1rem 0; z-index:10; }
+  #search-input { width:100%; padding:.6rem .9rem; font-size:1rem; border:1px solid var(--border); border-radius:6px; background:var(--surface); }
+  .type-tabs { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.75rem; }
+  .type-tab { padding:.35rem .8rem; border:1px solid var(--border); border-radius:999px; background:var(--surface); color:var(--muted); font-size:.85rem; cursor:pointer; }
+  .type-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .cards { display:grid; gap:1rem; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr)); margin-top:1.25rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.1rem 1.3rem; display:flex; flex-direction:column; gap:.7rem; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .card-header { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+  .card-header h3 { font-size:1rem; }
+  .badge { font-size:.7rem; font-weight:700; text-transform:uppercase; padding:.2em .55em; border-radius:999px; }
+  .badge-mcp { background:#ede9fe; color:var(--mcp); }
+  .badge-skill { background:#dbeafe; color:var(--skill); }
+  .badge-agent { background:#dcfce7; color:var(--agent); }
+  .badge-prompt { background:#fce7f3; color:var(--prompt); }
+  .badge-bundle { background:#cffafe; color:var(--bundle); }
+  .badge-template { background:#fef3c7; color:var(--template); }
+  .version { font-size:.75rem; color:var(--muted); }
+  .description { color:var(--muted); font-size:.9rem; }
+  .install-row { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .install-btn { font-size:.78rem; padding:.35rem .65rem; border:1px solid var(--border); background:var(--surface); border-radius:6px; cursor:pointer; text-decoration:none; color:var(--text); }
+  .install-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .empty { color:var(--muted); font-size:.9rem; padding:.5rem 0; }
+  footer { text-align:center; padding:1.5rem; font-size:.8rem; color:var(--muted); border-top:1px solid var(--border); }
+  dialog { border:1px solid var(--border); border-radius:8px; padding:1.5rem; max-width:720px; width:90%; }
+  dialog pre { background:var(--bg); padding:1rem; border-radius:6px; overflow:auto; max-height:60vh; font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:1.75rem">&#129302;</span>
+  <div>
+    <h1>AI Catalog Marketplace</h1>
+    <p>Install via Copilot CLI, VSCode deeplink, copy raw, or download zip.</p>
+  </div>
+</header>
+<main>
+  <div class="search-bar">
+    <input id="search-input" type="search" placeholder="Search plugins, skills, prompts, templates..." autocomplete="off">
+    <div class="type-tabs" id="type-tabs">
+      <button class="type-tab active" data-type="all">All</button>
+      <button class="type-tab" data-type="mcp">MCP</button>
+      <button class="type-tab" data-type="skill">Skills</button>
+      <button class="type-tab" data-type="agent">Agents</button>
+      <button class="type-tab" data-type="prompt">Prompts</button>
+      <button class="type-tab" data-type="bundle">Bundles</button>
+      <button class="type-tab" data-type="template">Templates</button>
+    </div>
+  </div>
+  <div id="cards" class="cards"></div>
+  <p id="empty-msg" class="empty" style="display:none">No matches.</p>
+</main>
+<dialog id="raw-modal">
+  <h3 id="raw-title"></h3>
+  <pre id="raw-body"></pre>
+  <button id="raw-copy">Copy</button>
+  <button id="raw-close">Close</button>
+</dialog>
+<footer>Generated {{ generated_at }} &middot; <a href="{{ repo_url }}">GitHub</a></footer>
+<script>
+const REPO_URL = {{ repo_url_json | safe }};
+const CATALOG = {{ catalog_json | safe }};
+const ALL = [...CATALOG.plugins, ...CATALOG.templates];
+
+function scoreItem(item, q) {
+  if (!q) return 1;
+  q = q.toLowerCase();
+  const name = (item.name || '').toLowerCase();
+  const desc = (item.description || '').toLowerCase();
+  const kw = (item.keywords || []).map(k => String(k).toLowerCase());
+  const tags = (item.tags || []).map(t => String(t).toLowerCase());
+  let s = 0;
+  if (name.startsWith(q)) s += 3;
+  else if (name.includes(q)) s += 2;
+  if (kw.includes(q) || tags.includes(q)) s += 2;
+  if (desc.includes(q)) s += 1;
+  return s;
+}
+
+function badgeHtml(type) {
+  return `<span class="badge badge-${type}">${type}</span>`;
+}
+
+function versionHtml(v) {
+  return v ? `<span class="version">v${v}</span>` : '';
+}
+
+function installRow(item) {
+  const btns = [];
+  const inst = item.install || {};
+  if (inst.copilot) {
+    btns.push(`<button class="install-btn copilot-copy" data-copy="copilot plugin install ${inst.copilot}">Copy Copilot install</button>`);
+  }
+  if (inst.vscodeMcpDeeplink) {
+    btns.push(`<a class="install-btn" href="${inst.vscodeMcpDeeplink}">VSCode install</a>`);
+  }
+  if ((inst.rawFiles || []).length) {
+    const payload = encodeURIComponent(JSON.stringify({path: inst.repoPath, files: inst.rawFiles}));
+    btns.push(`<button class="install-btn" data-raw="${payload}">Copy raw</button>`);
+  }
+  if (inst.zip) {
+    btns.push(`<a class="install-btn" href="${inst.zip}" download>Download zip</a>`);
+  }
+  return `<div class="install-row">${btns.join('')}</div>`;
+}
+
+function renderCards(items) {
+  const cards = document.getElementById('cards');
+  cards.innerHTML = items.map(item => `
+    <div class="card">
+      <div class="card-header">
+        ${badgeHtml(item.type)}
+        <h3><a href="${REPO_URL}/tree/main/${item.install.repoPath}">${item.name}</a></h3>
+        ${versionHtml(item.version)}
+      </div>
+      <p class="description">${item.description || ''}</p>
+      ${installRow(item)}
+    </div>
+  `).join('');
+  document.getElementById('empty-msg').style.display = items.length ? 'none' : 'block';
+}
+
+function applyFilters() {
+  const q = document.getElementById('search-input').value.trim();
+  const type = document.querySelector('.type-tab.active').dataset.type;
+  const results = ALL
+    .map(item => ({item, score: scoreItem(item, q)}))
+    .filter(x => x.score > 0 && (type === 'all' || x.item.type === type))
+    .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name))
+    .map(x => x.item);
+  renderCards(results);
+  const url = new URL(location.href);
+  if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
+  if (type !== 'all') url.searchParams.set('type', type); else url.searchParams.delete('type');
+  history.replaceState(null, '', url);
+}
+
+let debounceTimer;
+document.getElementById('search-input').addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(applyFilters, 100);
+});
+document.querySelectorAll('.type-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    applyFilters();
+  });
+});
+
+document.addEventListener('click', async ev => {
+  const copyBtn = ev.target.closest('[data-copy]');
+  if (copyBtn) {
+    await navigator.clipboard.writeText(copyBtn.dataset.copy);
+    const prev = copyBtn.textContent;
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => { copyBtn.textContent = prev; }, 1500);
+    return;
+  }
+  const rawBtn = ev.target.closest('[data-raw]');
+  if (rawBtn) {
+    const info = JSON.parse(decodeURIComponent(rawBtn.dataset.raw));
+    const dlg = document.getElementById('raw-modal');
+    document.getElementById('raw-title').textContent = info.path + ' / ' + info.files[0];
+    const rawUrl = `${REPO_URL}/raw/main/${info.path}/${info.files[0]}`;
+    const text = await fetch(rawUrl).then(r => r.text()).catch(() => 'Fetch failed. Open ' + rawUrl);
+    document.getElementById('raw-body').textContent = text;
+    document.getElementById('raw-copy').onclick = () => navigator.clipboard.writeText(text);
+    document.getElementById('raw-close').onclick = () => dlg.close();
+    dlg.showModal();
+  }
+});
+
+const params = new URLSearchParams(location.search);
+if (params.get('q')) document.getElementById('search-input').value = params.get('q');
+if (params.get('type')) {
+  const t = params.get('type');
+  document.querySelectorAll('.type-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.type === t));
+}
+applyFilters();
+</script>
+</body>
+</html>

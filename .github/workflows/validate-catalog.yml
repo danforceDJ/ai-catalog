@@ -2,9 +2,7 @@ name: Validate Catalog
 
 on:
   pull_request:
-    branches:
-      - main
-      - master
+    branches: [main, master]
 
 permissions:
   contents: read
@@ -13,15 +11,9 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Generate catalog.json
-        run: |
-          chmod +x scripts/generate-catalog.sh
-          ./scripts/generate-catalog.sh
-
-      - name: Validate catalog.json
-        run: |
-          chmod +x scripts/validate-catalog.sh
-          ./scripts/validate-catalog.sh
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Run validator
+        run: uv run --script scripts/validate_catalog.py
+      - name: Run tests
+        run: uv run --with pytest --with pyyaml --with jsonschema --with jinja2 -- pytest -q

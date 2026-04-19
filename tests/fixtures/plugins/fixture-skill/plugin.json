@@ -1,0 +1,9 @@
+{
+  "name": "fixture-skill",
+  "description": "A fixture skill plugin for tests.",
+  "version": "1.0.0",
+  "keywords": ["fixture", "test"],
+  "category": "testing",
+  "tags": ["unit-test"],
+  "skills": "skills"
+}

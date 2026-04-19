@@ -26,8 +26,8 @@ description: Company-wide default agent profile enforcing git workflow, security
 
 ## Available MCP Servers
 
-- `atlassian` (`mcp/atlassian`)
+- `atlassian` (`plugins/atlassian-mcp`)
 
 ## Available Skills
 
-- `jira-ticket-from-code` (`skills/jira-ticket-from-code`)
+- `jira-ticket-from-code` (`plugins/jira-ticket-from-code`)

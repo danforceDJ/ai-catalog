@@ -1,8 +1,6 @@
 ---
-name: default-pr-description
-description: Standard pull request description template with summary, test plan, and checklist sections.
-version: 1.0.0
-type: prompt
+name: pr-description
+description: Standard pull request description with summary, test plan, and checklist sections.
 ---
 
 ## Summary

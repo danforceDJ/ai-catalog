@@ -1,0 +1,89 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What This Is
+
+A convention-based AI configuration marketplace that doubles as a **GitHub Copilot CLI plugin marketplace**. The same git repo is:
+
+1. **A Copilot CLI marketplace** — `copilot plugin marketplace add danforceDJ/ai-catalog`, consumes `.github/plugin/marketplace.json`.
+2. **A static web marketplace** — GitHub Pages site with live search + four install paths per card (Copilot CLI, VSCode MCP deeplink, raw-file copy, `.zip` download).
+
+The web UI and marketplace manifest are both auto-generated from a single source of truth: the `plugins/` directory.
+
+## Development Commands
+
+Everything is Python via `uv` (single-file PEP 723 scripts).
+
+```bash
+# Generate .github/plugin/marketplace.json from plugins/ + marketplace.config.json
+uv run --script scripts/generate_marketplace.py
+
+# Generate catalog.json (search index) from plugins/ and templates/
+uv run --script scripts/generate_catalog.py
+
+# Generate docs/dl/<name>.zip for every plugin and template
+uv run --script scripts/generate_zips.py
+
+# Render docs/index.html from catalog.json + Jinja template
+uv run --script scripts/generate_site.py
+
+# Validate the catalog (schemas, naming, secrets, uniqueness, drift warnings)
+uv run --script scripts/validate_catalog.py
+
+# Run the full test suite
+uv run --with pytest --with pyyaml --with jsonschema --with jinja2 -- pytest -q
+
+# Install an item into a project using the deprecated bash fallback
+bash scripts/install.sh <mcp|skill|agent|prompt|template> <name> [--global]
+```
+
+CI runs `validate_catalog.py` + `pytest` on every PR (GitHub Actions: `.github/workflows/validate-catalog.yml`; GitLab CI: `.gitlab-ci.yml`). The deploy workflow (`.github/workflows/deploy-site.yml`) regenerates artefacts on push to main and commits them back.
+
+## Architecture
+
+**Data flow:**
+
+```
+Filesystem (plugins/ + templates/ + marketplace.config.json)
+    ↓  scripts/generate_catalog.py + generate_marketplace.py
+catalog.json  (search index)
+.github/plugin/marketplace.json  (Copilot CLI manifest)
+    ↓  scripts/generate_site.py + generate_zips.py
+docs/index.html + docs/dl/*.zip
+    ↓  GitHub Pages / git consumers
+Web UI + Copilot CLI install
+```
+
+**Filesystem conventions** — items are auto-discovered by path pattern:
+
+| Type | Path | Metadata source |
+|------|------|-----------------|
+| MCP Server | `plugins/<name>/.mcp.json` | `plugin.json` at `plugins/<name>/` |
+| Skill | `plugins/<name>/skills/<skill-name>/SKILL.md` | `plugin.json` (authoritative) + SKILL.md frontmatter (cross-checked) |
+| Agent Profile | `plugins/<name>/agents/<agent-name>.agent.md` | `plugin.json` + agent frontmatter |
+| Prompt (Command) | `plugins/<name>/commands/<cmd-name>.md` | `plugin.json` + command frontmatter |
+| Template (raw-download only) | `templates/<name>/TEMPLATE.md` | YAML frontmatter |
+| Bundle | `plugins/<name>/` with ≥2 component kinds | `plugin.json` |
+
+**Naming & invariants (enforced by `validate_catalog.py`):**
+
+- Plugin name: kebab-case, ≤64 chars, equals the directory name.
+- Command filename stem must equal its frontmatter `name`.
+- No duplicate plugin names, command names, or MCP server names across the catalog.
+- SKILL.md frontmatter drift vs `plugin.json` is a warning (not a failure).
+- `.mcp.json` is scanned for obvious secret patterns (GitHub tokens, `API_TOKEN=...`, etc.) — match fails validation.
+
+**`install.sh`** is the deprecated bash fallback for users without Copilot CLI. It emits a deprecation banner on every invocation and now reads from `plugins/<name>/` paths. Supports `mcp`, `skill`, `agent`, `prompt`, `template` types.
+
+## Do Not Commit
+
+- `catalog.json`
+- `.github/plugin/marketplace.json`
+- `docs/index.html`, `docs/catalog.json`, `docs/dl/*.zip`
+
+These are in `.gitignore` and owned by the deploy workflow (which `git add -f`s them on push to main).
+
+## Adding New Catalog Items
+
+Follow the filesystem conventions above. `plugin.json` is the Copilot-native manifest — required for every plugin. See `CONTRIBUTING.md` for the full checklist.

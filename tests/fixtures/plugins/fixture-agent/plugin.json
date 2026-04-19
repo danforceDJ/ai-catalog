@@ -1,0 +1,9 @@
+{
+  "name": "fixture-agent",
+  "description": "A fixture agent plugin.",
+  "version": "1.0.0",
+  "keywords": ["fixture", "agent"],
+  "category": "testing",
+  "tags": [],
+  "agents": "agents"
+}

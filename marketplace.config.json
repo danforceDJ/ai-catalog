@@ -1,0 +1,11 @@
+{
+  "name": "ai-catalog",
+  "owner": {
+    "name": "danforceDJ",
+    "email": ""
+  },
+  "metadata": {
+    "description": "Company-wide AI configuration marketplace: MCP servers, skills, agent profiles, prompts.",
+    "version": "1.0.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "fixture-prompt",
+  "description": "A fixture prompt plugin.",
+  "version": "1.0.0",
+  "keywords": ["fixture", "prompt"],
+  "category": "testing",
+  "tags": [],
+  "commands": "commands"
+}
