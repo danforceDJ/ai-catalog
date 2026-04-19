@@ -13,7 +13,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+
       - name: Run validator
         run: uv run --script scripts/validate_catalog.py
+
       - name: Run tests
         run: uv run --with pytest --with pyyaml --with jsonschema --with jinja2 -- pytest -q
+
+      - name: Check catalog.json is up-to-date
+        run: |
+          uv run --script scripts/generate_catalog.py
+          if ! git diff --exit-code catalog.json; then
+            echo ""
+            echo "ERROR: catalog.json is stale. Run 'uv run --script scripts/generate_catalog.py' locally and commit the result."
+            exit 1
+          fi
+
+      - name: Check marketplace.json is up-to-date
+        run: |
+          uv run --script scripts/generate_marketplace.py
+          if ! git diff --exit-code .github/plugin/marketplace.json; then
+            echo ""
+            echo "ERROR: .github/plugin/marketplace.json is stale. Run 'uv run --script scripts/generate_marketplace.py' locally and commit the result."
+            exit 1
+          fi

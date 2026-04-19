@@ -11,6 +11,7 @@ These instructions apply to agents working on this AI catalog repository.
 
 - Follow existing naming conventions: lowercase, hyphen-separated names (kebab-case). Directory name must match `plugin.json` `name`.
 - Validate before committing: `uv run --script scripts/validate_catalog.py`.
+- After adding or modifying plugins/templates, regenerate tracked artefacts: `uv run --script scripts/generate_catalog.py && uv run --script scripts/generate_marketplace.py`. Commit `catalog.json` and `.github/plugin/marketplace.json` alongside your changes.
 - Keep documentation accurate and synchronized with file structure.
 
 ## Security
