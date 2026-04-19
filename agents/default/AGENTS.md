@@ -1,3 +1,8 @@
+---
+name: default
+description: Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.
+---
+
 # Default Agent Profile
 
 ## General Rules

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Catalog Marketplace</title>
-  <meta name="description" content="Company-wide AI configuration marketplace: MCP servers, skills, and agent profiles." />
+  <meta name="description" content="Company-wide AI configuration marketplace: MCP servers, skills, agent profiles, and templates." />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -19,6 +19,7 @@
       --mcp-color: #7c3aed;
       --skill-color: #0969da;
       --agent-color: #1a7f37;
+      --template-color: #b45309;
       --radius: 8px;
       --shadow: 0 1px 3px rgba(27,31,36,.12), 0 8px 24px rgba(27,31,36,.06);
     }
@@ -33,7 +34,6 @@
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; color: var(--accent-hover); }
 
-    /* ---------- Header ---------- */
     header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -46,10 +46,8 @@
     header h1 { font-size: 1.35rem; font-weight: 700; }
     header p  { font-size: .9rem; color: var(--muted); margin-top: .1rem; }
 
-    /* ---------- Main ---------- */
     main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
 
-    /* ---------- Nav tabs ---------- */
     .nav-tabs {
       display: flex;
       gap: .5rem;
@@ -69,7 +67,6 @@
     }
     .nav-tabs a:hover { background: var(--bg); color: var(--text); text-decoration: none; }
 
-    /* ---------- Section ---------- */
     section { margin-bottom: 3rem; }
     section h2 {
       font-size: 1.15rem;
@@ -79,7 +76,6 @@
       border-bottom: 1px solid var(--border);
     }
 
-    /* ---------- Cards ---------- */
     .cards { display: grid; gap: 1rem; grid-template-columns: 1fr; }
     @media (min-width: 640px) {
       .cards { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); }
@@ -102,7 +98,6 @@
 
     .description { color: var(--muted); font-size: .9rem; }
 
-    /* ---------- Badges ---------- */
     .badge {
       display: inline-block;
       font-size: .7rem;
@@ -113,9 +108,10 @@
       border-radius: 2em;
       flex-shrink: 0;
     }
-    .badge-mcp   { background: #ede9fe; color: var(--mcp-color); }
-    .badge-skill { background: #dbeafe; color: var(--skill-color); }
-    .badge-agent { background: #dcfce7; color: var(--agent-color); }
+    .badge-mcp      { background: #ede9fe; color: var(--mcp-color); }
+    .badge-skill    { background: #dbeafe; color: var(--skill-color); }
+    .badge-agent    { background: #dcfce7; color: var(--agent-color); }
+    .badge-template { background: #fef3c7; color: var(--template-color); }
 
     .version {
       font-size: .75rem;
@@ -124,23 +120,40 @@
       margin-left: .3rem;
     }
 
-    /* ---------- Install block ---------- */
     .install h4 { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .5rem; }
     .install-tabs { display: flex; flex-direction: column; gap: .5rem; }
     .install-block { display: flex; flex-direction: column; gap: .2rem; }
     .ide-label { font-size: .75rem; font-weight: 600; color: var(--muted); }
+
+    .code-wrap { position: relative; display: flex; align-items: center; }
     .oneliner {
       display: block;
+      flex: 1;
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
       font-size: .78rem;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 4px;
-      padding: .35em .65em;
+      padding: .35em 2rem .35em .65em;
       overflow-x: auto;
       white-space: nowrap;
       color: var(--text);
     }
+    .copy-btn {
+      position: absolute;
+      right: .3rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: .85rem;
+      color: var(--muted);
+      padding: .15rem .25rem;
+      line-height: 1;
+      border-radius: 3px;
+      transition: color .15s, background .15s;
+    }
+    .copy-btn:hover { color: var(--accent); background: var(--border); }
+    .copy-btn.copied { color: var(--agent-color); }
 
     .detail-link {
       font-size: .82rem;
@@ -151,7 +164,6 @@
 
     .empty { color: var(--muted); font-size: .9rem; padding: .5rem 0; }
 
-    /* ---------- Footer ---------- */
     footer {
       text-align: center;
       padding: 1.5rem;
@@ -169,7 +181,7 @@
   <span class="logo">🤖</span>
   <div>
     <h1>AI Catalog Marketplace</h1>
-    <p>MCP servers, skills, and agent profiles for your team</p>
+    <p>MCP servers, skills, agent profiles, and templates for your team</p>
   </div>
 </header>
 
@@ -178,6 +190,7 @@
     <a href="#mcp-servers">MCP Servers</a>
     <a href="#skills">Skills</a>
     <a href="#agent-profiles">Agent Profiles</a>
+    <a href="#templates">Templates</a>
     <a href="https://github.com/danforceDJ/ai-catalog" target="_blank" rel="noopener">GitHub &rarr;</a>
   </nav>
 
@@ -196,11 +209,17 @@
         <div class="install-tabs">
           <div class="install-block">
             <span class="ide-label">VSCode</span>
-            <code class="oneliner">./scripts/install.sh mcp atlassian --ide vscode --project /path/to/project</code>
+            <div class="code-wrap">
+              <code class="oneliner">./scripts/install.sh mcp atlassian --ide vscode --project /path/to/project</code>
+              <button class="copy-btn" data-copy="./scripts/install.sh mcp atlassian --ide vscode --project /path/to/project" title="Copy">&#x2398;</button>
+            </div>
           </div>
           <div class="install-block">
             <span class="ide-label">JetBrains</span>
-            <code class="oneliner">./scripts/install.sh mcp atlassian --ide jetbrains</code>
+            <div class="code-wrap">
+              <code class="oneliner">./scripts/install.sh mcp atlassian --ide jetbrains</code>
+              <button class="copy-btn" data-copy="./scripts/install.sh mcp atlassian --ide jetbrains" title="Copy">&#x2398;</button>
+            </div>
           </div>
         </div>
         <a class="detail-link" href="https://github.com/danforceDJ/ai-catalog/tree/main/mcp/atlassian" target="_blank" rel="noopener">View config &amp; details &rarr;</a>
@@ -224,7 +243,10 @@
         <div class="install-tabs">
           <div class="install-block">
             <span class="ide-label">VSCode &amp; JetBrains</span>
-            <code class="oneliner">./scripts/install.sh skill jira-ticket-from-code --project /path/to/project</code>
+            <div class="code-wrap">
+              <code class="oneliner">./scripts/install.sh skill jira-ticket-from-code --project /path/to/project</code>
+              <button class="copy-btn" data-copy="./scripts/install.sh skill jira-ticket-from-code --project /path/to/project" title="Copy">&#x2398;</button>
+            </div>
           </div>
         </div>
         <a class="detail-link" href="https://github.com/danforceDJ/ai-catalog/blob/main/skills/jira-ticket-from-code/SKILL.md" target="_blank" rel="noopener">View skill file &rarr;</a>
@@ -242,16 +264,46 @@
         <span class="badge badge-agent">Agent Profile</span>
         <h3><a href="https://github.com/danforceDJ/ai-catalog/tree/main/agents/default" target="_blank" rel="noopener">default</a></h3>
       </div>
-      <p class="description">- Follow the existing code style and project conventions.</p>
+      <p class="description">Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.</p>
       <div class="install">
         <h4>Install</h4>
         <div class="install-tabs">
           <div class="install-block">
             <span class="ide-label">All IDEs</span>
-            <code class="oneliner">./scripts/install.sh agent default --project /path/to/project</code>
+            <div class="code-wrap">
+              <code class="oneliner">./scripts/install.sh agent default --project /path/to/project</code>
+              <button class="copy-btn" data-copy="./scripts/install.sh agent default --project /path/to/project" title="Copy">&#x2398;</button>
+            </div>
           </div>
         </div>
         <a class="detail-link" href="https://github.com/danforceDJ/ai-catalog/blob/main/agents/default/AGENTS.md" target="_blank" rel="noopener">View agent profile &rarr;</a>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section id="templates">
+    <h2>🗒️ Templates</h2>
+    <div class="cards">
+
+    <div class="card" id="template-default-pr-description">
+      <div class="card-header">
+        <span class="badge badge-template">Template</span>
+        <h3><a href="https://github.com/danforceDJ/ai-catalog/blob/main/templates/default-pr-description/TEMPLATE.md" target="_blank" rel="noopener">default-pr-description</a> <span class="version">v1.0.0</span></h3>
+      </div>
+      <p class="description">Standard pull request description template with summary, test plan, and checklist sections.</p>
+      <div class="install">
+        <h4>Install</h4>
+        <div class="install-tabs">
+          <div class="install-block">
+            <span class="ide-label">All IDEs</span>
+            <div class="code-wrap">
+              <code class="oneliner">./scripts/install.sh template default-pr-description --project /path/to/project</code>
+              <button class="copy-btn" data-copy="./scripts/install.sh template default-pr-description --project /path/to/project" title="Copy">&#x2398;</button>
+            </div>
+          </div>
+        </div>
+        <a class="detail-link" href="https://github.com/danforceDJ/ai-catalog/blob/main/templates/default-pr-description/TEMPLATE.md" target="_blank" rel="noopener">View template &rarr;</a>
       </div>
     </div>
     </div>
@@ -260,9 +312,26 @@
 
 <footer>
   Generated from <a href="https://github.com/danforceDJ/ai-catalog/blob/main/catalog.json" target="_blank" rel="noopener">catalog.json</a>
-  on 2026-04-19T08:11:06Z &mdash;
+  on 2026-04-19T19:52:26Z &mdash;
   <a href="https://github.com/danforceDJ/ai-catalog" target="_blank" rel="noopener">danforceDJ/ai-catalog</a>
 </footer>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var text = btn.getAttribute('data-copy');
+    navigator.clipboard.writeText(text).then(function() {
+      var prev = btn.innerHTML;
+      btn.innerHTML = '&#x2713;';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.innerHTML = prev;
+        btn.classList.remove('copied');
+      }, 1500);
+    });
+  });
+});
+</script>
 
 </body>
 </html>

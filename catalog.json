@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-19T07:11:46Z",
+  "generated_at": "2026-04-19T19:52:26Z",
   "mcp": [
     {
       "name": "atlassian",
@@ -18,8 +18,17 @@
   "agents": [
     {
       "name": "default",
-      "description": "- Follow the existing code style and project conventions.",
+      "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
       "path": "agents/default/AGENTS.md"
+    }
+  ],
+  "templates": [
+    {
+      "name": "default-pr-description",
+      "description": "Standard pull request description template with summary, test plan, and checklist sections.",
+      "version": "1.0.0",
+      "type": "prompt",
+      "path": "templates/default-pr-description/TEMPLATE.md"
     }
   ]
 }

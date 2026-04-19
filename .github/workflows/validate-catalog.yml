@@ -1,0 +1,27 @@
+name: Validate Catalog
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate catalog.json
+        run: |
+          chmod +x scripts/generate-catalog.sh
+          ./scripts/generate-catalog.sh
+
+      - name: Validate catalog.json
+        run: |
+          chmod +x scripts/validate-catalog.sh
+          ./scripts/validate-catalog.sh
