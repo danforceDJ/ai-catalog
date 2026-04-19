@@ -6,7 +6,6 @@
 """Generate catalog.json (search index) from plugins/ and templates/."""
 from __future__ import annotations
 import base64
-import datetime as dt
 import json
 import re
 from pathlib import Path
@@ -182,7 +181,6 @@ def build_catalog(repo_root: Path) -> dict:
                 if entry:
                     templates.append(entry)
     return {
-        "generated_at": dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "plugins": plugins,
         "templates": templates,
     }
