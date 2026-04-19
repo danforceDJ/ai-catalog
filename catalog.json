@@ -1,34 +1,169 @@
 {
-  "generated_at": "2026-04-19T19:52:26Z",
-  "mcp": [
+  "generated_at": "2026-04-19T22:44:29Z",
+  "plugins": [
     {
-      "name": "atlassian",
-      "description": "The Atlassian Rovo MCP Server uses OAuth 2.1 (SSO). No API tokens are required in this repository.",
-      "path": "mcp/atlassian"
-    }
-  ],
-  "skills": [
+      "name": "atlassian-mcp",
+      "description": "Atlassian Rovo MCP Server via OAuth 2.1 (SSO). No API tokens required in this repository.",
+      "version": "1.0.0",
+      "type": "mcp",
+      "category": "integrations",
+      "tags": [
+        "atlassian",
+        "mcp"
+      ],
+      "keywords": [
+        "atlassian",
+        "jira",
+        "confluence",
+        "rovo",
+        "mcp"
+      ],
+      "components": {
+        "skills": [],
+        "agents": [],
+        "commands": [],
+        "mcpServers": [
+          "atlassian"
+        ],
+        "hooks": false
+      },
+      "install": {
+        "copilot": "atlassian-mcp@ai-catalog",
+        "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
+        "rawFiles": [],
+        "zip": "dl/atlassian-mcp.zip",
+        "repoPath": "plugins/atlassian-mcp"
+      }
+    },
+    {
+      "name": "default-agent",
+      "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
+      "version": "1.0.0",
+      "type": "agent",
+      "category": "governance",
+      "tags": [
+        "default"
+      ],
+      "keywords": [
+        "agent",
+        "conventions",
+        "git",
+        "security"
+      ],
+      "components": {
+        "skills": [],
+        "agents": [
+          "default"
+        ],
+        "commands": [],
+        "mcpServers": [],
+        "hooks": false
+      },
+      "install": {
+        "copilot": "default-agent@ai-catalog",
+        "vscodeMcpDeeplink": null,
+        "rawFiles": [
+          "agents/default.agent.md"
+        ],
+        "zip": "dl/default-agent.zip",
+        "repoPath": "plugins/default-agent"
+      }
+    },
     {
       "name": "jira-ticket-from-code",
       "description": "Create Jira tickets from TODO/FIXME/BUG code comments by extracting intent and nearby implementation context.",
       "version": "1.0.0",
-      "path": "skills/jira-ticket-from-code/SKILL.md"
-    }
-  ],
-  "agents": [
+      "type": "skill",
+      "category": "productivity",
+      "tags": [
+        "jira",
+        "atlassian"
+      ],
+      "keywords": [
+        "jira",
+        "tickets",
+        "code-comments",
+        "todo"
+      ],
+      "components": {
+        "skills": [
+          "jira-ticket-from-code"
+        ],
+        "agents": [],
+        "commands": [],
+        "mcpServers": [],
+        "hooks": false
+      },
+      "install": {
+        "copilot": "jira-ticket-from-code@ai-catalog",
+        "vscodeMcpDeeplink": null,
+        "rawFiles": [
+          "skills/jira-ticket-from-code/SKILL.md"
+        ],
+        "zip": "dl/jira-ticket-from-code.zip",
+        "repoPath": "plugins/jira-ticket-from-code"
+      }
+    },
     {
-      "name": "default",
-      "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
-      "path": "agents/default/AGENTS.md"
+      "name": "pr-description-prompt",
+      "description": "Slash command that emits a standard PR description with summary, test plan, and checklist.",
+      "version": "1.0.0",
+      "type": "prompt",
+      "category": "productivity",
+      "tags": [
+        "github",
+        "prompt"
+      ],
+      "keywords": [
+        "pr",
+        "pull-request",
+        "prompt",
+        "template"
+      ],
+      "components": {
+        "skills": [],
+        "agents": [],
+        "commands": [
+          "pr-description"
+        ],
+        "mcpServers": [],
+        "hooks": false
+      },
+      "install": {
+        "copilot": "pr-description-prompt@ai-catalog",
+        "vscodeMcpDeeplink": null,
+        "rawFiles": [
+          "commands/pr-description.md"
+        ],
+        "zip": "dl/pr-description-prompt.zip",
+        "repoPath": "plugins/pr-description-prompt"
+      }
     }
   ],
   "templates": [
     {
-      "name": "default-pr-description",
-      "description": "Standard pull request description template with summary, test plan, and checklist sections.",
+      "name": "solution-architecture",
+      "description": "Reusable Solution Architecture document template with context, decisions, components, and risks sections.",
       "version": "1.0.0",
-      "type": "prompt",
-      "path": "templates/default-pr-description/TEMPLATE.md"
+      "type": "template",
+      "category": "architecture",
+      "tags": [
+        "architecture",
+        "docs",
+        "adr"
+      ],
+      "keywords": [
+        "solution",
+        "architecture",
+        "design"
+      ],
+      "install": {
+        "rawFiles": [
+          "TEMPLATE.md"
+        ],
+        "zip": "dl/solution-architecture.zip",
+        "repoPath": "templates/solution-architecture"
+      }
     }
   ]
 }

@@ -1,337 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Catalog Marketplace</title>
-  <meta name="description" content="Company-wide AI configuration marketplace: MCP servers, skills, agent profiles, and templates." />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #f6f8fa;
-      --surface: #ffffff;
-      --border: #d0d7de;
-      --text: #1f2328;
-      --muted: #636c76;
-      --accent: #0969da;
-      --accent-hover: #0550ae;
-      --mcp-color: #7c3aed;
-      --skill-color: #0969da;
-      --agent-color: #1a7f37;
-      --template-color: #b45309;
-      --radius: 8px;
-      --shadow: 0 1px 3px rgba(27,31,36,.12), 0 8px 24px rgba(27,31,36,.06);
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; color: var(--accent-hover); }
-
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 1.25rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    header .logo { font-size: 1.75rem; }
-    header h1 { font-size: 1.35rem; font-weight: 700; }
-    header p  { font-size: .9rem; color: var(--muted); margin-top: .1rem; }
-
-    main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
-
-    .nav-tabs {
-      display: flex;
-      gap: .5rem;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-    .nav-tabs a {
-      padding: .45rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 2rem;
-      font-size: .85rem;
-      font-weight: 500;
-      color: var(--muted);
-      background: var(--surface);
-      transition: background .15s, color .15s;
-      text-decoration: none;
-    }
-    .nav-tabs a:hover { background: var(--bg); color: var(--text); text-decoration: none; }
-
-    section { margin-bottom: 3rem; }
-    section h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      padding-bottom: .4rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .cards { display: grid; gap: 1rem; grid-template-columns: 1fr; }
-    @media (min-width: 640px) {
-      .cards { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); }
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.5rem;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: .75rem;
-    }
-    .card-header { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
-    .card-header h3 { font-size: 1rem; font-weight: 600; }
-    .card-header h3 a { color: var(--text); }
-    .card-header h3 a:hover { color: var(--accent); }
-
-    .description { color: var(--muted); font-size: .9rem; }
-
-    .badge {
-      display: inline-block;
-      font-size: .7rem;
-      font-weight: 700;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      padding: .2em .55em;
-      border-radius: 2em;
-      flex-shrink: 0;
-    }
-    .badge-mcp      { background: #ede9fe; color: var(--mcp-color); }
-    .badge-skill    { background: #dbeafe; color: var(--skill-color); }
-    .badge-agent    { background: #dcfce7; color: var(--agent-color); }
-    .badge-template { background: #fef3c7; color: var(--template-color); }
-
-    .version {
-      font-size: .75rem;
-      font-weight: 500;
-      color: var(--muted);
-      margin-left: .3rem;
-    }
-
-    .install h4 { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .5rem; }
-    .install-tabs { display: flex; flex-direction: column; gap: .5rem; }
-    .install-block { display: flex; flex-direction: column; gap: .2rem; }
-    .ide-label { font-size: .75rem; font-weight: 600; color: var(--muted); }
-
-    .code-wrap { position: relative; display: flex; align-items: center; }
-    .oneliner {
-      display: block;
-      flex: 1;
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-      font-size: .78rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: .35em 2rem .35em .65em;
-      overflow-x: auto;
-      white-space: nowrap;
-      color: var(--text);
-    }
-    .copy-btn {
-      position: absolute;
-      right: .3rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: .85rem;
-      color: var(--muted);
-      padding: .15rem .25rem;
-      line-height: 1;
-      border-radius: 3px;
-      transition: color .15s, background .15s;
-    }
-    .copy-btn:hover { color: var(--accent); background: var(--border); }
-    .copy-btn.copied { color: var(--agent-color); }
-
-    .detail-link {
-      font-size: .82rem;
-      font-weight: 500;
-      align-self: flex-start;
-      margin-top: .15rem;
-    }
-
-    .empty { color: var(--muted); font-size: .9rem; padding: .5rem 0; }
-
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      font-size: .8rem;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
-    }
-    footer a { color: var(--muted); }
-    footer a:hover { color: var(--accent); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Catalog Marketplace</title>
+<meta name="description" content="AI configuration marketplace: MCP servers, skills, agents, prompts, templates.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#f6f8fa; --surface:#fff; --border:#d0d7de; --text:#1f2328;
+    --muted:#636c76; --accent:#0969da;
+    --mcp:#7c3aed; --skill:#0969da; --agent:#1a7f37; --prompt:#db2777;
+    --bundle:#0891b2; --template:#b45309;
+  }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:1.25rem 2rem; display:flex; align-items:center; gap:1rem; }
+  header h1 { font-size:1.35rem; }
+  header p { font-size:.9rem; color:var(--muted); }
+  main { max-width:1080px; margin:0 auto; padding:1.5rem; }
+  .search-bar { position:sticky; top:0; background:var(--bg); padding:1rem 0; z-index:10; }
+  #search-input { width:100%; padding:.6rem .9rem; font-size:1rem; border:1px solid var(--border); border-radius:6px; background:var(--surface); }
+  .type-tabs { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.75rem; }
+  .type-tab { padding:.35rem .8rem; border:1px solid var(--border); border-radius:999px; background:var(--surface); color:var(--muted); font-size:.85rem; cursor:pointer; }
+  .type-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .cards { display:grid; gap:1rem; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr)); margin-top:1.25rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.1rem 1.3rem; display:flex; flex-direction:column; gap:.7rem; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .card-header { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+  .card-header h3 { font-size:1rem; }
+  .badge { font-size:.7rem; font-weight:700; text-transform:uppercase; padding:.2em .55em; border-radius:999px; }
+  .badge-mcp { background:#ede9fe; color:var(--mcp); }
+  .badge-skill { background:#dbeafe; color:var(--skill); }
+  .badge-agent { background:#dcfce7; color:var(--agent); }
+  .badge-prompt { background:#fce7f3; color:var(--prompt); }
+  .badge-bundle { background:#cffafe; color:var(--bundle); }
+  .badge-template { background:#fef3c7; color:var(--template); }
+  .version { font-size:.75rem; color:var(--muted); }
+  .description { color:var(--muted); font-size:.9rem; }
+  .install-row { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .install-btn { font-size:.78rem; padding:.35rem .65rem; border:1px solid var(--border); background:var(--surface); border-radius:6px; cursor:pointer; text-decoration:none; color:var(--text); }
+  .install-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .empty { color:var(--muted); font-size:.9rem; padding:.5rem 0; }
+  footer { text-align:center; padding:1.5rem; font-size:.8rem; color:var(--muted); border-top:1px solid var(--border); }
+  dialog { border:1px solid var(--border); border-radius:8px; padding:1.5rem; max-width:720px; width:90%; }
+  dialog pre { background:var(--bg); padding:1rem; border-radius:6px; overflow:auto; max-height:60vh; font-size:.85rem; }
+</style>
 </head>
 <body>
-
 <header>
-  <span class="logo">🤖</span>
+  <span style="font-size:1.75rem">&#129302;</span>
   <div>
     <h1>AI Catalog Marketplace</h1>
-    <p>MCP servers, skills, agent profiles, and templates for your team</p>
+    <p>Install via Copilot CLI, VSCode deeplink, copy raw, or download zip.</p>
   </div>
 </header>
-
 <main>
-  <nav class="nav-tabs" aria-label="Catalog sections">
-    <a href="#mcp-servers">MCP Servers</a>
-    <a href="#skills">Skills</a>
-    <a href="#agent-profiles">Agent Profiles</a>
-    <a href="#templates">Templates</a>
-    <a href="https://github.com/danforceDJ/ai-catalog" target="_blank" rel="noopener">GitHub &rarr;</a>
-  </nav>
-
-  <section id="mcp-servers">
-    <h2>🔌 MCP Servers</h2>
-    <div class="cards">
-
-    <div class="card" id="mcp-atlassian">
-      <div class="card-header">
-        <span class="badge badge-mcp">MCP Server</span>
-        <h3><a href="https://github.com/danforceDJ/ai-catalog/tree/main/mcp/atlassian" target="_blank" rel="noopener">atlassian</a></h3>
-      </div>
-      <p class="description">The Atlassian Rovo MCP Server uses OAuth 2.1 (SSO). No API tokens are required in this repository.</p>
-      <div class="install">
-        <h4>Install</h4>
-        <div class="install-tabs">
-          <div class="install-block">
-            <span class="ide-label">VSCode</span>
-            <div class="code-wrap">
-              <code class="oneliner">./scripts/install.sh mcp atlassian --ide vscode --project /path/to/project</code>
-              <button class="copy-btn" data-copy="./scripts/install.sh mcp atlassian --ide vscode --project /path/to/project" title="Copy">&#x2398;</button>
-            </div>
-          </div>
-          <div class="install-block">
-            <span class="ide-label">JetBrains</span>
-            <div class="code-wrap">
-              <code class="oneliner">./scripts/install.sh mcp atlassian --ide jetbrains</code>
-              <button class="copy-btn" data-copy="./scripts/install.sh mcp atlassian --ide jetbrains" title="Copy">&#x2398;</button>
-            </div>
-          </div>
-        </div>
-        <a class="detail-link" href="https://github.com/danforceDJ/ai-catalog/tree/main/mcp/atlassian" target="_blank" rel="noopener">View config &amp; details &rarr;</a>
-      </div>
+  <div class="search-bar">
+    <input id="search-input" type="search" placeholder="Search plugins, skills, prompts, templates..." autocomplete="off">
+    <div class="type-tabs" id="type-tabs">
+      <button class="type-tab active" data-type="all">All</button>
+      <button class="type-tab" data-type="mcp">MCP</button>
+      <button class="type-tab" data-type="skill">Skills</button>
+      <button class="type-tab" data-type="agent">Agents</button>
+      <button class="type-tab" data-type="prompt">Prompts</button>
+      <button class="type-tab" data-type="bundle">Bundles</button>
+      <button class="type-tab" data-type="template">Templates</button>
     </div>
-    </div>
-  </section>
-
-  <section id="skills">
-    <h2>🧠 Skills</h2>
-    <div class="cards">
-
-    <div class="card" id="skill-jira-ticket-from-code">
-      <div class="card-header">
-        <span class="badge badge-skill">Skill</span>
-        <h3><a href="https://github.com/danforceDJ/ai-catalog/tree/main/skills/jira-ticket-from-code/SKILL.md" target="_blank" rel="noopener">jira-ticket-from-code</a> <span class="version">v1.0.0</span></h3>
-      </div>
-      <p class="description">Create Jira tickets from TODO/FIXME/BUG code comments by extracting intent and nearby implementation context.</p>
-      <div class="install">
-        <h4>Install</h4>
-        <div class="install-tabs">
-          <div class="install-block">
-            <span class="ide-label">VSCode &amp; JetBrains</span>
-            <div class="code-wrap">
-              <code class="oneliner">./scripts/install.sh skill jira-ticket-from-code --project /path/to/project</code>
-              <button class="copy-btn" data-copy="./scripts/install.sh skill jira-ticket-from-code --project /path/to/project" title="Copy">&#x2398;</button>
-            </div>
-          </div>
-        </div>
-        <a class="detail-link" href="https://github.com/danforceDJ/ai-catalog/blob/main/skills/jira-ticket-from-code/SKILL.md" target="_blank" rel="noopener">View skill file &rarr;</a>
-      </div>
-    </div>
-    </div>
-  </section>
-
-  <section id="agent-profiles">
-    <h2>🤖 Agent Profiles</h2>
-    <div class="cards">
-
-    <div class="card" id="agent-default">
-      <div class="card-header">
-        <span class="badge badge-agent">Agent Profile</span>
-        <h3><a href="https://github.com/danforceDJ/ai-catalog/tree/main/agents/default" target="_blank" rel="noopener">default</a></h3>
-      </div>
-      <p class="description">Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.</p>
-      <div class="install">
-        <h4>Install</h4>
-        <div class="install-tabs">
-          <div class="install-block">
-            <span class="ide-label">All IDEs</span>
-            <div class="code-wrap">
-              <code class="oneliner">./scripts/install.sh agent default --project /path/to/project</code>
-              <button class="copy-btn" data-copy="./scripts/install.sh agent default --project /path/to/project" title="Copy">&#x2398;</button>
-            </div>
-          </div>
-        </div>
-        <a class="detail-link" href="https://github.com/danforceDJ/ai-catalog/blob/main/agents/default/AGENTS.md" target="_blank" rel="noopener">View agent profile &rarr;</a>
-      </div>
-    </div>
-    </div>
-  </section>
-
-  <section id="templates">
-    <h2>🗒️ Templates</h2>
-    <div class="cards">
-
-    <div class="card" id="template-default-pr-description">
-      <div class="card-header">
-        <span class="badge badge-template">Template</span>
-        <h3><a href="https://github.com/danforceDJ/ai-catalog/blob/main/templates/default-pr-description/TEMPLATE.md" target="_blank" rel="noopener">default-pr-description</a> <span class="version">v1.0.0</span></h3>
-      </div>
-      <p class="description">Standard pull request description template with summary, test plan, and checklist sections.</p>
-      <div class="install">
-        <h4>Install</h4>
-        <div class="install-tabs">
-          <div class="install-block">
-            <span class="ide-label">All IDEs</span>
-            <div class="code-wrap">
-              <code class="oneliner">./scripts/install.sh template default-pr-description --project /path/to/project</code>
-              <button class="copy-btn" data-copy="./scripts/install.sh template default-pr-description --project /path/to/project" title="Copy">&#x2398;</button>
-            </div>
-          </div>
-        </div>
-        <a class="detail-link" href="https://github.com/danforceDJ/ai-catalog/blob/main/templates/default-pr-description/TEMPLATE.md" target="_blank" rel="noopener">View template &rarr;</a>
-      </div>
-    </div>
-    </div>
-  </section>
+  </div>
+  <div id="cards" class="cards"></div>
+  <p id="empty-msg" class="empty" style="display:none">No matches.</p>
 </main>
-
-<footer>
-  Generated from <a href="https://github.com/danforceDJ/ai-catalog/blob/main/catalog.json" target="_blank" rel="noopener">catalog.json</a>
-  on 2026-04-19T19:52:26Z &mdash;
-  <a href="https://github.com/danforceDJ/ai-catalog" target="_blank" rel="noopener">danforceDJ/ai-catalog</a>
-</footer>
-
+<dialog id="raw-modal">
+  <h3 id="raw-title"></h3>
+  <pre id="raw-body"></pre>
+  <button id="raw-copy">Copy</button>
+  <button id="raw-close">Close</button>
+</dialog>
+<footer>Generated 2026-04-19T22:44:29Z &middot; <a href="https://github.com/danforceDJ/ai-catalog">GitHub</a></footer>
 <script>
-document.querySelectorAll('.copy-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    var text = btn.getAttribute('data-copy');
-    navigator.clipboard.writeText(text).then(function() {
-      var prev = btn.innerHTML;
-      btn.innerHTML = '&#x2713;';
-      btn.classList.add('copied');
-      setTimeout(function() {
-        btn.innerHTML = prev;
-        btn.classList.remove('copied');
-      }, 1500);
-    });
+const REPO_URL = "https://github.com/danforceDJ/ai-catalog";
+const CATALOG = {"generated_at": "2026-04-19T22:44:29Z", "plugins": [{"name": "atlassian-mcp", "description": "Atlassian Rovo MCP Server via OAuth 2.1 (SSO). No API tokens required in this repository.", "version": "1.0.0", "type": "mcp", "category": "integrations", "tags": ["atlassian", "mcp"], "keywords": ["atlassian", "jira", "confluence", "rovo", "mcp"], "components": {"skills": [], "agents": [], "commands": [], "mcpServers": ["atlassian"], "hooks": false}, "install": {"copilot": "atlassian-mcp@ai-catalog", "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19", "rawFiles": [], "zip": "dl/atlassian-mcp.zip", "repoPath": "plugins/atlassian-mcp"}}, {"name": "default-agent", "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.", "version": "1.0.0", "type": "agent", "category": "governance", "tags": ["default"], "keywords": ["agent", "conventions", "git", "security"], "components": {"skills": [], "agents": ["default"], "commands": [], "mcpServers": [], "hooks": false}, "install": {"copilot": "default-agent@ai-catalog", "vscodeMcpDeeplink": null, "rawFiles": ["agents/default.agent.md"], "zip": "dl/default-agent.zip", "repoPath": "plugins/default-agent"}}, {"name": "jira-ticket-from-code", "description": "Create Jira tickets from TODO/FIXME/BUG code comments by extracting intent and nearby implementation context.", "version": "1.0.0", "type": "skill", "category": "productivity", "tags": ["jira", "atlassian"], "keywords": ["jira", "tickets", "code-comments", "todo"], "components": {"skills": ["jira-ticket-from-code"], "agents": [], "commands": [], "mcpServers": [], "hooks": false}, "install": {"copilot": "jira-ticket-from-code@ai-catalog", "vscodeMcpDeeplink": null, "rawFiles": ["skills/jira-ticket-from-code/SKILL.md"], "zip": "dl/jira-ticket-from-code.zip", "repoPath": "plugins/jira-ticket-from-code"}}, {"name": "pr-description-prompt", "description": "Slash command that emits a standard PR description with summary, test plan, and checklist.", "version": "1.0.0", "type": "prompt", "category": "productivity", "tags": ["github", "prompt"], "keywords": ["pr", "pull-request", "prompt", "template"], "components": {"skills": [], "agents": [], "commands": ["pr-description"], "mcpServers": [], "hooks": false}, "install": {"copilot": "pr-description-prompt@ai-catalog", "vscodeMcpDeeplink": null, "rawFiles": ["commands/pr-description.md"], "zip": "dl/pr-description-prompt.zip", "repoPath": "plugins/pr-description-prompt"}}], "templates": [{"name": "solution-architecture", "description": "Reusable Solution Architecture document template with context, decisions, components, and risks sections.", "version": "1.0.0", "type": "template", "category": "architecture", "tags": ["architecture", "docs", "adr"], "keywords": ["solution", "architecture", "design"], "install": {"rawFiles": ["TEMPLATE.md"], "zip": "dl/solution-architecture.zip", "repoPath": "templates/solution-architecture"}}]};
+const ALL = [...CATALOG.plugins, ...CATALOG.templates];
+
+function scoreItem(item, q) {
+  if (!q) return 1;
+  q = q.toLowerCase();
+  const name = (item.name || '').toLowerCase();
+  const desc = (item.description || '').toLowerCase();
+  const kw = (item.keywords || []).map(k => String(k).toLowerCase());
+  const tags = (item.tags || []).map(t => String(t).toLowerCase());
+  let s = 0;
+  if (name.startsWith(q)) s += 3;
+  else if (name.includes(q)) s += 2;
+  if (kw.includes(q) || tags.includes(q)) s += 2;
+  if (desc.includes(q)) s += 1;
+  return s;
+}
+
+function badgeHtml(type) {
+  return `<span class="badge badge-${type}">${type}</span>`;
+}
+
+function versionHtml(v) {
+  return v ? `<span class="version">v${v}</span>` : '';
+}
+
+function installRow(item) {
+  const btns = [];
+  const inst = item.install || {};
+  if (inst.copilot) {
+    btns.push(`<button class="install-btn copilot-copy" data-copy="copilot plugin install ${inst.copilot}">Copy Copilot install</button>`);
+  }
+  if (inst.vscodeMcpDeeplink) {
+    btns.push(`<a class="install-btn" href="${inst.vscodeMcpDeeplink}">VSCode install</a>`);
+  }
+  if ((inst.rawFiles || []).length) {
+    const payload = encodeURIComponent(JSON.stringify({path: inst.repoPath, files: inst.rawFiles}));
+    btns.push(`<button class="install-btn" data-raw="${payload}">Copy raw</button>`);
+  }
+  if (inst.zip) {
+    btns.push(`<a class="install-btn" href="${inst.zip}" download>Download zip</a>`);
+  }
+  return `<div class="install-row">${btns.join('')}</div>`;
+}
+
+function renderCards(items) {
+  const cards = document.getElementById('cards');
+  cards.innerHTML = items.map(item => `
+    <div class="card">
+      <div class="card-header">
+        ${badgeHtml(item.type)}
+        <h3><a href="${REPO_URL}/tree/main/${item.install.repoPath}">${item.name}</a></h3>
+        ${versionHtml(item.version)}
+      </div>
+      <p class="description">${item.description || ''}</p>
+      ${installRow(item)}
+    </div>
+  `).join('');
+  document.getElementById('empty-msg').style.display = items.length ? 'none' : 'block';
+}
+
+function applyFilters() {
+  const q = document.getElementById('search-input').value.trim();
+  const type = document.querySelector('.type-tab.active').dataset.type;
+  const results = ALL
+    .map(item => ({item, score: scoreItem(item, q)}))
+    .filter(x => x.score > 0 && (type === 'all' || x.item.type === type))
+    .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name))
+    .map(x => x.item);
+  renderCards(results);
+  const url = new URL(location.href);
+  if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
+  if (type !== 'all') url.searchParams.set('type', type); else url.searchParams.delete('type');
+  history.replaceState(null, '', url);
+}
+
+let debounceTimer;
+document.getElementById('search-input').addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(applyFilters, 100);
+});
+document.querySelectorAll('.type-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    applyFilters();
   });
 });
-</script>
 
+document.addEventListener('click', async ev => {
+  const copyBtn = ev.target.closest('[data-copy]');
+  if (copyBtn) {
+    await navigator.clipboard.writeText(copyBtn.dataset.copy);
+    const prev = copyBtn.textContent;
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => { copyBtn.textContent = prev; }, 1500);
+    return;
+  }
+  const rawBtn = ev.target.closest('[data-raw]');
+  if (rawBtn) {
+    const info = JSON.parse(decodeURIComponent(rawBtn.dataset.raw));
+    const dlg = document.getElementById('raw-modal');
+    document.getElementById('raw-title').textContent = info.path + ' / ' + info.files[0];
+    const rawUrl = `${REPO_URL}/raw/main/${info.path}/${info.files[0]}`;
+    const text = await fetch(rawUrl).then(r => r.text()).catch(() => 'Fetch failed. Open ' + rawUrl);
+    document.getElementById('raw-body').textContent = text;
+    document.getElementById('raw-copy').onclick = () => navigator.clipboard.writeText(text);
+    document.getElementById('raw-close').onclick = () => dlg.close();
+    dlg.showModal();
+  }
+});
+
+const params = new URLSearchParams(location.search);
+if (params.get('q')) document.getElementById('search-input').value = params.get('q');
+if (params.get('type')) {
+  const t = params.get('type');
+  document.querySelectorAll('.type-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.type === t));
+}
+applyFilters();
+</script>
 </body>
 </html>

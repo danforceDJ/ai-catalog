@@ -2,38 +2,38 @@ name: Deploy Site
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: deploy-site
   cancel-in-progress: false
 
 jobs:
-  build-and-commit:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+
       - uses: astral-sh/setup-uv@v5
-      - name: Generate artefacts
+
+      - name: Generate Pages artefacts
         run: |
-          uv run --script scripts/generate_catalog.py
-          uv run --script scripts/generate_marketplace.py
           uv run --script scripts/generate_zips.py
           uv run --script scripts/generate_site.py
-      - name: Commit generated artefacts
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f catalog.json .github/plugin/marketplace.json docs/
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "chore: regenerate catalog [skip ci]"
-          git push
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
