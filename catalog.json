@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-04-19T06:17:01Z",
+  "mcp": [
+    {
+      "name": "atlassian",
+      "description": "The Atlassian Rovo MCP Server uses OAuth 2.1 (SSO). No API tokens are required in this repository.",
+      "path": "mcp/atlassian"
+    }
+  ],
+  "skills": [
+    {
+      "name": "jira-ticket-from-code",
+      "description": "Create Jira tickets from TODO/FIXME/BUG code comments by extracting intent and nearby implementation context.",
+      "version": "1.0.0",
+      "path": "skills/jira-ticket-from-code/SKILL.md"
+    }
+  ],
+  "agents": [
+    {
+      "name": "default",
+      "description": "- Follow the existing code style and project conventions.",
+      "path": "agents/default/AGENTS.md"
+    }
+  ]
+}
