@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cat <<'BANNER' >&2
+[install.sh] DEPRECATED: prefer `copilot plugin install <name>@ai-catalog`.
+             This fallback remains for users without Copilot CLI.
+BANNER
+
 usage() {
   cat <<'USAGE'
-Usage: ./scripts/install.sh <mcp|skill|agent|template> <name> [options]
+Usage: ./scripts/install.sh <mcp|skill|agent|prompt|template> <name> [options]
 
 Options:
   --ide vscode|jetbrains   Target IDE (default: vscode; applies to mcp type)
@@ -106,78 +111,64 @@ merge_mcp_json() {
 
 case "$TYPE" in
   mcp)
-    SOURCE="$ROOT_DIR/mcp/$NAME/vscode.mcp.json"
-    README_PATH="$ROOT_DIR/mcp/$NAME/README.md"
-
-    if [ ! -f "$README_PATH" ]; then
-      echo "MCP '$NAME' not found at mcp/$NAME"
-      exit 1
-    fi
+    SOURCE="$ROOT_DIR/plugins/$NAME/.mcp.json"
+    README_PATH="$ROOT_DIR/plugins/$NAME/README.md"
 
     if [ ! -f "$SOURCE" ]; then
-      echo "No vscode.mcp.json found for MCP '$NAME'"
+      echo "MCP plugin '$NAME' not found at plugins/$NAME/.mcp.json" >&2
       exit 1
     fi
 
     if [ "$IDE" = "vscode" ]; then
       if $GLOBAL; then
         TARGET="$(vscode_global_mcp_path)"
-        merge_mcp_json "$SOURCE" "$TARGET"
-        echo "Installed MCP '$NAME' into global VSCode config: $TARGET"
       else
         mkdir -p "$PROJECT_PATH/.vscode"
         TARGET="$PROJECT_PATH/.vscode/mcp.json"
-        merge_mcp_json "$SOURCE" "$TARGET"
-        echo "Installed MCP '$NAME' config into $TARGET"
       fi
+      merge_mcp_json "$SOURCE" "$TARGET"
+      echo "Installed MCP '$NAME' into $TARGET"
 
     elif [ "$IDE" = "jetbrains" ]; then
       JB_ROOT="$(jetbrains_config_root)"
-
       if [ "$(detect_os)" = "windows" ]; then
         echo "JetBrains MCP setup on Windows:"
         echo "  Config root: $JB_ROOT"
         echo "  Open Settings > Tools > AI Assistant > MCP and add a stdio server."
-        echo "  See $README_PATH for details."
+        [ -f "$README_PATH" ] && echo "  See $README_PATH for details."
         exit 0
       fi
-
       if [ ! -d "$JB_ROOT" ]; then
         echo "JetBrains config directory not found at $JB_ROOT"
-        echo "Manual setup: Settings > Tools > AI Assistant > MCP"
-        echo "See $README_PATH for details."
+        [ -f "$README_PATH" ] && echo "See $README_PATH for manual setup."
         exit 0
       fi
-
       installed_count=0
       while IFS= read -r ide_dir; do
-        TARGET="$ide_dir/mcp.json"
-        merge_mcp_json "$SOURCE" "$TARGET"
-        echo "Installed MCP '$NAME' into $TARGET"
+        merge_mcp_json "$SOURCE" "$ide_dir/mcp.json"
+        echo "Installed MCP '$NAME' into $ide_dir/mcp.json"
         installed_count=$((installed_count + 1))
       done < <(find "$JB_ROOT" -mindepth 1 -maxdepth 1 -type d \
         \( -name 'IntelliJIdea*' -o -name 'WebStorm*' -o -name 'PyCharm*' \
            -o -name 'GoLand*' -o -name 'CLion*' -o -name 'Rider*' \
            -o -name 'DataGrip*' -o -name 'RubyMine*' -o -name 'PhpStorm*' \) \
         2>/dev/null | sort)
-
       if [ "$installed_count" -eq 0 ]; then
         echo "No JetBrains IDE directories found under $JB_ROOT"
-        echo "Manual setup: Settings > Tools > AI Assistant > MCP"
-        echo "See $README_PATH for details."
+        [ -f "$README_PATH" ] && echo "See $README_PATH for details."
       fi
 
     else
-      echo "Unsupported IDE: $IDE"
+      echo "Unsupported IDE: $IDE" >&2
       exit 1
     fi
     ;;
 
   skill)
-    SOURCE_DIR="$ROOT_DIR/skills/$NAME"
+    SOURCE_DIR="$ROOT_DIR/plugins/$NAME/skills/$NAME"
 
     if [ ! -d "$SOURCE_DIR" ]; then
-      echo "Skill '$NAME' not found at skills/$NAME"
+      echo "Skill '$NAME' not found at plugins/$NAME/skills/$NAME" >&2
       exit 1
     fi
 
@@ -195,31 +186,51 @@ case "$TYPE" in
     ;;
 
   agent)
-    SOURCE_DIR="$ROOT_DIR/agents/$NAME"
-
-    if [ ! -d "$SOURCE_DIR" ]; then
-      echo "Agent profile '$NAME' not found at agents/$NAME"
+    AGENTS_DIR="$ROOT_DIR/plugins/$NAME/agents"
+    if [ ! -d "$AGENTS_DIR" ]; then
+      echo "Agent '$NAME' not found at plugins/$NAME/agents/" >&2
       exit 1
     fi
-
     if $GLOBAL; then
       TARGET_DIR="$HOME/.ai-catalog/agents/$NAME"
     else
       TARGET_DIR="$PROJECT_PATH/.agents/$NAME"
       mkdir -p "$PROJECT_PATH/.agents"
     fi
+    mkdir -p "$TARGET_DIR"
+    # Copy all *.agent.md files under the plugin's agents/ dir
+    cp "$AGENTS_DIR"/*.agent.md "$TARGET_DIR/" 2>/dev/null || {
+      echo "No *.agent.md files in $AGENTS_DIR" >&2
+      exit 1
+    }
+    echo "Installed agent '$NAME' into $TARGET_DIR"
+    ;;
 
-    mkdir -p "$(dirname "$TARGET_DIR")"
-    rm -rf "$TARGET_DIR"
-    cp -R "$SOURCE_DIR" "$TARGET_DIR"
-    echo "Installed agent profile '$NAME' into $TARGET_DIR"
+  prompt)
+    COMMANDS_DIR="$ROOT_DIR/plugins/$NAME/commands"
+    if [ ! -d "$COMMANDS_DIR" ]; then
+      echo "Prompt '$NAME' not found at plugins/$NAME/commands/" >&2
+      exit 1
+    fi
+    if $GLOBAL; then
+      TARGET_DIR="$HOME/.ai-catalog/prompts/$NAME"
+    else
+      TARGET_DIR="$PROJECT_PATH/.prompts/$NAME"
+      mkdir -p "$PROJECT_PATH/.prompts"
+    fi
+    mkdir -p "$TARGET_DIR"
+    cp "$COMMANDS_DIR"/*.md "$TARGET_DIR/" 2>/dev/null || {
+      echo "No command *.md files in $COMMANDS_DIR" >&2
+      exit 1
+    }
+    echo "Installed prompt '$NAME' into $TARGET_DIR"
     ;;
 
   template)
     SOURCE_DIR="$ROOT_DIR/templates/$NAME"
 
     if [ ! -d "$SOURCE_DIR" ]; then
-      echo "Template '$NAME' not found at templates/$NAME"
+      echo "Template '$NAME' not found at templates/$NAME" >&2
       exit 1
     fi
 
@@ -237,7 +248,7 @@ case "$TYPE" in
     ;;
 
   *)
-    echo "Unsupported type: $TYPE"
+    echo "Unsupported type: $TYPE" >&2
     usage
     exit 1
     ;;
