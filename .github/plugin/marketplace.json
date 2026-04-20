@@ -1,0 +1,101 @@
+{
+  "name": "ai-catalog",
+  "owner": {
+    "name": "danforceDJ",
+    "email": ""
+  },
+  "metadata": {
+    "description": "Company-wide AI configuration marketplace: MCP servers, skills, agent profiles, prompts.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "atlassian-mcp",
+      "source": "plugins/atlassian-mcp",
+      "description": "Atlassian Rovo MCP Server via OAuth 2.1 (SSO). No API tokens required in this repository.",
+      "version": "1.0.0",
+      "author": {
+        "name": "danforceDJ"
+      },
+      "license": "MIT",
+      "keywords": [
+        "atlassian",
+        "jira",
+        "confluence",
+        "rovo",
+        "mcp"
+      ],
+      "category": "integrations",
+      "tags": [
+        "atlassian",
+        "mcp"
+      ],
+      "mcpServers": ".mcp.json"
+    },
+    {
+      "name": "default-agent",
+      "source": "plugins/default-agent",
+      "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
+      "version": "1.0.0",
+      "author": {
+        "name": "danforceDJ"
+      },
+      "license": "MIT",
+      "keywords": [
+        "agent",
+        "conventions",
+        "git",
+        "security"
+      ],
+      "category": "governance",
+      "tags": [
+        "default"
+      ],
+      "agents": "agents"
+    },
+    {
+      "name": "jira-ticket-from-code",
+      "source": "plugins/jira-ticket-from-code",
+      "description": "Create Jira tickets from TODO/FIXME/BUG code comments by extracting intent and nearby implementation context.",
+      "version": "1.0.0",
+      "author": {
+        "name": "danforceDJ"
+      },
+      "license": "MIT",
+      "keywords": [
+        "jira",
+        "tickets",
+        "code-comments",
+        "todo"
+      ],
+      "category": "productivity",
+      "tags": [
+        "jira",
+        "atlassian"
+      ],
+      "skills": "skills"
+    },
+    {
+      "name": "pr-description-prompt",
+      "source": "plugins/pr-description-prompt",
+      "description": "Slash command that emits a standard PR description with summary, test plan, and checklist.",
+      "version": "1.0.0",
+      "author": {
+        "name": "danforceDJ"
+      },
+      "license": "MIT",
+      "keywords": [
+        "pr",
+        "pull-request",
+        "prompt",
+        "template"
+      ],
+      "category": "productivity",
+      "tags": [
+        "github",
+        "prompt"
+      ],
+      "commands": "commands"
+    }
+  ]
+}

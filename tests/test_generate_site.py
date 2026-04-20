@@ -15,7 +15,6 @@ def _load(name: str):
 
 
 SAMPLE_CATALOG = {
-    "generated_at": "2026-04-20T00:00:00Z",
     "plugins": [
         {
             "name": "sample-skill", "description": "A sample.", "version": "1.0.0",

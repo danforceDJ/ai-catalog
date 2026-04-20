@@ -5,6 +5,7 @@
 # ///
 """Render docs/index.html from catalog.json + Jinja template."""
 from __future__ import annotations
+import datetime as dt
 import json
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -41,8 +42,9 @@ def render_site(catalog: dict, out_path: Path, scripts_dir: Path | None = None) 
     )
     template = env.get_template("index.html.j2")
     catalog_json = json.dumps(catalog, ensure_ascii=False)
+    generated_at = dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     html = template.render(
-        generated_at=catalog.get("generated_at", ""),
+        generated_at=generated_at,
         repo_url=REPO_URL,
         repo_url_json=json.dumps(REPO_URL),
         catalog_json=catalog_json,
