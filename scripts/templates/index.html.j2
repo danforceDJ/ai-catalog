@@ -78,6 +78,7 @@
 <footer>Generated {{ generated_at }} &middot; <a href="{{ repo_url }}">GitHub</a></footer>
 <script>
 const REPO_URL = {{ repo_url_json | safe }};
+const RAW_BASE = REPO_URL.replace('https://github.com', 'https://raw.githubusercontent.com') + '/main';
 const CATALOG = {{ catalog_json | safe }};
 const ALL = [...CATALOG.plugins, ...CATALOG.templates];
 
@@ -181,7 +182,7 @@ document.addEventListener('click', async ev => {
     const info = JSON.parse(decodeURIComponent(rawBtn.dataset.raw));
     const dlg = document.getElementById('raw-modal');
     document.getElementById('raw-title').textContent = info.path + ' / ' + info.files[0];
-    const rawUrl = `${REPO_URL}/raw/main/${info.path}/${info.files[0]}`;
+    const rawUrl = `${RAW_BASE}/${info.path}/${info.files[0]}`;
     const text = await fetch(rawUrl).then(r => r.text()).catch(() => 'Fetch failed. Open ' + rawUrl);
     document.getElementById('raw-body').textContent = text;
     document.getElementById('raw-copy').onclick = () => navigator.clipboard.writeText(text);
