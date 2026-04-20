@@ -28,4 +28,4 @@ These instructions apply to agents working on this AI catalog repository.
   - Prompts (slash commands) go under `plugins/<name>/commands/<command-name>.md`.
   - MCP configs go in `plugins/<name>/.mcp.json`.
 - Add templates (raw-download-only) under `templates/<name>/TEMPLATE.md`.
-- CI regenerates `catalog.json`, `.github/plugin/marketplace.json`, and `docs/` on merge to main — do not commit these artefacts manually.
+- CI also regenerates `catalog.json`, `.github/plugin/marketplace.json`, and `docs/` on merge to main. For PRs, regenerate and commit the tracked artefacts (`catalog.json` and `.github/plugin/marketplace.json`) with your changes; `docs/` remains CI-managed.
