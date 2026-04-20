@@ -22,12 +22,27 @@ jobs:
 
       - name: Check catalog.json is up-to-date
         run: |
+          cp catalog.json /tmp/catalog.json.committed
           uv run --script scripts/generate_catalog.py
-          if ! git diff --exit-code catalog.json; then
-            echo ""
-            echo "ERROR: catalog.json is stale. Run 'uv run --script scripts/generate_catalog.py' locally and commit the result."
-            exit 1
-          fi
+          python - <<'PY'
+          import json
+          import sys
+          
+          def normalize_catalog(path):
+              with open(path, "r", encoding="utf-8") as f:
+                  data = json.load(f)
+              if isinstance(data, dict):
+                  data.pop("generated_at", None)
+              return data
+          
+          committed = normalize_catalog("/tmp/catalog.json.committed")
+          generated = normalize_catalog("catalog.json")
+          
+          if committed != generated:
+              print("")
+              print("ERROR: catalog.json is stale. Run 'uv run --script scripts/generate_catalog.py' locally and commit the result.")
+              sys.exit(1)
+          PY
 
       - name: Check marketplace.json is up-to-date
         run: |
