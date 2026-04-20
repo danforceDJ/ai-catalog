@@ -38,7 +38,7 @@ uv run --with pytest --with pyyaml --with jsonschema --with jinja2 -- pytest -q
 bash scripts/install.sh <mcp|skill|agent|prompt|template> <name> [--global]
 ```
 
-CI runs `validate_catalog.py` + `pytest` + a freshness check on every PR (GitHub Actions: `.github/workflows/validate-catalog.yml`; GitLab CI: `.gitlab-ci.yml`). The deploy workflow (`.github/workflows/deploy-site.yml`) generates `docs/` on push to main and deploys it to GitHub Pages via artifact — no direct git push to main.
+GitHub Actions runs `validate_catalog.py` + `pytest` + a freshness check on every PR (`.github/workflows/validate-catalog.yml`). GitLab CI (`.gitlab-ci.yml`) runs the bash generate/validate scripts. The deploy workflow (`.github/workflows/deploy-site.yml`) generates `docs/` on push to main and deploys it to GitHub Pages via artifact — no direct git push to main.
 
 ## Architecture
 
