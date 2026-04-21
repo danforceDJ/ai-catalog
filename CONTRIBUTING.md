@@ -2,6 +2,28 @@
 
 Thanks for contributing to the AI catalog.
 
+## Local development setup
+
+Install the pre-commit hooks once per clone — they auto-regenerate `catalog.json` and `.github/plugin/marketplace.json` on every commit so you never have to remember to do it manually:
+
+```bash
+uv tool install pre-commit
+pre-commit install
+```
+
+To run generators manually (outside of a commit):
+```bash
+uv run --script scripts/generate_catalog.py
+uv run --script scripts/generate_marketplace.py
+```
+
+To validate the catalog without committing:
+```bash
+uv run --script scripts/validate_catalog.py
+```
+
+> **Note:** The regeneration hook runs against the full working tree, not just your staged files. If you use `git add -p` (partial staging), regenerate manually and stage the result before committing.
+
 ## Adding a new plugin
 
 1. Create `plugins/<kebab-case-name>/plugin.json`. Required field: `name` (must match the directory name, kebab-case, ≤64 chars). Recommended: `description`, `version`, `author`, `keywords`, `category`, `tags`.
@@ -12,12 +34,11 @@ Thanks for contributing to the AI catalog.
    - **MCP** — `.mcp.json` in the Copilot `{"servers": {...}}` shape.
 3. Declare the component path(s) in `plugin.json` (`skills`, `agents`, `commands`, `mcpServers`). Defaults are `skills/`, `agents/`, `commands/`, `.mcp.json`.
 4. Run `uv run --script scripts/validate_catalog.py` locally — fix any errors.
-5. Regenerate tracked artefacts and commit them:
+5. Stage your files and commit. If you installed the pre-commit hook (see **Local development setup** above), `catalog.json` and `.github/plugin/marketplace.json` are regenerated and staged automatically. If you skipped hook setup, regenerate manually first:
    ```bash
    uv run --script scripts/generate_catalog.py
    uv run --script scripts/generate_marketplace.py
    git add catalog.json .github/plugin/marketplace.json
-   git commit -m "chore: regenerate catalog"
    ```
 6. Open a PR. CI validates and checks that the tracked artefacts match the generated output; on merge the deploy workflow publishes `docs/` to GitHub Pages.
 
