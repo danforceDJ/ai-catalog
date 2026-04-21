@@ -7,5 +7,5 @@
   "keywords": ["jira", "tickets", "code-comments", "todo"],
   "category": "productivity",
   "tags": ["jira", "atlassian"],
-  "skills": "skills"
+  "skills": ["jira-ticket-from-code"]
 }

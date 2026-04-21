@@ -24,6 +24,10 @@ def fake_repo(tmp_path, fixtures_dir):
     )
     scripts_link = tmp_path / "scripts"
     scripts_link.symlink_to(SCRIPTS)
+    for name in ("skills", "agents", "commands", "mcpServers"):
+        src = fixtures_dir / name
+        if src.exists():
+            (tmp_path / name).symlink_to(src)
     return tmp_path
 
 
@@ -101,3 +105,103 @@ def test_frontmatter_drift_is_warning_not_error(tmp_path, fixtures_dir):
     exit_code = v.run()
     assert any("drifts" in w for w in v.warnings)
     assert exit_code == 0, "drift must be a warning, not an error"
+
+
+def test_fixtures_pass_validation_with_top_level_dirs(fake_repo):
+    mod = _load("validate_catalog")
+    v = mod.Validator(fake_repo)
+    exit_code = v.run()
+    assert v.errors == [], f"unexpected errors: {v.errors}"
+    assert exit_code == 0
+
+
+def test_list_ref_missing_skill_fails(tmp_path, fixtures_dir):
+    mod = _load("validate_catalog")
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    (tmp_path / "scripts").symlink_to(SCRIPTS)
+    bad = tmp_path / "plugins" / "fixture-bad-ref"
+    bad.mkdir()
+    (bad / "plugin.json").write_text(json.dumps({
+        "name": "fixture-bad-ref",
+        "skills": ["nonexistent-skill"],
+    }))
+    v = mod.Validator(tmp_path)
+    v.run()
+    assert any("nonexistent-skill" in e for e in v.errors)
+
+
+def test_list_ref_missing_agent_fails(tmp_path, fixtures_dir):
+    mod = _load("validate_catalog")
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    (tmp_path / "scripts").symlink_to(SCRIPTS)
+    bad = tmp_path / "plugins" / "fixture-bad-agent-ref"
+    bad.mkdir()
+    (bad / "plugin.json").write_text(json.dumps({
+        "name": "fixture-bad-agent-ref",
+        "agents": ["ghost-agent"],
+    }))
+    v = mod.Validator(tmp_path)
+    v.run()
+    assert any("ghost-agent" in e for e in v.errors)
+
+
+def test_list_ref_missing_command_fails(tmp_path, fixtures_dir):
+    mod = _load("validate_catalog")
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    (tmp_path / "scripts").symlink_to(SCRIPTS)
+    bad = tmp_path / "plugins" / "fixture-bad-cmd-ref"
+    bad.mkdir()
+    (bad / "plugin.json").write_text(json.dumps({
+        "name": "fixture-bad-cmd-ref",
+        "commands": ["ghost-cmd"],
+    }))
+    v = mod.Validator(tmp_path)
+    v.run()
+    assert any("ghost-cmd" in e for e in v.errors)
+
+
+def test_list_ref_missing_mcp_fails(tmp_path, fixtures_dir):
+    mod = _load("validate_catalog")
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    (tmp_path / "scripts").symlink_to(SCRIPTS)
+    bad = tmp_path / "plugins" / "fixture-bad-mcp-ref"
+    bad.mkdir()
+    (bad / "plugin.json").write_text(json.dumps({
+        "name": "fixture-bad-mcp-ref",
+        "mcpServers": ["ghost-mcp"],
+    }))
+    v = mod.Validator(tmp_path)
+    v.run()
+    assert any("ghost-mcp" in e for e in v.errors)
+
+
+def test_standalone_skill_missing_description_fails(tmp_path, fixtures_dir):
+    mod = _load("validate_catalog")
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    (tmp_path / "scripts").symlink_to(SCRIPTS)
+    skills_dir = tmp_path / "skills" / "no-desc-skill"
+    skills_dir.mkdir(parents=True)
+    (skills_dir / "SKILL.md").write_text("---\nname: no-desc-skill\n---\nbody")
+    v = mod.Validator(tmp_path)
+    v.run()
+    assert any("description" in e for e in v.errors)
+
+
+def test_standalone_mcp_secret_scan_fails(tmp_path, fixtures_dir):
+    mod = _load("validate_catalog")
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    (tmp_path / "scripts").symlink_to(SCRIPTS)
+    mcp_dir = tmp_path / "mcpServers" / "leaky-top-mcp"
+    mcp_dir.mkdir(parents=True)
+    (mcp_dir / ".mcp.json").write_text(json.dumps({
+        "servers": {"leaky": {"command": "echo", "env": {"API_TOKEN": "ghp_" + "a" * 36}}}
+    }))
+    v = mod.Validator(tmp_path)
+    v.run()
+    assert any("secret" in e.lower() or "ghp_" in e for e in v.errors)

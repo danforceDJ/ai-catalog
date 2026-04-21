@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "fixture-top-server": {
+      "command": "echo",
+      "args": ["top"]
+    }
+  }
+}

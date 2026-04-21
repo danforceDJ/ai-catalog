@@ -7,5 +7,5 @@
   "keywords": ["atlassian", "jira", "confluence", "rovo", "mcp"],
   "category": "integrations",
   "tags": ["atlassian", "mcp"],
-  "mcpServers": ".mcp.json"
+  "mcpServers": ["atlassian"]
 }
