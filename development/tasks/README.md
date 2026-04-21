@@ -30,8 +30,8 @@ The `danforceDJ/ai-catalog` repo already has:
 
 | Gap | Priority | User Stories |
 |---|---|---|
-| No `instructions/` type (auto-applied coding standards) | P2 | US-207 |
-| No `hooks/` type (agentic session hooks) | P2 | US-208 |
+| No `instructions/` type (auto-applied coding standards) | P1 | US-207 |
+| No `hooks/` type (agentic session hooks) | P1 | US-208 |
 | No scaffolding command for new plugins/skills | P2 | US-402 |
 | No `llms.txt` / machine-readable catalog for AI agents | P2 | US-403 |
 | Web marketplace lacks category/tag filtering | P2 | US-404 |
@@ -51,33 +51,34 @@ The `danforceDJ/ai-catalog` repo already has:
 **Files:** `scripts/validate_catalog.py`
 
 **Description:**  
-Currently `type` is inferred from which component sub-paths exist. The field is present in `catalog.json` output but not validated against a fixed enum at schema level. This means a typo like `"type": "skilll"` silently passes.
+Currently `type` is inferred from which component sub-paths exist. The field is present in `catalog.json` output but not validated against a fixed enum at schema level. This means a typo like `"type": "skilll"` silently passes. Because `plugin.json` exists only for plugins, the enum should be limited to plugin types; templates under `templates/` are out of scope for this field. To avoid changing generation behavior, `plugin.json.type` should be validated as a required consistency check against the type already derived from plugin structure.
 
 **Steps:**
-1. Define the valid enum: `["skill", "agent", "prompt", "mcp", "bundle", "template"]`.
-2. In `validate_catalog.py`, after loading `plugin.json`, assert `type` is present and in the enum.
-3. Add a test fixture with an invalid `type` value and assert validation fails.
+1. Define the valid enum for `plugin.json` as: `["skill", "agent", "prompt", "mcp", "bundle"]`.
+2. In `validate_catalog.py`, after loading `plugin.json`, assert `type` is present, is in the enum, and matches the type derived from the plugin's component sub-paths.
+3. Add test fixtures that cover both an invalid `type` value and a valid-but-inconsistent declared `type`, and assert validation fails in each case.
 4. Run `uv run --with pytest --with pyyaml --with jsonschema --with jinja2 -- pytest -q` — all tests must pass.
 
-**Done when:** `validate_catalog.py` exits non-zero with a clear message if `type` is missing or invalid.
+**Done when:** `validate_catalog.py` exits non-zero with a clear message if `type` is missing, invalid, or inconsistent with the plugin's derived type.
 
 ---
 
-### TASK-102 — Make SKILL.md frontmatter drift a hard error for `version` mismatches
+### TASK-102 — Make SKILL.md frontmatter drift a hard error for `name` mismatches
 
 **User stories:** US-301, US-501  
 **Files:** `scripts/validate_catalog.py`
 
 **Description:**  
-SKILL.md frontmatter `name` and `version` drift vs. `plugin.json` is currently a warning. The `name` field is especially important — a mismatch means the Copilot CLI installs a skill under the wrong name. Promote `name` drift to a hard error.
+SKILL.md frontmatter `name` and `version` can drift vs. `plugin.json`. The `name` field is especially important — a mismatch means the Copilot CLI installs a skill under the wrong name. Add a `name` drift check and make `name` drift a hard error. Keep `version` drift as a warning.
 
 **Steps:**
-1. In `validate_catalog.py`, change the `name` drift check from `warn` to `error` (non-zero exit).
-2. Keep `version` drift as a warning (version bumping is a common lag).
-3. Update the relevant test fixtures to match.
-4. Run full test suite.
+1. In `validate_catalog.py`, add a check that compares SKILL.md frontmatter `name` against the expected skill folder name.
+2. Treat `name` drift as an `error` (non-zero exit).
+3. Keep `version` drift as a warning (version bumping is a common lag).
+4. Update the relevant test fixtures to cover `name` drift as a validation failure and `version` drift as a warning-only case.
+5. Run full test suite.
 
-**Done when:** Validation exits non-zero if SKILL.md `name` != the skill folder name.
+**Done when:** Validation exits non-zero if SKILL.md `name` != the skill folder name, while `version` drift remains warning-only.
 
 ---
 
@@ -92,9 +93,9 @@ SKILL.md frontmatter `name` and `version` drift vs. `plugin.json` is currently a
 **Steps:**
 1. In `validate_catalog.py`, warn if `plugin.json` is missing `author.name`.
 2. Add `author` to the example `plugin.json` in `CONTRIBUTING.md`.
-3. Add `author` to all existing plugin `plugin.json` files that are missing it.
+3. Update contributor guidance so future plugin submissions include `author.name` rather than implying existing plugins need cleanup.
 
-**Done when:** All existing plugins have `author.name`; missing `author` produces a validation warning.
+**Done when:** Missing `author.name` produces a validation warning, and `CONTRIBUTING.md` clearly shows and recommends `author.name` for new plugins.
 
 ---
 

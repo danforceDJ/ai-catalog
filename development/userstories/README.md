@@ -176,7 +176,7 @@
 
 **As a** tech lead,  
 **I want to** publish company coding standards as `.instructions.md` files (à la `awesome-copilot`),  
-**so that** Copilot automatically applies them to files matching a given pattern (e.g., `**.ts`, `**.py`) without any developer action.
+**so that** Copilot automatically applies them to files matching a given pattern (e.g., `**/*.ts`, `**/*.py`) without any developer action.
 
 **Acceptance criteria:**
 - A new top-level `instructions/<name>/` folder supports `.instructions.md` files (follows the same flat layout as `skills/`, `agents/`, etc.).
