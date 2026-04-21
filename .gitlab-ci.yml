@@ -6,7 +6,9 @@ validate:
   stage: validate
   image: alpine:latest
   before_script:
-    - apk add --no-cache bash jq
+    - apk add --no-cache bash jq curl python3
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - source $HOME/.local/bin/env
   script:
     - chmod +x scripts/generate-catalog.sh scripts/validate-catalog.sh
     - ./scripts/generate-catalog.sh
@@ -18,7 +20,9 @@ pages:
   stage: pages
   image: alpine:latest
   before_script:
-    - apk add --no-cache bash jq
+    - apk add --no-cache bash jq curl python3
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - source $HOME/.local/bin/env
   script:
     - chmod +x scripts/generate-catalog.sh scripts/generate-site.sh
     - ./scripts/generate-catalog.sh

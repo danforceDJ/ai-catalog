@@ -1,0 +1,16 @@
+repos:
+  - repo: local
+    hooks:
+      - id: regenerate-catalog
+        name: Regenerate catalog + marketplace manifest
+        entry: scripts/hooks/regenerate-catalog.sh
+        language: script
+        pass_filenames: false
+        files: ^(plugins/.*|templates/.*|marketplace\.config\.json$)
+
+      - id: validate-catalog
+        name: Validate catalog
+        entry: scripts/hooks/validate-catalog.sh
+        language: script
+        pass_filenames: false
+        files: ^(plugins/.*|templates/.*|marketplace\.config\.json|catalog\.json|\.github/plugin/marketplace\.json)$

@@ -14,7 +14,6 @@ import yaml
 from jsonschema import Draft202012Validator
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SCHEMA_DIR = Path(__file__).resolve().parent / "schemas"
 KEBAB_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 SECRET_PATTERNS = [
@@ -24,6 +23,70 @@ SECRET_PATTERNS = [
     re.compile(r"ghu_[A-Za-z0-9]{36}"),
     re.compile(r"\"API_TOKEN\"\s*:\s*\"[^\"]{8,}\""),
 ]
+
+# JSON schemas embedded directly (previously in scripts/schemas/)
+PLUGIN_SCHEMA = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Copilot CLI plugin.json",
+    "type": "object",
+    "required": ["name"],
+    "properties": {
+        "name": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64},
+        "description": {"type": "string", "maxLength": 1024},
+        "version": {"type": "string"},
+        "author": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+                "name": {"type": "string"},
+                "email": {"type": "string"},
+                "url": {"type": "string"}
+            }
+        },
+        "homepage": {"type": "string"},
+        "repository": {"type": "string"},
+        "license": {"type": "string"},
+        "keywords": {"type": "array", "items": {"type": "string"}},
+        "category": {"type": "string"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "agents": {"type": ["string", "array"]},
+        "skills": {"type": ["string", "array"]},
+        "commands": {"type": ["string", "array"]},
+        "hooks": {"type": ["string", "object"]},
+        "mcpServers": {"type": ["string", "object"]},
+        "lspServers": {"type": ["string", "object"]}
+    },
+    "additionalProperties": True
+}
+
+MARKETPLACE_SCHEMA = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Copilot CLI marketplace.json",
+    "type": "object",
+    "required": ["name", "owner", "plugins"],
+    "properties": {
+        "name": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64},
+        "owner": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {"name": {"type": "string"}, "email": {"type": "string"}}
+        },
+        "metadata": {"type": "object"},
+        "plugins": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["name", "source"],
+                "properties": {
+                    "name": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64},
+                    "source": {"type": ["string", "object"]}
+                },
+                "additionalProperties": True
+            }
+        }
+    },
+    "additionalProperties": True
+}
 
 
 def parse_frontmatter(text: str) -> dict:
@@ -46,15 +109,8 @@ class Validator:
         self.repo = repo
         self.errors: list[str] = []
         self.warnings: list[str] = []
-        schema_dir = repo / "scripts" / "schemas"
-        if not schema_dir.is_dir():
-            schema_dir = SCHEMA_DIR
-        self.plugin_validator = Draft202012Validator(
-            json.loads((schema_dir / "plugin.schema.json").read_text())
-        )
-        self.marketplace_validator = Draft202012Validator(
-            json.loads((schema_dir / "marketplace.schema.json").read_text())
-        )
+        self.plugin_validator = Draft202012Validator(PLUGIN_SCHEMA)
+        self.marketplace_validator = Draft202012Validator(MARKETPLACE_SCHEMA)
 
     def fail(self, msg: str) -> None:
         self.errors.append(msg)
