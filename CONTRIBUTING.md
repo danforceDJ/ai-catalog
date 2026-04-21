@@ -7,8 +7,7 @@ Thanks for contributing to the AI catalog.
 Install the pre-commit hooks once per clone — they auto-regenerate `catalog.json` and `.github/plugin/marketplace.json` on every commit so you never have to remember to do it manually:
 
 ```bash
-uv tool install pre-commit
-pre-commit install
+uv run --with pre-commit pre-commit install
 ```
 
 To run generators manually (outside of a commit):
