@@ -12,15 +12,19 @@ Each task maps to one or more user stories. Tasks are ordered by priority (P1 = 
 
 The `danforceDJ/ai-catalog` repo already has:
 
-- ✅ Plugin structure: `plugins/<name>/plugin.json` + skill/agent/command/MCP sub-paths
+- ✅ Plugin structure: `plugins/<name>/plugin.json` referencing top-level primitives by name list
+- ✅ **Flat top-level layout**: standalone `skills/`, `agents/`, `commands/`, `mcpServers/` directories
+- ✅ Backward-compatible embedded skill sub-paths inside `plugins/<name>/` still supported
 - ✅ Python generator scripts (`generate_catalog.py`, `generate_marketplace.py`, `generate_site.py`)
-- ✅ Validation script (`validate_catalog.py`) with secret scanning
+- ✅ Validation script (`validate_catalog.py`) with secret scanning (now extended to `mcpServers/`)
 - ✅ GitHub Actions CI (validate + deploy-site)
 - ✅ GitLab CI with bash wrapper scripts
 - ✅ Pre-commit hook via `.pre-commit-config.yaml`
-- ✅ Web marketplace (GitHub Pages)
+- ✅ Web marketplace (GitHub Pages) with bundle badge support
 - ✅ Copilot CLI marketplace manifest (`.github/plugin/marketplace.json`)
-- ✅ 4 example plugins + 1 template
+- ✅ 5 plugins (including `value-stream-1-default` bundle) + 1 template + 3 standalone skills
+- ✅ Bundle plugin type detected (`type: "bundle"`) and displayed in marketplace with distinct badge
+- ✅ List-reference `plugin.json` validation: missing referenced primitive = hard error
 
 **Gaps vs. user stories and awesome-copilot:**
 
@@ -28,14 +32,14 @@ The `danforceDJ/ai-catalog` repo already has:
 |---|---|---|
 | No `instructions/` type (auto-applied coding standards) | P2 | US-207 |
 | No `hooks/` type (agentic session hooks) | P2 | US-208 |
-| No scaffolding command for new plugins | P2 | US-402 |
+| No scaffolding command for new plugins/skills | P2 | US-402 |
 | No `llms.txt` / machine-readable catalog for AI agents | P2 | US-403 |
 | Web marketplace lacks category/tag filtering | P2 | US-404 |
 | No onboarding cookbook or learning hub equivalent | P3 | US-401 |
 | `plugin.json` `type` field inferred, not enforced as enum | P1 | US-501 |
-| Bundle plugin type not explicitly shown in marketplace UI | P2 | US-206 |
 | Drift check between SKILL.md frontmatter and plugin.json is warn-only | P2 | US-301 |
 | VS Code deeplink only generated for MCP — not for agent/skill/prompt | P2 | US-103 |
+| Top-level standalone skills/agents/commands not installable via Copilot CLI (no plugin wrapper) | P2 | US-102 |
 
 ---
 
@@ -99,18 +103,18 @@ SKILL.md frontmatter `name` and `version` drift vs. `plugin.json` is currently a
 ### TASK-201 — Add `instructions/` content type (auto-applied coding standards)
 
 **User stories:** US-207  
-**Files:** `scripts/validate_catalog.py`, `scripts/generate_catalog.py`, `scripts/generate_marketplace.py`, `CONTRIBUTING.md`, `plugins/<name>/instructions/`
+**Files:** `scripts/validate_catalog.py`, `scripts/generate_catalog.py`, `scripts/generate_marketplace.py`, `CONTRIBUTING.md`, `instructions/<name>/`
 
 **Description:**  
-Modeled after `awesome-copilot`'s `instructions/` folder. Each instruction file is a `.instructions.md` with `applyTo` and `description` frontmatter. They are scoped inside a plugin so they can be installed as a unit.
+Modeled after `awesome-copilot`'s `instructions/` folder. Each instruction file is a `.instructions.md` with `applyTo` and `description` frontmatter. Following the new flat top-level layout, instructions live at `instructions/<name>/` in the repo root (not nested inside a plugin folder).
 
 **Steps:**
-1. Define the sub-path convention: `plugins/<name>/instructions/<name>.instructions.md`.
+1. Define the top-level convention: `instructions/<name>/<name>.instructions.md`.
 2. Update `validate_catalog.py` to discover and validate instruction files (required: `description`, `applyTo`; filename must match frontmatter `name` if present).
-3. Update `generate_catalog.py` to include instructions in the catalog index.
+3. Update `generate_catalog.py` to scan `instructions/` and include them in the catalog index.
 4. Update `generate_marketplace.py` to expose instructions as raw file install targets.
 5. Update `CONTRIBUTING.md` with an "Adding Instructions" section.
-6. Create a sample plugin with at least one instruction (e.g., `plugins/typescript-standards/instructions/typescript.instructions.md`).
+6. Create a sample instruction file (e.g., `instructions/typescript-standards/typescript.instructions.md`).
 7. Run full test suite.
 
 **Done when:** Instructions appear in `catalog.json`, are installable via Copilot CLI, and validation enforces their schema.
@@ -120,20 +124,19 @@ Modeled after `awesome-copilot`'s `instructions/` folder. Each instruction file 
 ### TASK-202 — Add `hooks/` content type (agentic session hooks)
 
 **User stories:** US-208  
-**Files:** `scripts/validate_catalog.py`, `scripts/generate_catalog.py`, `CONTRIBUTING.md`, `plugins/<name>/hooks/`
+**Files:** `scripts/validate_catalog.py`, `scripts/generate_catalog.py`, `CONTRIBUTING.md`, `hooks/<name>/`
 
 **Description:**  
-Modeled after `awesome-copilot`'s `hooks/` type. Each hook is a folder inside a plugin containing a `hooks.json` and a `README.md` with frontmatter.
+Modeled after `awesome-copilot`'s `hooks/` type. Following the flat top-level layout, hooks live at `hooks/<name>/` in the repo root, each containing a `hooks.json` and a `README.md` with frontmatter.
 
 **Steps:**
-1. Define the sub-path convention: `plugins/<name>/hooks/<hook-name>/hooks.json` + `README.md`.
-2. Update `validate_catalog.py` to discover hook folders and validate required fields (`name`, `description` in README.md frontmatter; valid JSON in `hooks.json`).
-3. Update `generate_catalog.py` to include hooks in the catalog index.
+1. Define the top-level convention: `hooks/<hook-name>/hooks.json` + `README.md`.
+2. Update `validate_catalog.py` to discover hook folders at `hooks/` and validate required fields (`name`, `description` in README.md frontmatter; valid JSON in `hooks.json`).
+3. Update `generate_catalog.py` to scan `hooks/` and include hooks in the catalog index.
 4. Update `generate_marketplace.py` to expose hook folders as zip-install targets.
-5. Update `plugin.json` schema to include `hooks: true/false` or a list of hook names.
-6. Update `CONTRIBUTING.md` with an "Adding Hooks" section.
-7. Create one sample hook plugin.
-8. Run full test suite.
+5. Update `CONTRIBUTING.md` with an "Adding Hooks" section.
+6. Create one sample hook (e.g., `hooks/lint-on-save/`).
+7. Run full test suite.
 
 **Done when:** Hook plugins validate, appear in `catalog.json`, and can be installed via CLI.
 
@@ -141,25 +144,29 @@ Modeled after `awesome-copilot`'s `hooks/` type. Each hook is a folder inside a 
 
 ## P2 Tasks — Developer Experience
 
-### TASK-301 — Scaffolding script for new plugins
+### TASK-301 — Scaffolding script for new plugins and standalone primitives
 
 **User stories:** US-402  
 **Files:** `scripts/scaffold_plugin.py` (new), `CONTRIBUTING.md`
 
 **Description:**  
-A `uv`-runnable Python script that creates the boilerplate directory and file structure for a new plugin. Inspired by `awesome-copilot`'s `npm run plugin:create` and `npm run skill:create` commands.
+A `uv`-runnable Python script that creates the boilerplate directory and file structure for a new catalog item. Following the flat top-level layout, standalone skills/agents/commands/MCP configs are scaffolded at their top-level directory; bundle plugins are scaffolded under `plugins/<name>/`. Inspired by `awesome-copilot`'s `npm run plugin:create` and `npm run skill:create` commands.
 
 **Steps:**
 1. Create `scripts/scaffold_plugin.py` as a PEP 723 single-file script.
 2. Accept `--name <kebab-case-name>` and `--type <skill|agent|prompt|mcp|bundle>` arguments.
-3. Generate:
-   - `plugins/<name>/plugin.json` with all required fields and placeholders.
-   - The appropriate sub-path file(s): `SKILL.md`, `.agent.md`, command `.md`, or `.mcp.json`.
-4. After generation, print the next steps (run validation, fill placeholders, commit).
-5. Add usage instructions to `CONTRIBUTING.md`.
-6. Write a test that runs the script and asserts the expected files are created.
+3. Generate for standalone types:
+   - `skill` → `skills/<name>/SKILL.md` with frontmatter placeholders.
+   - `agent` → `agents/<name>.agent.md` with frontmatter placeholders.
+   - `prompt` → `commands/<name>.md` with frontmatter placeholders.
+   - `mcp` → `mcpServers/<name>/.mcp.json` with `{"servers": {}}` shell.
+4. Generate for `bundle`:
+   - `plugins/<name>/plugin.json` with `"skills": []`, `"mcpServers": []` placeholders and all required fields.
+5. After generation, print the next steps (run validation, fill placeholders, add a plugin wrapper if needed, commit).
+6. Add usage instructions to `CONTRIBUTING.md`.
+7. Write a test that runs the script and asserts the expected files are created.
 
-**Done when:** `uv run --script scripts/scaffold_plugin.py --name my-skill --type skill` creates a valid, validatable plugin skeleton.
+**Done when:** `uv run --script scripts/scaffold_plugin.py --name my-skill --type skill` creates `skills/my-skill/SKILL.md` as a valid, validatable skeleton; `--type bundle` creates `plugins/<name>/plugin.json`.
 
 ---
 
@@ -221,21 +228,17 @@ Currently `vscodeMcpDeeplink` is only generated for MCP plugins. Extend to gener
 
 ---
 
-### TASK-305 — Bundle plugin type — explicit marketplace UI treatment
+### TASK-305 — Bundle plugin type — explicit marketplace UI treatment ✅ Done
 
 **User stories:** US-206  
-**Files:** `scripts/generate_catalog.py`, `scripts/generate_site.py`
+**Status:** Completed as part of the flat top-level structure redesign.
 
-**Description:**  
-Bundles (plugins with ≥2 component types) are currently labeled as their primary type. Make bundles explicitly labeled as "bundle" in the marketplace so developers understand they're getting multiple components.
+- `generate_catalog.py` detects ≥2 component types and emits `type: "bundle"`.
+- The site Jinja template renders a `badge-bundle` chip on bundle cards.
+- A "Bundles" tab appears in the type-filter bar.
+- The reference bundle `plugins/value-stream-1-default/` (skills + MCP) is live in the catalog.
 
-**Steps:**
-1. In `generate_catalog.py`, detect when a plugin has ≥2 component types and set `type: "bundle"`.
-2. Update the site template to render a "Bundle" badge on bundle cards, listing component types.
-3. Add a "bundle" category to the filter UI (TASK-303).
-4. Create a sample bundle plugin (e.g., `plugins/jira-workflow-bundle/` with a skill + MCP).
-
-**Done when:** Bundle plugins display a distinct badge in the marketplace and can be filtered by type "bundle".
+No further action needed.
 
 ---
 
@@ -262,17 +265,18 @@ Publish the company's existing coding standards (TypeScript, Python, Java, etc.)
 ### TASK-402 — Add Slack / Teams MCP plugin
 
 **User stories:** US-204  
-**Files:** `plugins/slack-mcp/` or `plugins/teams-mcp/`
+**Files:** `mcpServers/slack/` (or `mcpServers/teams/`), `plugins/slack-mcp/plugin.json`
 
 **Description:**  
-Add MCP server configurations for the company's internal messaging platforms (Slack or Microsoft Teams). This enables Copilot to send notifications, look up users, and post to channels during agent sessions.
+Add MCP server configurations for the company's internal messaging platforms (Slack or Microsoft Teams). Following the flat top-level layout, the MCP config lives at `mcpServers/slack/.mcp.json` and a thin plugin wrapper at `plugins/slack-mcp/plugin.json` makes it installable via Copilot CLI.
 
 **Steps:**
 1. Identify the correct MCP server package (e.g., `@modelcontextprotocol/server-slack`).
 2. Configure OAuth/SSO — no tokens hard-coded.
-3. Create `plugins/slack-mcp/.mcp.json` and `plugin.json`.
-4. Test the install flow via `copilot plugin install slack-mcp@ai-catalog`.
-5. Validate and publish via PR.
+3. Create `mcpServers/slack/.mcp.json` with `{"servers": {"slack": {...}}}`.
+4. Create `plugins/slack-mcp/plugin.json` with `"mcpServers": ["slack"]`.
+5. Test the install flow via `copilot plugin install slack-mcp@ai-catalog`.
+6. Validate and publish via PR.
 
 **Done when:** Slack/Teams MCP plugin is in the catalog, uses OAuth, and passes secret scanning.
 
@@ -281,16 +285,17 @@ Add MCP server configurations for the company's internal messaging platforms (Sl
 ### TASK-403 — Add GitHub MCP plugin
 
 **User stories:** US-204  
-**Files:** `plugins/github-mcp/`
+**Files:** `mcpServers/github/`, `plugins/github-mcp/plugin.json`
 
 **Description:**  
-Add the official GitHub MCP server so developers can use Copilot to query PRs, issues, and repositories programmatically.
+Add the official GitHub MCP server so developers can use Copilot to query PRs, issues, and repositories programmatically. The MCP config goes in `mcpServers/github/.mcp.json`; a thin wrapper plugin at `plugins/github-mcp/plugin.json` exposes it via Copilot CLI.
 
 **Steps:**
 1. Use the official GitHub MCP server (`@github/mcp-server`).
 2. Configure with OAuth or GitHub App — no PATs hard-coded.
-3. Create `plugin.json` and `.mcp.json`.
-4. Validate and publish.
+3. Create `mcpServers/github/.mcp.json` with `{"servers": {"github": {...}}}`.
+4. Create `plugins/github-mcp/plugin.json` with `"mcpServers": ["github"]`.
+5. Validate and publish.
 
 **Done when:** `copilot plugin install github-mcp@ai-catalog` installs the GitHub MCP server correctly.
 
@@ -299,15 +304,16 @@ Add the official GitHub MCP server so developers can use Copilot to query PRs, i
 ### TASK-404 — Add code review agent profile
 
 **User stories:** US-202  
-**Files:** `plugins/code-review-agent/agents/code-review.agent.md`
+**Files:** `agents/code-review.agent.md`, `plugins/code-review-agent/plugin.json`
 
 **Description:**  
-A specialized agent profile for code review tasks: checks for security issues, enforces naming conventions, checks test coverage, and summarizes changes in a structured format.
+A specialized agent profile for code review tasks: checks for security issues, enforces naming conventions, checks test coverage, and summarizes changes in a structured format. Following the flat top-level layout, the agent file lives at `agents/code-review.agent.md`; the plugin wrapper makes it installable via Copilot CLI.
 
 **Steps:**
 1. Write `agents/code-review.agent.md` with `tools`, `model`, and `description` frontmatter.
 2. Reference relevant company coding standards (link to instructions plugin once TASK-401 is done).
-3. Validate and publish.
+3. Create `plugins/code-review-agent/plugin.json` with `"agents": ["code-review"]`.
+4. Validate and publish.
 
 **Done when:** The agent profile is installable and activates in Copilot Chat with the correct persona.
 
@@ -381,7 +387,7 @@ A utility script that reads a subset of `github/awesome-copilot` content (agents
 | TASK-302 `llms.txt` generation | P2 | US-403 | ⬜ Todo |
 | TASK-303 Category/tag filtering in UI | P2 | US-404 | ⬜ Todo |
 | TASK-304 VS Code deeplinks for agents/skills | P2 | US-103 | ⬜ Todo |
-| TASK-305 Bundle badge in marketplace | P2 | US-206 | ⬜ Todo |
+| TASK-305 Bundle badge in marketplace | P2 | US-206 | ✅ Done |
 | TASK-401 Coding standards Instructions plugin | P2 | US-207 | ⬜ Todo |
 | TASK-402 Slack/Teams MCP plugin | P2 | US-204 | ⬜ Todo |
 | TASK-403 GitHub MCP plugin | P2 | US-204 | ⬜ Todo |

@@ -12,7 +12,8 @@
 
 | Concept | awesome-copilot | ai-catalog (company) |
 |---|---|---|
-| Content types | agents, instructions, skills, plugins, hooks, agentic workflows | skills, agents, prompts (commands), MCP servers, templates |
+| Content types | agents, instructions, skills, plugins, hooks, agentic workflows | skills, agents, prompts (commands), MCP servers, templates, bundles |
+| Directory layout | flat top-level (`agents/`, `skills/`, `instructions/`, `hooks/`) | **flat top-level** (`skills/`, `agents/`, `commands/`, `mcpServers/`) + bundle manifests in `plugins/` |
 | Discoverability | public website + llms.txt + npm build pipeline | GitHub Pages + Copilot CLI plugin format |
 | Install method | `copilot plugin install <name>@awesome-copilot` | `copilot plugin install <name>@ai-catalog` |
 | Contribution model | open community PRs | internal team PRs (company-controlled) |
@@ -23,7 +24,7 @@
 
 **Key simplification opportunities** identified by comparing the two repos:
 
-1. `awesome-copilot` has flat top-level folders (`agents/`, `skills/`, `instructions/`). `ai-catalog` nests everything under `plugins/<name>/` — this makes each plugin self-contained and easier to install as a unit, which is the right call for a company catalog.
+1. ~~`awesome-copilot` has flat top-level folders (`agents/`, `skills/`, `instructions/`). `ai-catalog` nests everything under `plugins/<name>/` — this makes each plugin self-contained and easier to install as a unit, which is the right call for a company catalog.~~ **Resolved:** `ai-catalog` now uses a flat top-level layout (`skills/`, `agents/`, `commands/`, `mcpServers/`). Plugins are pure bundle manifests that reference primitives by name list. Primitives are shareable across bundles without duplication.
 2. `awesome-copilot` includes `hooks/` and `workflows/` types not yet present in `ai-catalog` — these are high-value for internal CI/DevOps automation.
 3. `awesome-copilot` provides a `Learning Hub` and `Cookbook` for onboarding; `ai-catalog` has no equivalent onboarding material yet.
 4. `awesome-copilot` supports `instructions/` (auto-applied `.instructions.md` files) — not present in `ai-catalog` but directly applicable to company coding standards.
@@ -94,10 +95,10 @@
 **so that** my teammates can discover and install it.
 
 **Acceptance criteria:**
-- I create `plugins/<name>/skills/<skill-name>/SKILL.md` with frontmatter (`name`, `description`, `version`).
-- I create `plugins/<name>/plugin.json` declaring the skill.
+- I create `skills/<skill-name>/SKILL.md` with frontmatter (`name`, `description`, `version`).
+- To make it Copilot CLI installable, I optionally create `plugins/<name>/plugin.json` declaring `"skills": ["<skill-name>"]`.
 - Running `uv run --script scripts/validate_catalog.py` passes with no errors.
-- After my PR is merged, the skill appears in the web marketplace and is installable via CLI.
+- After my PR is merged, the skill appears in the web marketplace and is installable via CLI (via its plugin wrapper).
 
 ---
 
@@ -108,8 +109,8 @@
 **so that** all developers get consistent agent behavior (commit conventions, security rules, etc.) without manual setup.
 
 **Acceptance criteria:**
-- I create `plugins/<name>/agents/<agent-name>.agent.md` with frontmatter.
-- I declare it in `plugin.json`.
+- I create `agents/<agent-name>.agent.md` with frontmatter.
+- To make it Copilot CLI installable, I create `plugins/<name>/plugin.json` declaring `"agents": ["<agent-name>"]`.
 - Validation passes; the agent appears in the marketplace after merge.
 
 ---
@@ -121,8 +122,9 @@
 **so that** my teammates can use it in Copilot Chat without re-typing the same prompt.
 
 **Acceptance criteria:**
-- I create `plugins/<name>/commands/<command-name>.md` with frontmatter.
+- I create `commands/<command-name>.md` with frontmatter.
 - Filename stem matches the `name` field in frontmatter (enforced by validation).
+- To make it Copilot CLI installable, I create `plugins/<name>/plugin.json` declaring `"commands": ["<command-name>"]`.
 - Command appears in the marketplace after merge.
 
 ---
@@ -134,7 +136,8 @@
 **so that** developers can connect Copilot to internal tools with a single install command.
 
 **Acceptance criteria:**
-- I create `plugins/<name>/.mcp.json` in the Copilot `{"servers": {...}}` shape.
+- I create `mcpServers/<name>/.mcp.json` in the Copilot `{"servers": {...}}` shape.
+- To make it Copilot CLI installable, I create `plugins/<name>/plugin.json` declaring `"mcpServers": ["<name>"]`.
 - No secrets or tokens are hard-coded (OAuth/SSO or environment variable references only).
 - Validation scans for secret patterns and fails if found.
 - MCP plugin appears in the marketplace with a VS Code deeplink.
@@ -157,13 +160,15 @@
 ### US-206 — Add a Bundle Plugin (skill + MCP + agent)
 
 **As a** platform team,  
-**I want to** publish a bundle plugin that groups a skill, MCP server, and agent profile into a single installable unit for a specific workflow (e.g., "Jira workflow bundle"),  
+**I want to** publish a bundle plugin that groups a skill, MCP server, and agent profile into a single installable unit for a specific workflow (e.g., "Atlassian value-stream bundle"),  
 **so that** developers get everything they need in one install command.
 
 **Acceptance criteria:**
-- Plugin declares ≥2 component types in `plugin.json`.
+- Plugin `plugin.json` declares ≥2 component types using name lists (e.g., `"skills": ["a", "b"]`, `"mcpServers": ["x"]`).
+- Referenced primitives exist in their top-level directories (`skills/`, `agents/`, `commands/`, `mcpServers/`).
 - `copilot plugin install <bundle-name>@ai-catalog` installs all components.
-- Bundle appears in the marketplace and is clearly labeled as a bundle.
+- Bundle appears in the marketplace with a distinct "bundle" badge and can be filtered by type "bundle".
+- **Example:** `plugins/value-stream-1-default/` bundles `skills/publish-to-confluence`, `skills/generate-architecture-doc`, `skills/jira-ticket-from-code`, and `mcpServers/atlassian`. ✅ Live in catalog.
 
 ---
 
@@ -174,7 +179,7 @@
 **so that** Copilot automatically applies them to files matching a given pattern (e.g., `**.ts`, `**.py`) without any developer action.
 
 **Acceptance criteria:**
-- A new `instructions/` folder (or `plugins/<name>/instructions/` sub-path) supports `.instructions.md` files.
+- A new top-level `instructions/<name>/` folder supports `.instructions.md` files (follows the same flat layout as `skills/`, `agents/`, etc.).
 - Each file has `applyTo` and `description` frontmatter fields.
 - Instructions are discoverable in the web marketplace and can be installed via CLI.
 - Validation enforces required frontmatter fields.
@@ -188,7 +193,7 @@
 **so that** agent-assisted development enforces quality gates automatically.
 
 **Acceptance criteria:**
-- A new `hooks/` sub-path inside a plugin supports hook definitions.
+- A new top-level `hooks/<name>/` folder supports hook definitions (follows the flat layout convention).
 - Hook has a `hooks.json` configuration and a `README.md` with frontmatter.
 - Validation checks required fields.
 - Hooks appear in the marketplace and are installable.
@@ -230,7 +235,7 @@
 **so that** I never accidentally push stale artifacts and break CI.
 
 **Acceptance criteria:**
-- A pre-commit hook runs `generate_catalog.py` and `generate_marketplace.py` when `plugins/` or `templates/` files change.
+- A pre-commit hook runs `generate_catalog.py` and `generate_marketplace.py` when `plugins/`, `skills/`, `agents/`, `commands/`, `mcpServers/`, or `templates/` files change.
 - The hook auto-stages the regenerated files.
 - If regeneration fails (e.g., invalid plugin), the commit is blocked with an error.
 
