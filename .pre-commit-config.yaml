@@ -6,11 +6,11 @@ repos:
         entry: scripts/hooks/regenerate-catalog.sh
         language: script
         pass_filenames: false
-        files: ^(plugins/|templates/|marketplace\.config\.json)
+        files: ^(plugins/.*|templates/.*|marketplace\.config\.json$)
 
       - id: validate-catalog
         name: Validate catalog
         entry: scripts/hooks/validate-catalog.sh
         language: script
         pass_filenames: false
-        files: ^(plugins/|templates/|marketplace\.config\.json|catalog\.json|\.github/plugin/marketplace\.json)
+        files: ^(plugins/.*|templates/.*|marketplace\.config\.json|catalog\.json|\.github/plugin/marketplace\.json)$
