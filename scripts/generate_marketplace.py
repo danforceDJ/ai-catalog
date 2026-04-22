@@ -5,6 +5,7 @@
 # ///
 """Generate .github/plugin/marketplace.json from plugins/ + marketplace.config.json."""
 from __future__ import annotations
+import copy
 import json
 from pathlib import Path
 import shutil
@@ -29,17 +30,17 @@ def load_mcp_servers(repo_root: Path, names: list[str]) -> dict:
     return merged
 
 
-def _is_list_ref_plugin(manifest: dict) -> bool:
+def _is_list_reference_plugin(manifest: dict) -> bool:
     return any(isinstance(manifest.get(field), list) for field in ("skills", "agents", "commands", "mcpServers"))
 
 
-def _write_compat_plugin(repo_root: Path, plugin_dir: Path, manifest: dict) -> Path:
+def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dict) -> Path:
     compat_dir = plugin_dir / ".copilot-plugin"
     if compat_dir.exists():
         shutil.rmtree(compat_dir)
     compat_dir.mkdir(parents=True, exist_ok=True)
 
-    compat_manifest = dict(manifest)
+    compat_manifest = copy.deepcopy(manifest)
 
     skills = manifest.get("skills")
     if isinstance(skills, list):
@@ -93,8 +94,8 @@ def build_marketplace(repo_root: Path) -> dict:
             manifest = json.loads(manifest_path.read_text())
             source_dir = plugin_dir
             entry_manifest = manifest
-            if _is_list_ref_plugin(manifest):
-                source_dir = _write_compat_plugin(repo_root, plugin_dir, manifest)
+            if _is_list_reference_plugin(manifest):
+                source_dir = _write_compatibility_plugin(repo_root, plugin_dir, manifest)
                 entry_manifest = json.loads((source_dir / "plugin.json").read_text())
             entry: dict = {
                 "name": entry_manifest["name"],
