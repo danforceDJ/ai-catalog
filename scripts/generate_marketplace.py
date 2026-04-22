@@ -13,8 +13,19 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PASSTHROUGH_FIELDS = (
     "description", "version", "author", "homepage", "repository",
     "license", "keywords", "category", "tags",
-    "skills", "agents", "commands", "hooks", "mcpServers", "lspServers",
+    "skills", "agents", "commands", "hooks", "lspServers",
 )
+
+
+def load_mcp_servers(repo_root: Path, names: list[str]) -> dict:
+    """Resolve a list of MCP server names to their actual server config objects."""
+    merged: dict = {}
+    for name in names:
+        mcp_path = repo_root / "mcpServers" / name / ".mcp.json"
+        if mcp_path.is_file():
+            data = json.loads(mcp_path.read_text())
+            merged.update(data.get("servers", {}))
+    return merged
 
 
 def build_marketplace(repo_root: Path) -> dict:
@@ -34,6 +45,14 @@ def build_marketplace(repo_root: Path) -> dict:
             for field in PASSTHROUGH_FIELDS:
                 if field in manifest:
                     entry[field] = manifest[field]
+            # Resolve mcpServers name list → actual server config objects
+            if "mcpServers" in manifest:
+                mcp_val = manifest["mcpServers"]
+                if isinstance(mcp_val, list):
+                    resolved = load_mcp_servers(repo_root, mcp_val)
+                    entry["mcpServers"] = resolved if resolved else mcp_val
+                else:
+                    entry["mcpServers"] = mcp_val
             entries.append(entry)
     return {
         "name": config["name"],
