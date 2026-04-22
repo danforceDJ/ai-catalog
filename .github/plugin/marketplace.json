@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "atlassian-mcp",
-      "source": "plugins/atlassian-mcp",
+      "source": "plugins/atlassian-mcp/.copilot-plugin",
       "description": "Atlassian Rovo MCP Server via OAuth 2.1 (SSO). No API tokens required in this repository.",
       "version": "1.0.0",
       "author": {
@@ -30,21 +30,11 @@
         "atlassian",
         "mcp"
       ],
-      "mcpServers": {
-        "atlassian": {
-          "type": "stdio",
-          "command": "npx",
-          "args": [
-            "-y",
-            "mcp-remote@latest",
-            "https://mcp.atlassian.com/v1/sse"
-          ]
-        }
-      }
+      "mcpServers": ".mcp.json"
     },
     {
       "name": "default-agent",
-      "source": "plugins/default-agent",
+      "source": "plugins/default-agent/.copilot-plugin",
       "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
       "version": "1.0.0",
       "author": {
@@ -61,13 +51,11 @@
       "tags": [
         "default"
       ],
-      "agents": [
-        "default"
-      ]
+      "agents": "agents"
     },
     {
       "name": "jira-ticket-from-code",
-      "source": "plugins/jira-ticket-from-code",
+      "source": "plugins/jira-ticket-from-code/.copilot-plugin",
       "description": "Create Jira tickets from TODO/FIXME/BUG code comments by extracting intent and nearby implementation context.",
       "version": "1.0.0",
       "author": {
@@ -85,13 +73,11 @@
         "jira",
         "atlassian"
       ],
-      "skills": [
-        "jira-ticket-from-code"
-      ]
+      "skills": "skills"
     },
     {
       "name": "pr-description-prompt",
-      "source": "plugins/pr-description-prompt",
+      "source": "plugins/pr-description-prompt/.copilot-plugin",
       "description": "Slash command that emits a standard PR description with summary, test plan, and checklist.",
       "version": "1.0.0",
       "author": {
@@ -109,13 +95,11 @@
         "github",
         "prompt"
       ],
-      "commands": [
-        "pr-description"
-      ]
+      "commands": "commands"
     },
     {
       "name": "value-stream-1-default",
-      "source": "plugins/value-stream-1-default",
+      "source": "plugins/value-stream-1-default/.copilot-plugin",
       "description": "Default bundle for value stream 1: Confluence publishing, architecture doc generation, Jira ticketing from code, and Atlassian MCP.",
       "version": "1.0.0",
       "author": {
@@ -135,22 +119,8 @@
         "bundle",
         "workflow"
       ],
-      "skills": [
-        "publish-to-confluence",
-        "generate-architecture-doc",
-        "jira-ticket-from-code"
-      ],
-      "mcpServers": {
-        "atlassian": {
-          "type": "stdio",
-          "command": "npx",
-          "args": [
-            "-y",
-            "mcp-remote@latest",
-            "https://mcp.atlassian.com/v1/sse"
-          ]
-        }
-      }
+      "skills": "skills",
+      "mcpServers": ".mcp.json"
     }
   ]
 }

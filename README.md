@@ -21,6 +21,7 @@ agents/<name>.agent.md          ← standalone agent profiles
 commands/<name>.md              ← standalone slash commands
 mcpServers/<name>/.mcp.json     ← standalone MCP server configs
 plugins/<name>/plugin.json      ← wrapper or bundle (references primitives by name list)
+plugins/<name>/.copilot-plugin/ ← generated Copilot-compatible package used by marketplace source
 templates/<name>/TEMPLATE.md    ← raw-download-only document templates
 ```
 
