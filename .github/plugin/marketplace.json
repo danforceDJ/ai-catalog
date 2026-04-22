@@ -2,7 +2,7 @@
   "name": "ai-catalog",
   "owner": {
     "name": "danforceDJ",
-    "email": ""
+    "email": "danforceDJ@users.noreply.github.com"
   },
   "metadata": {
     "description": "Company-wide AI configuration marketplace: MCP servers, skills, agent profiles, prompts.",
@@ -30,9 +30,17 @@
         "atlassian",
         "mcp"
       ],
-      "mcpServers": [
-        "atlassian"
-      ]
+      "mcpServers": {
+        "atlassian": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "mcp-remote@latest",
+            "https://mcp.atlassian.com/v1/sse"
+          ]
+        }
+      }
     },
     {
       "name": "default-agent",
@@ -132,9 +140,17 @@
         "generate-architecture-doc",
         "jira-ticket-from-code"
       ],
-      "mcpServers": [
-        "atlassian"
-      ]
+      "mcpServers": {
+        "atlassian": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "mcp-remote@latest",
+            "https://mcp.atlassian.com/v1/sse"
+          ]
+        }
+      }
     }
   ]
 }
