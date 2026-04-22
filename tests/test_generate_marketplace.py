@@ -2,6 +2,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import shutil
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 
@@ -16,7 +17,11 @@ def _load(name: str):
 
 def test_build_marketplace_from_fixtures(fixtures_dir, tmp_path):
     root = tmp_path
-    (root / "plugins").symlink_to(fixtures_dir / "plugins")
+    shutil.copytree(fixtures_dir / "plugins", root / "plugins")
+    for name in ("skills", "agents", "commands", "mcpServers"):
+        src = fixtures_dir / name
+        if src.exists():
+            shutil.copytree(src, root / name)
     (root / "marketplace.config.json").write_text(
         (fixtures_dir / "marketplace.config.json").read_text()
     )
@@ -35,3 +40,14 @@ def test_build_marketplace_from_fixtures(fixtures_dir, tmp_path):
     assert bundle["version"] == "1.0.0"
     assert bundle["skills"] == "skills"
     assert bundle["mcpServers"] == ".mcp.json"
+    list_bundle = next(p for p in result["plugins"] if p["name"] == "fixture-list-bundle")
+    assert list_bundle["source"] == "plugins/fixture-list-bundle/.copilot-plugin"
+    assert list_bundle["skills"] == "skills"
+    assert list_bundle["mcpServers"] == ".mcp.json"
+    generated_plugin = root / "plugins" / "fixture-list-bundle" / ".copilot-plugin" / "plugin.json"
+    generated_mcp = root / "plugins" / "fixture-list-bundle" / ".copilot-plugin" / ".mcp.json"
+    assert generated_plugin.is_file()
+    assert generated_mcp.is_file()
+    assert json.loads(generated_mcp.read_text())["servers"] == {
+        "fixture-top-server": {"command": "echo", "args": ["top"]}
+    }

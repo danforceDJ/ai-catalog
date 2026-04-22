@@ -1,0 +1,24 @@
+{
+  "name": "value-stream-1-default",
+  "description": "Default bundle for value stream 1: Confluence publishing, architecture doc generation, Jira ticketing from code, and Atlassian MCP.",
+  "version": "1.0.0",
+  "author": {
+    "name": "danforceDJ"
+  },
+  "license": "MIT",
+  "keywords": [
+    "atlassian",
+    "confluence",
+    "jira",
+    "architecture",
+    "bundle"
+  ],
+  "category": "bundles",
+  "tags": [
+    "atlassian",
+    "bundle",
+    "workflow"
+  ],
+  "skills": "skills",
+  "mcpServers": ".mcp.json"
+}

@@ -68,7 +68,8 @@ The skill appears in the web catalog with "Copy raw" and "Download zip" buttons.
    - **Agent** — `"agents": ["<name>"]` (resolves to `agents/<name>.agent.md`)
    - **Command** — `"commands": ["<name>"]` (resolves to `commands/<name>.md`)
    - **MCP** — `"mcpServers": ["<name>"]` (resolves to `mcpServers/<name>/.mcp.json`)
-3. Validate, regenerate, commit, and open a PR.
+3. Regenerate marketplace metadata. This also materializes a Copilot-compatible plugin package at `plugins/<name>/.copilot-plugin/` (with generated `plugin.json`, copied primitive files, and generated `.mcp.json` when needed).
+4. Validate, regenerate, commit, and open a PR.
 
 > **Backward compatibility:** You may still embed content inside a plugin directory using string paths (`"skills": "skills"`, `"agents": "agents"`, etc.). This is supported but not recommended for new plugins — use top-level primitives for shareability.
 
