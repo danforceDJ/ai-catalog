@@ -32,28 +32,59 @@ def _first(value: Any, default: str) -> str:
     return default
 
 
-def plugin_components(plugin_dir: Path, manifest: dict) -> dict:
-    skills_path = plugin_dir / _first(manifest.get("skills", "skills"), "skills")
-    agents_path = plugin_dir / _first(manifest.get("agents", "agents"), "agents")
-    commands_path = plugin_dir / _first(manifest.get("commands", "commands"), "commands")
+def _resolve_mcp_servers(mcp_paths: list[Path]) -> list[str]:
+    servers: list[str] = []
+    for p in mcp_paths:
+        if p.is_file():
+            try:
+                cfg = json.loads(p.read_text())
+                servers.extend(sorted((cfg.get("servers") or {}).keys()))
+            except json.JSONDecodeError:
+                pass
+    return sorted(servers)
+
+
+def plugin_components(plugin_dir: Path, manifest: dict, repo_root: Path | None = None) -> dict:
+    skills_value = manifest.get("skills", "skills")
+    agents_value = manifest.get("agents", "agents")
+    commands_value = manifest.get("commands", "commands")
     mcp_value = manifest.get("mcpServers", ".mcp.json")
     hooks_value = manifest.get("hooks", "hooks.json")
-    mcp_path = plugin_dir / mcp_value if isinstance(mcp_value, str) else None
-    hooks_path = plugin_dir / hooks_value if isinstance(hooks_value, str) else None
 
-    skills = sorted(s.name for s in skills_path.iterdir() if s.is_dir() and (s / "SKILL.md").is_file()) \
-        if skills_path.is_dir() else []
-    agents = sorted(p.stem.removesuffix(".agent") for p in agents_path.glob("*.agent.md")) \
-        if agents_path.is_dir() else []
-    commands = sorted(p.stem for p in commands_path.glob("*.md")) \
-        if commands_path.is_dir() else []
-    mcp_servers: list[str] = []
-    if mcp_path and mcp_path.is_file():
-        try:
-            cfg = json.loads(mcp_path.read_text())
-            mcp_servers = sorted((cfg.get("servers") or {}).keys())
-        except json.JSONDecodeError:
-            mcp_servers = []
+    # Skills: list of top-level names or a string path relative to plugin_dir
+    if isinstance(skills_value, list) and repo_root is not None:
+        skills = [n for n in skills_value if (repo_root / "skills" / n / "SKILL.md").is_file()]
+    else:
+        skills_path = plugin_dir / _first(skills_value, "skills")
+        skills = sorted(s.name for s in skills_path.iterdir() if s.is_dir() and (s / "SKILL.md").is_file()) \
+            if skills_path.is_dir() else []
+
+    # Agents: list of top-level names or a string path relative to plugin_dir
+    if isinstance(agents_value, list) and repo_root is not None:
+        agents = [n for n in agents_value if (repo_root / "agents" / f"{n}.agent.md").is_file()]
+    else:
+        agents_path = plugin_dir / _first(agents_value, "agents")
+        agents = sorted(p.stem.removesuffix(".agent") for p in agents_path.glob("*.agent.md")) \
+            if agents_path.is_dir() else []
+
+    # Commands: list of top-level names or a string path relative to plugin_dir
+    if isinstance(commands_value, list) and repo_root is not None:
+        commands = [n for n in commands_value if (repo_root / "commands" / f"{n}.md").is_file()]
+    else:
+        commands_path = plugin_dir / _first(commands_value, "commands")
+        commands = sorted(p.stem for p in commands_path.glob("*.md")) \
+            if commands_path.is_dir() else []
+
+    # MCP servers: list of top-level dir names or a string .mcp.json path relative to plugin_dir
+    if isinstance(mcp_value, list) and repo_root is not None:
+        mcp_paths = [repo_root / "mcpServers" / name / ".mcp.json" for name in mcp_value]
+    elif isinstance(mcp_value, str):
+        mcp_paths = [plugin_dir / mcp_value]
+    else:
+        mcp_paths = []
+    mcp_servers = _resolve_mcp_servers(mcp_paths)
+
+    hooks_path = plugin_dir / (hooks_value if isinstance(hooks_value, str) else "hooks.json")
     return {
         "skills": skills,
         "agents": agents,
@@ -77,11 +108,16 @@ def derive_type(components: dict) -> str:
     return "empty"
 
 
-def build_deeplink(plugin_dir: Path, manifest: dict) -> str | None:
+def build_deeplink(plugin_dir: Path, manifest: dict, repo_root: Path | None = None) -> str | None:
     mcp_value = manifest.get("mcpServers", ".mcp.json")
-    if not isinstance(mcp_value, str):
+    if isinstance(mcp_value, list) and repo_root is not None:
+        if len(mcp_value) != 1:
+            return None
+        mcp_path = repo_root / "mcpServers" / mcp_value[0] / ".mcp.json"
+    elif isinstance(mcp_value, str):
+        mcp_path = plugin_dir / mcp_value
+    else:
         return None
-    mcp_path = plugin_dir / mcp_value
     if not mcp_path.is_file():
         return None
     try:
@@ -99,7 +135,12 @@ def build_deeplink(plugin_dir: Path, manifest: dict) -> str | None:
     return f"vscode:mcp/install?name={name}&config={encoded}"
 
 
-def raw_files(plugin_dir: Path, components: dict) -> list[str]:
+def raw_files(plugin_dir: Path, components: dict, manifest: dict | None = None) -> list[str]:
+    # List-reference plugins: standalone primitive entries carry raw files; wrapper has none
+    if manifest is not None:
+        if isinstance(manifest.get("skills"), list) or isinstance(manifest.get("agents"), list) \
+                or isinstance(manifest.get("commands"), list):
+            return []
     kinds_with_items = sum(1 for k in ("skills", "agents", "commands") if components[k])
     if kinds_with_items != 1 or components["mcpServers"]:
         return []
@@ -115,14 +156,14 @@ def raw_files(plugin_dir: Path, components: dict) -> list[str]:
     return []
 
 
-def build_plugin_entry(plugin_dir: Path) -> dict | None:
+def build_plugin_entry(plugin_dir: Path, repo_root: Path | None = None) -> dict | None:
     manifest_path = plugin_dir / "plugin.json"
     if not manifest_path.is_file():
         return None
     manifest = json.loads(manifest_path.read_text())
-    components = plugin_components(plugin_dir, manifest)
+    components = plugin_components(plugin_dir, manifest, repo_root)
     entry_type = derive_type(components)
-    deeplink = build_deeplink(plugin_dir, manifest) if components["mcpServers"] else None
+    deeplink = build_deeplink(plugin_dir, manifest, repo_root) if components["mcpServers"] else None
     return {
         "name": manifest["name"],
         "description": manifest.get("description", ""),
@@ -135,7 +176,7 @@ def build_plugin_entry(plugin_dir: Path) -> dict | None:
         "install": {
             "copilot": f"{manifest['name']}@ai-catalog",
             "vscodeMcpDeeplink": deeplink,
-            "rawFiles": raw_files(plugin_dir, components),
+            "rawFiles": raw_files(plugin_dir, components, manifest),
             "zip": f"dl/{plugin_dir.name}.zip",
             "repoPath": f"plugins/{plugin_dir.name}",
         },
@@ -163,15 +204,173 @@ def build_template_entry(template_dir: Path) -> dict | None:
     }
 
 
+def _deeplink_from_mcp_path(mcp_path: Path) -> str | None:
+    if not mcp_path.is_file():
+        return None
+    try:
+        cfg = json.loads(mcp_path.read_text())
+    except json.JSONDecodeError:
+        return None
+    servers = cfg.get("servers") or {}
+    if not servers:
+        return None
+    name, server_cfg = next(iter(servers.items()))
+    payload = json.dumps({"name": name, **server_cfg}, separators=(",", ":"))
+    if len(payload.encode()) > DEEPLINK_MAX_BYTES:
+        return None
+    encoded = base64.urlsafe_b64encode(payload.encode()).decode().rstrip("=")
+    return f"vscode:mcp/install?name={name}&config={encoded}"
+
+
+def build_top_level_entries(
+    repo_root: Path,
+    covered_skills: set[str],
+    covered_agents: set[str],
+    covered_commands: set[str],
+) -> list[dict]:
+    """Build catalog entries for top-level primitives not already wrapped by a plugin."""
+    entries: list[dict] = []
+
+    # Standalone skills
+    skills_dir = repo_root / "skills"
+    if skills_dir.is_dir():
+        for skill_dir in sorted(d for d in skills_dir.iterdir() if d.is_dir()):
+            if skill_dir.name in covered_skills:
+                continue
+            skill_md = skill_dir / "SKILL.md"
+            if not skill_md.is_file():
+                continue
+            fm = parse_frontmatter(skill_md.read_text())
+            entries.append({
+                "name": fm.get("name", skill_dir.name),
+                "description": fm.get("description", ""),
+                "version": fm.get("version", ""),
+                "type": "skill",
+                "category": fm.get("category", ""),
+                "tags": fm.get("tags", []) or [],
+                "keywords": fm.get("keywords", []) or [],
+                "components": {"skills": [skill_dir.name], "agents": [], "commands": [], "mcpServers": [], "hooks": False},
+                "install": {
+                    "copilot": None,
+                    "vscodeMcpDeeplink": None,
+                    "rawFiles": ["SKILL.md"],
+                    "zip": f"dl/{skill_dir.name}.zip",
+                    "repoPath": f"skills/{skill_dir.name}",
+                },
+            })
+
+    # Standalone agents
+    agents_dir = repo_root / "agents"
+    if agents_dir.is_dir():
+        for agent_path in sorted(agents_dir.glob("*.agent.md")):
+            agent_name = agent_path.stem.removesuffix(".agent")
+            if agent_name in covered_agents:
+                continue
+            fm = parse_frontmatter(agent_path.read_text())
+            entries.append({
+                "name": fm.get("name", agent_name),
+                "description": fm.get("description", ""),
+                "version": fm.get("version", ""),
+                "type": "agent",
+                "category": fm.get("category", ""),
+                "tags": fm.get("tags", []) or [],
+                "keywords": fm.get("keywords", []) or [],
+                "components": {"skills": [], "agents": [agent_name], "commands": [], "mcpServers": [], "hooks": False},
+                "install": {
+                    "copilot": None,
+                    "vscodeMcpDeeplink": None,
+                    "rawFiles": [agent_path.name],
+                    "zip": f"dl/{agent_name}.zip",
+                    "repoPath": "agents",
+                },
+            })
+
+    # Standalone commands
+    commands_dir = repo_root / "commands"
+    if commands_dir.is_dir():
+        for cmd_path in sorted(commands_dir.glob("*.md")):
+            cmd_name = cmd_path.stem
+            if cmd_name in covered_commands:
+                continue
+            fm = parse_frontmatter(cmd_path.read_text())
+            entries.append({
+                "name": fm.get("name", cmd_name),
+                "description": fm.get("description", ""),
+                "version": fm.get("version", ""),
+                "type": "prompt",
+                "category": fm.get("category", ""),
+                "tags": fm.get("tags", []) or [],
+                "keywords": fm.get("keywords", []) or [],
+                "components": {"skills": [], "agents": [], "commands": [cmd_name], "mcpServers": [], "hooks": False},
+                "install": {
+                    "copilot": None,
+                    "vscodeMcpDeeplink": None,
+                    "rawFiles": [cmd_path.name],
+                    "zip": f"dl/{cmd_name}.zip",
+                    "repoPath": "commands",
+                },
+            })
+
+    # Standalone MCP server configs
+    mcp_dir = repo_root / "mcpServers"
+    if mcp_dir.is_dir():
+        for mcp_server_dir in sorted(d for d in mcp_dir.iterdir() if d.is_dir()):
+            mcp_path = mcp_server_dir / ".mcp.json"
+            if not mcp_path.is_file():
+                continue
+            try:
+                cfg = json.loads(mcp_path.read_text())
+            except json.JSONDecodeError:
+                continue
+            server_names = sorted((cfg.get("servers") or {}).keys())
+            if not server_names:
+                continue
+            deeplink = _deeplink_from_mcp_path(mcp_path)
+            entries.append({
+                "name": mcp_server_dir.name,
+                "description": "",
+                "version": "",
+                "type": "mcp",
+                "category": "",
+                "tags": [],
+                "keywords": [],
+                "components": {"skills": [], "agents": [], "commands": [], "mcpServers": server_names, "hooks": False},
+                "install": {
+                    "copilot": None,
+                    "vscodeMcpDeeplink": deeplink,
+                    "rawFiles": [],
+                    "zip": f"dl/{mcp_server_dir.name}.zip",
+                    "repoPath": f"mcpServers/{mcp_server_dir.name}",
+                },
+            })
+
+    return entries
+
+
 def build_catalog(repo_root: Path) -> dict:
     plugins: list[dict] = []
     plugins_dir = repo_root / "plugins"
     if plugins_dir.is_dir():
         for d in sorted(plugins_dir.iterdir()):
             if d.is_dir():
-                entry = build_plugin_entry(d)
+                entry = build_plugin_entry(d, repo_root)
                 if entry:
                     plugins.append(entry)
+
+    # Collect primitives already covered by plugin wrappers
+    covered_skills: set[str] = set()
+    covered_agents: set[str] = set()
+    covered_commands: set[str] = set()
+    for entry in plugins:
+        covered_skills.update(entry["components"]["skills"])
+        covered_agents.update(entry["components"]["agents"])
+        covered_commands.update(entry["components"]["commands"])
+
+    # Add standalone catalog entries for uncovered top-level primitives
+    standalone = build_top_level_entries(repo_root, covered_skills, covered_agents, covered_commands)
+    plugins.extend(standalone)
+    plugins.sort(key=lambda p: p["name"])
+
     templates: list[dict] = []
     templates_dir = repo_root / "templates"
     if templates_dir.is_dir():
@@ -193,7 +392,7 @@ def main() -> None:
     docs_copy = REPO_ROOT / "docs" / "catalog.json"
     docs_copy.parent.mkdir(parents=True, exist_ok=True)
     docs_copy.write_text(payload)
-    print(f"Wrote catalog.json ({len(catalog['plugins'])} plugins, {len(catalog['templates'])} templates)")
+    print(f"Wrote catalog.json ({len(catalog['plugins'])} plugins/primitives, {len(catalog['templates'])} templates)")
 
 
 if __name__ == "__main__":

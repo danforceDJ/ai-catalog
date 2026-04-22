@@ -7,5 +7,5 @@
   "keywords": ["pr", "pull-request", "prompt", "template"],
   "category": "productivity",
   "tags": ["github", "prompt"],
-  "commands": "commands"
+  "commands": ["pr-description"]
 }

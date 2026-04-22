@@ -7,5 +7,5 @@
   "keywords": ["agent", "conventions", "git", "security"],
   "category": "governance",
   "tags": ["default"],
-  "agents": "agents"
+  "agents": ["default"]
 }

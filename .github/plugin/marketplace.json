@@ -30,7 +30,9 @@
         "atlassian",
         "mcp"
       ],
-      "mcpServers": ".mcp.json"
+      "mcpServers": [
+        "atlassian"
+      ]
     },
     {
       "name": "default-agent",
@@ -51,7 +53,9 @@
       "tags": [
         "default"
       ],
-      "agents": "agents"
+      "agents": [
+        "default"
+      ]
     },
     {
       "name": "jira-ticket-from-code",
@@ -73,7 +77,9 @@
         "jira",
         "atlassian"
       ],
-      "skills": "skills"
+      "skills": [
+        "jira-ticket-from-code"
+      ]
     },
     {
       "name": "pr-description-prompt",
@@ -95,7 +101,40 @@
         "github",
         "prompt"
       ],
-      "commands": "commands"
+      "commands": [
+        "pr-description"
+      ]
+    },
+    {
+      "name": "value-stream-1-default",
+      "source": "plugins/value-stream-1-default",
+      "description": "Default bundle for value stream 1: Confluence publishing, architecture doc generation, Jira ticketing from code, and Atlassian MCP.",
+      "version": "1.0.0",
+      "author": {
+        "name": "danforceDJ"
+      },
+      "license": "MIT",
+      "keywords": [
+        "atlassian",
+        "confluence",
+        "jira",
+        "architecture",
+        "bundle"
+      ],
+      "category": "bundles",
+      "tags": [
+        "atlassian",
+        "bundle",
+        "workflow"
+      ],
+      "skills": [
+        "publish-to-confluence",
+        "generate-architecture-doc",
+        "jira-ticket-from-code"
+      ],
+      "mcpServers": [
+        "atlassian"
+      ]
     }
   ]
 }

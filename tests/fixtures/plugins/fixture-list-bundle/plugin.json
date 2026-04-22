@@ -1,0 +1,10 @@
+{
+  "name": "fixture-list-bundle",
+  "description": "Fixture bundle using list-based top-level references.",
+  "version": "1.0.0",
+  "keywords": ["fixture", "bundle", "list-ref"],
+  "category": "testing",
+  "tags": ["pack"],
+  "skills": ["fixture-top-skill"],
+  "mcpServers": ["fixture-top-mcp"]
+}

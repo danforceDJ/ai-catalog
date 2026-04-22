@@ -19,6 +19,10 @@ def _load(name: str):
 def fake_repo(tmp_path, fixtures_dir):
     (tmp_path / "plugins").symlink_to(fixtures_dir / "plugins")
     (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    for name in ("skills", "agents", "commands", "mcpServers"):
+        src = fixtures_dir / name
+        if src.exists():
+            (tmp_path / name).symlink_to(src)
     return tmp_path
 
 
@@ -31,6 +35,7 @@ def test_catalog_types(fake_repo):
     assert types["fixture-agent"] == "agent"
     assert types["fixture-prompt"] == "prompt"
     assert types["fixture-bundle"] == "bundle"
+    assert types["fixture-list-bundle"] == "bundle"
 
 
 def test_catalog_components(fake_repo):
@@ -84,6 +89,87 @@ def test_catalog_deeplink_size_cap(tmp_path, fixtures_dir):
     huge_args = ["x" * 3000]
     (big_plugin / ".mcp.json").write_text(json.dumps({"servers": {"big": {"command": "echo", "args": huge_args}}}))
     (tmp_path / "templates").mkdir()
+    for name in ("skills", "agents", "commands", "mcpServers"):
+        src = fixtures_dir / name
+        if src.exists():
+            (tmp_path / name).symlink_to(src)
     catalog = mod.build_catalog(tmp_path)
     big = next(p for p in catalog["plugins"] if p["name"] == "fixture-giant-mcp")
     assert big["install"]["vscodeMcpDeeplink"] is None, "deeplink must be None when >2KB"
+
+
+def test_catalog_list_ref_bundle_components(fake_repo):
+    mod = _load("generate_catalog")
+    catalog = mod.build_catalog(fake_repo)
+    bundle = next(p for p in catalog["plugins"] if p["name"] == "fixture-list-bundle")
+    assert bundle["type"] == "bundle"
+    assert bundle["components"]["skills"] == ["fixture-top-skill"]
+    assert bundle["components"]["mcpServers"] == ["fixture-top-server"]
+    assert bundle["components"]["agents"] == []
+    assert bundle["components"]["commands"] == []
+
+
+def test_catalog_list_ref_bundle_raw_files_empty(fake_repo):
+    mod = _load("generate_catalog")
+    catalog = mod.build_catalog(fake_repo)
+    bundle = next(p for p in catalog["plugins"] if p["name"] == "fixture-list-bundle")
+    # Wrapper plugins using list refs have no raw files; standalone entries carry them
+    assert bundle["install"]["rawFiles"] == []
+
+
+def test_catalog_list_ref_bundle_deeplink(fake_repo):
+    mod = _load("generate_catalog")
+    catalog = mod.build_catalog(fake_repo)
+    bundle = next(p for p in catalog["plugins"] if p["name"] == "fixture-list-bundle")
+    # Single top-level MCP reference → deeplink generated
+    assert bundle["install"]["vscodeMcpDeeplink"] is not None
+    assert bundle["install"]["vscodeMcpDeeplink"].startswith("vscode:mcp/install?name=fixture-top-server&config=")
+
+
+def test_catalog_standalone_entries_for_uncovered_primitives(fake_repo):
+    mod = _load("generate_catalog")
+    catalog = mod.build_catalog(fake_repo)
+    names = {p["name"] for p in catalog["plugins"]}
+    # fixture-top-skill is covered by fixture-list-bundle → no standalone entry
+    assert "fixture-top-skill" not in names
+    # fixture-top-agent/command are NOT referenced by any plugin → standalone entries appear
+    assert "fixture-top-agent" in names
+    assert "fixture-top-command" in names
+
+
+def test_catalog_standalone_agent_install(fake_repo):
+    mod = _load("generate_catalog")
+    catalog = mod.build_catalog(fake_repo)
+    agent = next(p for p in catalog["plugins"] if p["name"] == "fixture-top-agent")
+    assert agent["type"] == "agent"
+    assert agent["install"]["copilot"] is None
+    assert agent["install"]["rawFiles"] == ["fixture-top-agent.agent.md"]
+    assert agent["install"]["repoPath"] == "agents"
+
+
+def test_catalog_standalone_command_install(fake_repo):
+    mod = _load("generate_catalog")
+    catalog = mod.build_catalog(fake_repo)
+    cmd = next(p for p in catalog["plugins"] if p["name"] == "fixture-top-command")
+    assert cmd["type"] == "prompt"
+    assert cmd["install"]["copilot"] is None
+    assert cmd["install"]["rawFiles"] == ["fixture-top-command.md"]
+
+
+def test_catalog_missing_top_level_ref_resolves_gracefully(tmp_path, fixtures_dir):
+    mod = _load("generate_catalog")
+    import shutil
+    plugins_root = tmp_path / "plugins"
+    plugins_root.mkdir()
+    bad = plugins_root / "fixture-bad-ref"
+    bad.mkdir()
+    (bad / "plugin.json").write_text(json.dumps({
+        "name": "fixture-bad-ref",
+        "skills": ["nonexistent-skill"],
+    }))
+    (tmp_path / "templates").mkdir()
+    catalog = mod.build_catalog(tmp_path)
+    entry = next(p for p in catalog["plugins"] if p["name"] == "fixture-bad-ref")
+    # Missing referenced skill → resolved as empty list, entry still generated
+    assert entry["components"]["skills"] == []
+    assert entry["type"] == "empty"

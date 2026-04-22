@@ -1,6 +1,31 @@
 {
   "plugins": [
     {
+      "name": "atlassian",
+      "description": "",
+      "version": "",
+      "type": "mcp",
+      "category": "",
+      "tags": [],
+      "keywords": [],
+      "components": {
+        "skills": [],
+        "agents": [],
+        "commands": [],
+        "mcpServers": [
+          "atlassian"
+        ],
+        "hooks": false
+      },
+      "install": {
+        "copilot": null,
+        "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
+        "rawFiles": [],
+        "zip": "dl/atlassian.zip",
+        "repoPath": "mcpServers/atlassian"
+      }
+    },
+    {
       "name": "atlassian-mcp",
       "description": "Atlassian Rovo MCP Server via OAuth 2.1 (SSO). No API tokens required in this repository.",
       "version": "1.0.0",
@@ -61,9 +86,7 @@
       "install": {
         "copilot": "default-agent@ai-catalog",
         "vscodeMcpDeeplink": null,
-        "rawFiles": [
-          "agents/default.agent.md"
-        ],
+        "rawFiles": [],
         "zip": "dl/default-agent.zip",
         "repoPath": "plugins/default-agent"
       }
@@ -96,9 +119,7 @@
       "install": {
         "copilot": "jira-ticket-from-code@ai-catalog",
         "vscodeMcpDeeplink": null,
-        "rawFiles": [
-          "skills/jira-ticket-from-code/SKILL.md"
-        ],
+        "rawFiles": [],
         "zip": "dl/jira-ticket-from-code.zip",
         "repoPath": "plugins/jira-ticket-from-code"
       }
@@ -131,11 +152,48 @@
       "install": {
         "copilot": "pr-description-prompt@ai-catalog",
         "vscodeMcpDeeplink": null,
-        "rawFiles": [
-          "commands/pr-description.md"
-        ],
+        "rawFiles": [],
         "zip": "dl/pr-description-prompt.zip",
         "repoPath": "plugins/pr-description-prompt"
+      }
+    },
+    {
+      "name": "value-stream-1-default",
+      "description": "Default bundle for value stream 1: Confluence publishing, architecture doc generation, Jira ticketing from code, and Atlassian MCP.",
+      "version": "1.0.0",
+      "type": "bundle",
+      "category": "bundles",
+      "tags": [
+        "atlassian",
+        "bundle",
+        "workflow"
+      ],
+      "keywords": [
+        "atlassian",
+        "confluence",
+        "jira",
+        "architecture",
+        "bundle"
+      ],
+      "components": {
+        "skills": [
+          "publish-to-confluence",
+          "generate-architecture-doc",
+          "jira-ticket-from-code"
+        ],
+        "agents": [],
+        "commands": [],
+        "mcpServers": [
+          "atlassian"
+        ],
+        "hooks": false
+      },
+      "install": {
+        "copilot": "value-stream-1-default@ai-catalog",
+        "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
+        "rawFiles": [],
+        "zip": "dl/value-stream-1-default.zip",
+        "repoPath": "plugins/value-stream-1-default"
       }
     }
   ],
