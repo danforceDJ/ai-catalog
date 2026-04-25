@@ -9,33 +9,33 @@ A convention-based AI configuration marketplace that doubles as a **GitHub Copil
 1. **A Copilot CLI marketplace** — `copilot plugin marketplace add danforceDJ/ai-catalog`, consumes `.github/plugin/marketplace.json`.
 2. **A static web marketplace** — GitHub Pages site with live search + four install paths per card (Copilot CLI, VSCode MCP deeplink, raw-file copy, `.zip` download).
 
-The web UI and marketplace manifest are both auto-generated from a single source of truth: the `plugins/` directory.
+The web UI and marketplace manifest are both auto-generated from a single source of truth: the `catalog/` directory.
 
 ## Development Commands
 
 Everything is Python via `uv` (single-file PEP 723 scripts).
 
 ```bash
-# Generate .github/plugin/marketplace.json from plugins/ + marketplace.config.json
-uv run --script scripts/generate_marketplace.py
+# Generate .github/plugin/marketplace.json from catalog/plugins/ + system/config/marketplace.config.json
+uv run --script system/scripts/generate_marketplace.py
 
-# Generate catalog.json (search index) from plugins/ and templates/
-uv run --script scripts/generate_catalog.py
+# Generate system/artifacts/catalog.json (search index) from catalog/plugins/ and catalog/templates/
+uv run --script system/scripts/generate_catalog.py
 
 # Generate docs/dl/<name>.zip for every plugin and template
-uv run --script scripts/generate_zips.py
+uv run --script system/scripts/generate_zips.py
 
-# Render docs/index.html from catalog.json + Jinja template
-uv run --script scripts/generate_site.py
+# Render docs/index.html from system/artifacts/catalog.json + Jinja template
+uv run --script system/scripts/generate_site.py
 
 # Validate the catalog (schemas, naming, secrets, uniqueness, drift warnings)
-uv run --script scripts/validate_catalog.py
+uv run --script system/scripts/validate_catalog.py
 
 # Run the full test suite
-uv run --with pytest --with pyyaml --with jsonschema --with jinja2 -- pytest -q
+uv run --with pytest --with pyyaml --with jsonschema --with jinja2 -- pytest -q system/tests/
 
 # Install an item into a project using the deprecated bash fallback
-bash scripts/install.sh <mcp|skill|agent|prompt|template> <name> [--global]
+bash system/scripts/install.sh <mcp|skill|agent|prompt|template> <name> [--global]
 ```
 
 GitHub Actions runs `validate_catalog.py` + `pytest` + a freshness check on every PR (`.github/workflows/validate-catalog.yml`). GitLab CI (`.gitlab-ci.yml`) runs the bash generate/validate scripts. The deploy workflow (`.github/workflows/deploy-site.yml`) generates `docs/` on push to main and deploys it to GitHub Pages via artifact — no direct git push to main.
@@ -45,11 +45,11 @@ GitHub Actions runs `validate_catalog.py` + `pytest` + a freshness check on ever
 **Data flow:**
 
 ```
-Filesystem (plugins/ + templates/ + marketplace.config.json)
-    ↓  scripts/generate_catalog.py + generate_marketplace.py
-catalog.json  (search index)
+Filesystem (catalog/plugins/ + catalog/templates/ + system/config/marketplace.config.json)
+    ↓  system/scripts/generate_catalog.py + generate_marketplace.py
+system/artifacts/catalog.json  (search index)
 .github/plugin/marketplace.json  (Copilot CLI manifest)
-    ↓  scripts/generate_site.py + generate_zips.py
+    ↓  system/scripts/generate_site.py + generate_zips.py
 docs/index.html + docs/dl/*.zip
     ↓  GitHub Pages / git consumers
 Web UI + Copilot CLI install
@@ -59,12 +59,12 @@ Web UI + Copilot CLI install
 
 | Type | Path | Metadata source |
 |------|------|-----------------|
-| MCP Server | `plugins/<name>/.mcp.json` | `plugin.json` at `plugins/<name>/` |
-| Skill | `plugins/<name>/skills/<skill-name>/SKILL.md` | `plugin.json` (authoritative) + SKILL.md frontmatter (cross-checked) |
-| Agent Profile | `plugins/<name>/agents/<agent-name>.agent.md` | `plugin.json` + agent frontmatter |
-| Prompt (Command) | `plugins/<name>/commands/<cmd-name>.md` | `plugin.json` + command frontmatter |
-| Template (raw-download only) | `templates/<name>/TEMPLATE.md` | YAML frontmatter |
-| Bundle | `plugins/<name>/` with ≥2 component kinds | `plugin.json` |
+| MCP Server | `catalog/integrations/<name>/.mcp.json` | `plugin.json` at `catalog/plugins/<name>/` |
+| Skill | `catalog/skills/<skill-name>/SKILL.md` | `plugin.json` (authoritative) + SKILL.md frontmatter (cross-checked) |
+| Agent Profile | `catalog/agents/<agent-name>.agent.md` | `plugin.json` + agent frontmatter |
+| Prompt (Command) | `catalog/prompts/<cmd-name>.md` | `plugin.json` + command frontmatter |
+| Template (raw-download only) | `catalog/templates/<name>/TEMPLATE.md` | YAML frontmatter |
+| Bundle | `catalog/plugins/<name>/` with ≥2 component kinds | `plugin.json` |
 
 **Naming & invariants (enforced by `validate_catalog.py`):**
 
@@ -74,7 +74,7 @@ Web UI + Copilot CLI install
 - SKILL.md frontmatter drift vs `plugin.json` is a warning (not a failure).
 - `.mcp.json` is scanned for obvious secret patterns (GitHub tokens, `API_TOKEN=...`, etc.) — match fails validation.
 
-**`install.sh`** is the deprecated bash fallback for users without Copilot CLI. It emits a deprecation banner on every invocation and now reads from `plugins/<name>/` paths. Supports `mcp`, `skill`, `agent`, `prompt`, `template` types.
+**`install.sh`** is the deprecated bash fallback for users without Copilot CLI. It emits a deprecation banner on every invocation and now reads from `catalog/plugins/<name>/` paths. Supports `mcp`, `skill`, `agent`, `prompt`, `template` types.
 
 ## Do Not Commit
 
@@ -82,8 +82,8 @@ Web UI + Copilot CLI install
 
 ## Do Commit
 
-- `catalog.json` and `.github/plugin/marketplace.json` — tracked artefacts required for Copilot CLI discovery. Regenerate locally after every plugin/template change and commit alongside your PR. CI fails if they are stale.
+- `system/artifacts/catalog.json` and `.github/plugin/marketplace.json` — tracked artefacts required for Copilot CLI discovery. Regenerate locally after every plugin/template change and commit alongside your PR. CI fails if they are stale.
 
 ## Adding New Catalog Items
 
-Follow the filesystem conventions above. `plugin.json` is the Copilot-native manifest — required for every plugin. See `CONTRIBUTING.md` for the full checklist.
+Follow the filesystem conventions above. `plugin.json` is the Copilot-native manifest — required for every plugin at `catalog/plugins/<name>/plugin.json`. See `CONTRIBUTING.md` for the full checklist.

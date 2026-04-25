@@ -8,7 +8,7 @@ from __future__ import annotations
 import zipfile
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 ONE_MB = 1_048_576
 
 
@@ -25,8 +25,8 @@ def main() -> None:
     out_dir = REPO_ROOT / "docs" / "dl"
     out_dir.mkdir(parents=True, exist_ok=True)
     sources: list[Path] = []
-    for parent in ("plugins", "templates"):
-        base = REPO_ROOT / parent
+    for parent in (("catalog", "plugins"), ("catalog", "templates")):
+        base = REPO_ROOT / Path(*parent)
         if base.is_dir():
             sources.extend(sorted(d for d in base.iterdir() if d.is_dir()))
     for src in sources:

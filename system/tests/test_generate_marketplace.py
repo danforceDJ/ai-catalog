@@ -17,12 +17,16 @@ def _load(name: str):
 
 def test_build_marketplace_from_fixtures(fixtures_dir, tmp_path):
     root = tmp_path
-    shutil.copytree(fixtures_dir / "plugins", root / "plugins")
-    for name in ("skills", "agents", "commands", "mcpServers"):
-        src = fixtures_dir / name
+    catalog_dir = root / "catalog"
+    catalog_dir.mkdir()
+    shutil.copytree(fixtures_dir / "catalog" / "plugins", catalog_dir / "plugins")
+    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "integrations")]:
+        src = fixtures_dir / "catalog" / newname
         if src.exists():
-            shutil.copytree(src, root / name)
-    (root / "marketplace.config.json").write_text(
+            shutil.copytree(src, catalog_dir / newname)
+    config_dir = root / "system" / "config"
+    config_dir.mkdir(parents=True)
+    (config_dir / "marketplace.config.json").write_text(
         (fixtures_dir / "marketplace.config.json").read_text()
     )
 
@@ -36,16 +40,16 @@ def test_build_marketplace_from_fixtures(fixtures_dir, tmp_path):
     assert set(names) == {"fixture-agent", "fixture-bundle", "fixture-list-bundle", "fixture-mcp",
                           "fixture-prompt", "fixture-skill"}
     bundle = next(p for p in result["plugins"] if p["name"] == "fixture-bundle")
-    assert bundle["source"] == "plugins/fixture-bundle"
+    assert bundle["source"] == "catalog/plugins/fixture-bundle"
     assert bundle["version"] == "1.0.0"
     assert bundle["skills"] == "skills"
     assert bundle["mcpServers"] == ".mcp.json"
     list_bundle = next(p for p in result["plugins"] if p["name"] == "fixture-list-bundle")
-    assert list_bundle["source"] == "plugins/fixture-list-bundle/.copilot-plugin"
+    assert list_bundle["source"] == "catalog/plugins/fixture-list-bundle/.copilot-plugin"
     assert list_bundle["skills"] == "skills"
     assert list_bundle["mcpServers"] == ".mcp.json"
-    generated_plugin = root / "plugins" / "fixture-list-bundle" / ".copilot-plugin" / "plugin.json"
-    generated_mcp = root / "plugins" / "fixture-list-bundle" / ".copilot-plugin" / ".mcp.json"
+    generated_plugin = root / "catalog" / "plugins" / "fixture-list-bundle" / ".copilot-plugin" / "plugin.json"
+    generated_mcp = root / "catalog" / "plugins" / "fixture-list-bundle" / ".copilot-plugin" / ".mcp.json"
     assert generated_plugin.is_file()
     assert generated_mcp.is_file()
     assert json.loads(generated_mcp.read_text())["servers"] == {

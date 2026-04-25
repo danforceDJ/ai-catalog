@@ -4,8 +4,8 @@ You don't need to be a developer to contribute to our AI toolkit. This guide wil
 
 ## 🧭 Repository Map
 - **`catalog/prompts/`**: Reusable text snippets or "Slash Commands" (e.g., `/write-email`).
-- **`catalog/personas/`**: Custom AI personalities or "Agents" (e.g., "Reviewer Agent").
-- **`catalog/capabilities/`**: Detailed instructions for specific tasks (e.g., "How to summarize a PR").
+- **`catalog/agents/`**: Custom AI personalities or "Agent Profiles" (e.g., "Reviewer Agent").
+- **`catalog/skills/`**: Detailed instructions for specific tasks (e.g., "How to summarize a PR").
 - **`catalog/templates/`**: Blank documents you can fill out.
 - **`catalog/integrations/`**: Advanced connections to tools like Jira or Slack.
 

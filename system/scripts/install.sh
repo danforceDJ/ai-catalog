@@ -61,7 +61,7 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 detect_os() {
   case "$(uname -s)" in
@@ -111,11 +111,11 @@ merge_mcp_json() {
 
 case "$TYPE" in
   mcp)
-    SOURCE="$ROOT_DIR/plugins/$NAME/.mcp.json"
-    README_PATH="$ROOT_DIR/plugins/$NAME/README.md"
+    SOURCE="$ROOT_DIR/catalog/plugins/$NAME/.mcp.json"
+    README_PATH="$ROOT_DIR/catalog/plugins/$NAME/README.md"
 
     if [ ! -f "$SOURCE" ]; then
-      echo "MCP plugin '$NAME' not found at plugins/$NAME/.mcp.json" >&2
+      echo "MCP plugin '$NAME' not found at catalog/plugins/$NAME/.mcp.json" >&2
       exit 1
     fi
 
@@ -165,10 +165,10 @@ case "$TYPE" in
     ;;
 
   skill)
-    SOURCE_DIR="$ROOT_DIR/plugins/$NAME/skills/$NAME"
+    SOURCE_DIR="$ROOT_DIR/catalog/plugins/$NAME/skills/$NAME"
 
     if [ ! -d "$SOURCE_DIR" ]; then
-      echo "Skill '$NAME' not found at plugins/$NAME/skills/$NAME" >&2
+      echo "Skill '$NAME' not found at catalog/plugins/$NAME/skills/$NAME" >&2
       exit 1
     fi
 
@@ -186,9 +186,9 @@ case "$TYPE" in
     ;;
 
   agent)
-    AGENTS_DIR="$ROOT_DIR/plugins/$NAME/agents"
+    AGENTS_DIR="$ROOT_DIR/catalog/plugins/$NAME/agents"
     if [ ! -d "$AGENTS_DIR" ]; then
-      echo "Agent '$NAME' not found at plugins/$NAME/agents/" >&2
+      echo "Agent '$NAME' not found at catalog/plugins/$NAME/agents/" >&2
       exit 1
     fi
     if $GLOBAL; then
@@ -207,9 +207,9 @@ case "$TYPE" in
     ;;
 
   prompt)
-    COMMANDS_DIR="$ROOT_DIR/plugins/$NAME/commands"
+    COMMANDS_DIR="$ROOT_DIR/catalog/plugins/$NAME/commands"
     if [ ! -d "$COMMANDS_DIR" ]; then
-      echo "Prompt '$NAME' not found at plugins/$NAME/commands/" >&2
+      echo "Prompt '$NAME' not found at catalog/plugins/$NAME/commands/" >&2
       exit 1
     fi
     if $GLOBAL; then
@@ -227,10 +227,10 @@ case "$TYPE" in
     ;;
 
   template)
-    SOURCE_DIR="$ROOT_DIR/templates/$NAME"
+    SOURCE_DIR="$ROOT_DIR/catalog/templates/$NAME"
 
     if [ ! -d "$SOURCE_DIR" ]; then
-      echo "Template '$NAME' not found at templates/$NAME" >&2
+      echo "Template '$NAME' not found at catalog/templates/$NAME" >&2
       exit 1
     fi
 

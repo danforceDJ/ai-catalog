@@ -29,7 +29,7 @@
         "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
         "rawFiles": [],
         "zip": "dl/atlassian.zip",
-        "repoPath": "mcpServers/atlassian"
+        "repoPath": "catalog/integrations/atlassian"
       }
     },
     {
@@ -70,7 +70,7 @@
         "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
         "rawFiles": [],
         "zip": "dl/atlassian-mcp.zip",
-        "repoPath": "plugins/atlassian-mcp"
+        "repoPath": "catalog/plugins/atlassian-mcp"
       }
     },
     {
@@ -108,7 +108,7 @@
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/default-agent.zip",
-        "repoPath": "plugins/default-agent"
+        "repoPath": "catalog/plugins/default-agent"
       }
     },
     {
@@ -146,7 +146,7 @@
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/jira-ticket-from-code.zip",
-        "repoPath": "plugins/jira-ticket-from-code"
+        "repoPath": "catalog/plugins/jira-ticket-from-code"
       }
     },
     {
@@ -185,7 +185,7 @@
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/pr-description-prompt.zip",
-        "repoPath": "plugins/pr-description-prompt"
+        "repoPath": "catalog/plugins/pr-description-prompt"
       }
     },
     {
@@ -231,7 +231,7 @@
         "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
         "rawFiles": [],
         "zip": "dl/value-stream-1-default.zip",
-        "repoPath": "plugins/value-stream-1-default"
+        "repoPath": "catalog/plugins/value-stream-1-default"
       }
     }
   ],
@@ -257,7 +257,7 @@
           "TEMPLATE.md"
         ],
         "zip": "dl/solution-architecture.zip",
-        "repoPath": "templates/solution-architecture"
+        "repoPath": "catalog/templates/solution-architecture"
       }
     }
   ]

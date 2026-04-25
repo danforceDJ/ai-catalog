@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 REPO_URL = "https://github.com/danforceDJ/ai-catalog"
 
 
@@ -35,7 +35,7 @@ def score_item(item: dict, q: str) -> int:
 
 
 def render_site(catalog: dict, out_path: Path, scripts_dir: Path | None = None) -> None:
-    scripts_dir = scripts_dir or (REPO_ROOT / "scripts")
+    scripts_dir = scripts_dir or (REPO_ROOT / "system" / "scripts")
     env = Environment(
         loader=FileSystemLoader(scripts_dir / "templates"),
         autoescape=select_autoescape(enabled_extensions=("j2",)),
@@ -54,7 +54,7 @@ def render_site(catalog: dict, out_path: Path, scripts_dir: Path | None = None) 
 
 
 def main() -> None:
-    catalog = json.loads((REPO_ROOT / "catalog.json").read_text())
+    catalog = json.loads((REPO_ROOT / "system" / "artifacts" / "catalog.json").read_text())
     render_site(catalog, REPO_ROOT / "docs" / "index.html")
     print(f"Wrote docs/index.html ({len(catalog['plugins'])} plugins, {len(catalog['templates'])} templates)")
 

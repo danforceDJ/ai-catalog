@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import shutil
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 PASSTHROUGH_FIELDS = (
     "description", "version", "author", "homepage", "repository",
@@ -23,7 +23,7 @@ def load_mcp_servers(repo_root: Path, names: list[str]) -> dict:
     """Resolve a list of MCP server names to their actual server config objects."""
     merged: dict = {}
     for name in names:
-        mcp_path = repo_root / "mcpServers" / name / ".mcp.json"
+        mcp_path = repo_root / "catalog" / "integrations" / name / ".mcp.json"
         if mcp_path.is_file():
             data = json.loads(mcp_path.read_text())
             merged.update(data.get("servers", {}))
@@ -45,7 +45,7 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
     skills = manifest.get("skills")
     if isinstance(skills, list):
         for name in skills:
-            src = repo_root / "skills" / name / "SKILL.md"
+            src = repo_root / "catalog" / "skills" / name / "SKILL.md"
             if src.is_file():
                 dst = compat_dir / "skills" / name / "SKILL.md"
                 dst.parent.mkdir(parents=True, exist_ok=True)
@@ -55,7 +55,7 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
     agents = manifest.get("agents")
     if isinstance(agents, list):
         for name in agents:
-            src = repo_root / "agents" / f"{name}.agent.md"
+            src = repo_root / "catalog" / "agents" / f"{name}.agent.md"
             if src.is_file():
                 dst = compat_dir / "agents" / src.name
                 dst.parent.mkdir(parents=True, exist_ok=True)
@@ -65,7 +65,7 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
     commands = manifest.get("commands")
     if isinstance(commands, list):
         for name in commands:
-            src = repo_root / "commands" / f"{name}.md"
+            src = repo_root / "catalog" / "prompts" / f"{name}.md"
             if src.is_file():
                 dst = compat_dir / "commands" / src.name
                 dst.parent.mkdir(parents=True, exist_ok=True)
@@ -83,8 +83,8 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
 
 
 def build_marketplace(repo_root: Path) -> dict:
-    config = json.loads((repo_root / "marketplace.config.json").read_text())
-    plugins_dir = repo_root / "plugins"
+    config = json.loads((repo_root / "system" / "config" / "marketplace.config.json").read_text())
+    plugins_dir = repo_root / "catalog" / "plugins"
     entries: list[dict] = []
     if plugins_dir.is_dir():
         for plugin_dir in sorted(plugins_dir.iterdir()):

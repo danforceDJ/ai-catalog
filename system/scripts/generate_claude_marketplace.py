@@ -13,7 +13,7 @@ from typing import Any
 
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 
 PASSTHROUGH_FIELDS = (
@@ -34,7 +34,7 @@ def load_mcp_servers(repo_root: Path, names: list[str]) -> dict:
     """Resolve a list of MCP server names to their actual server config objects."""
     merged: dict = {}
     for name in names:
-        mcp_path = repo_root / "mcpServers" / name / ".mcp.json"
+        mcp_path = repo_root / "catalog" / "integrations" / name / ".mcp.json"
         if mcp_path.is_file():
             data = json.loads(mcp_path.read_text())
             merged.update(data.get("servers", {}))
@@ -71,7 +71,7 @@ def resolve_commands(manifest: dict, plugin_dir: Path, repo_root: Path) -> list[
     if isinstance(commands_value, list):
         # List reference: look in repo_root / "commands" / f"{name}.md"
         for name in commands_value:
-            cmd_path = repo_root / "commands" / f"{name}.md"
+            cmd_path = repo_root / "catalog" / "prompts" / f"{name}.md"
             if cmd_path.is_file():
                 command_names.append(name)
     elif isinstance(commands_value, str):
@@ -85,7 +85,7 @@ def resolve_commands(manifest: dict, plugin_dir: Path, repo_root: Path) -> list[
     for name in command_names:
         # Determine path based on reference type
         if isinstance(commands_value, list):
-            cmd_path = repo_root / "commands" / f"{name}.md"
+            cmd_path = repo_root / "catalog" / "prompts" / f"{name}.md"
             prompt_path = f"commands/{name}.md"
         else:
             cmd_path = plugin_dir / commands_value / f"{name}.md"
@@ -116,7 +116,7 @@ def resolve_agents(manifest: dict, plugin_dir: Path, repo_root: Path) -> str | l
     if isinstance(agents_value, list):
         # List reference: look in repo_root / "agents" / f"{name}.agent.md"
         for name in agents_value:
-            agent_path = repo_root / "agents" / f"{name}.agent.md"
+            agent_path = repo_root / "catalog" / "agents" / f"{name}.agent.md"
             if agent_path.is_file():
                 agent_names.append(name)
     elif isinstance(agents_value, str):
@@ -185,7 +185,7 @@ def materialize_claude_plugin(repo_root: Path, plugin_dir: Path, manifest: dict,
     if isinstance(commands_value, list):
         # Copy from repo_root / "commands" / f"{name}.md"
         for name in commands_value:
-            src = repo_root / "commands" / f"{name}.md"
+            src = repo_root / "catalog" / "prompts" / f"{name}.md"
             if src.is_file():
                 dst = claude_dir / "commands" / f"{name}.md"
                 dst.parent.mkdir(parents=True, exist_ok=True)
@@ -203,7 +203,7 @@ def materialize_claude_plugin(repo_root: Path, plugin_dir: Path, manifest: dict,
     if isinstance(agents_value, list):
         # Copy from repo_root / "agents" / f"{name}.agent.md"
         for name in agents_value:
-            src = repo_root / "agents" / f"{name}.agent.md"
+            src = repo_root / "catalog" / "agents" / f"{name}.agent.md"
             if src.is_file():
                 dst = claude_dir / "agents" / f"{name}.agent.md"
                 dst.parent.mkdir(parents=True, exist_ok=True)
@@ -226,10 +226,10 @@ def materialize_claude_plugin(repo_root: Path, plugin_dir: Path, manifest: dict,
 
 def build_claude_marketplace(repo_root: Path) -> dict:
     """Build Claude marketplace structure."""
-    config = json.loads((repo_root / "marketplace.config.json").read_text())
+    config = json.loads((repo_root / "system" / "config" / "marketplace.config.json").read_text())
     repo_url = f"https://github.com/{config['owner']['name']}/{config['name']}"
     
-    plugins_dir = repo_root / "plugins"
+    plugins_dir = repo_root / "catalog" / "plugins"
     entries: list[dict] = []
     
     if plugins_dir.is_dir():
@@ -276,7 +276,7 @@ def build_claude_marketplace(repo_root: Path) -> dict:
                 "source": {
                     "type": "git",
                     "url": repo_url,
-                    "path": f"plugins/{plugin_name}",
+                    "path": f"catalog/plugins/{plugin_name}",
                 },
                 "manifest": "claude-plugin.json",
             }
@@ -301,13 +301,13 @@ def main() -> None:
     marketplace = build_claude_marketplace(REPO_ROOT)
     
     # Write claude.marketplace.json
-    out = REPO_ROOT / "claude.marketplace.json"
+    out = REPO_ROOT / "system" / "artifacts" / "claude.marketplace.json"
     out.write_text(json.dumps(marketplace, indent=2, ensure_ascii=False) + "\n")
     
     print(f"Wrote {out.relative_to(REPO_ROOT)} ({len(marketplace['plugins'])} plugins)")
     
     # Summary of generated claude-plugin.json files
-    plugins_dir = REPO_ROOT / "plugins"
+    plugins_dir = REPO_ROOT / "catalog" / "plugins"
     if plugins_dir.is_dir():
         count = sum(1 for p in plugins_dir.iterdir() if (p / "claude-plugin.json").is_file())
         print(f"Wrote {count} claude-plugin.json files")

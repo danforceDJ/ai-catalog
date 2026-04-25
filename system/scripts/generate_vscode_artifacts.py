@@ -13,13 +13,13 @@ from pathlib import Path
 
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 FRONTMATTER_PATTERN = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 
 
 def write_vscode_mcp_json() -> None:
     """Merge all mcpServers/*/.mcp.json files into .vscode/mcp.json."""
-    mcp_servers_dir = REPO_ROOT / "mcpServers"
+    mcp_servers_dir = REPO_ROOT / "catalog" / "integrations"
     merged_servers = {}
 
     if not mcp_servers_dir.exists():
@@ -59,7 +59,7 @@ def write_vscode_mcp_json() -> None:
 
 def write_github_prompts() -> None:
     """Convert commands/*.md to .github/prompts/*.prompt.md with VS Code format."""
-    commands_dir = REPO_ROOT / "commands"
+    commands_dir = REPO_ROOT / "catalog" / "prompts"
     if not commands_dir.exists():
         return
 
@@ -98,7 +98,7 @@ def write_github_prompts() -> None:
 
 def write_github_instructions() -> None:
     """Concatenate all agents/*.agent.md bodies into .github/instructions/catalog-agent.instructions.md."""
-    agents_dir = REPO_ROOT / "agents"
+    agents_dir = REPO_ROOT / "catalog" / "agents"
     if not agents_dir.exists():
         return
 
