@@ -1,0 +1,24 @@
+{
+  "name": "senior-cloud-architect",
+  "description": "Expert in modern architecture design patterns, NFR requirements, and creating comprehensive architectural diagrams and documentation",
+  "version": "1.0.0",
+  "author": {
+    "name": "github/awesome-copilot"
+  },
+  "license": "MIT",
+  "keywords": [
+    "agent",
+    "architecture",
+    "cloud",
+    "diagrams",
+    "mermaid",
+    "nfr"
+  ],
+  "category": "development",
+  "tags": [
+    "architecture",
+    "cloud",
+    "design"
+  ],
+  "instructions": "agents/senior-cloud-architect.agent.md"
+}

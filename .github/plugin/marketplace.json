@@ -98,6 +98,31 @@
       "commands": "commands"
     },
     {
+      "name": "senior-cloud-architect",
+      "source": "catalog/plugins/senior-cloud-architect/.copilot-plugin",
+      "description": "Expert in modern architecture design patterns, NFR requirements, and creating comprehensive architectural diagrams and documentation",
+      "version": "1.0.0",
+      "author": {
+        "name": "github/awesome-copilot"
+      },
+      "license": "MIT",
+      "keywords": [
+        "agent",
+        "architecture",
+        "cloud",
+        "diagrams",
+        "mermaid",
+        "nfr"
+      ],
+      "category": "development",
+      "tags": [
+        "architecture",
+        "cloud",
+        "design"
+      ],
+      "agents": "agents"
+    },
+    {
       "name": "value-stream-1-default",
       "source": "catalog/plugins/value-stream-1-default/.copilot-plugin",
       "description": "Default bundle for value stream 1: Confluence publishing, architecture doc generation, Jira ticketing from code, and Atlassian MCP.",

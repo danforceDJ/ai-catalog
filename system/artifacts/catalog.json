@@ -189,6 +189,48 @@
       }
     },
     {
+      "name": "senior-cloud-architect",
+      "description": "Expert in modern architecture design patterns, NFR requirements, and creating comprehensive architectural diagrams and documentation",
+      "version": "1.0.0",
+      "type": "agent",
+      "category": "development",
+      "tags": [
+        "architecture",
+        "cloud",
+        "design"
+      ],
+      "keywords": [
+        "agent",
+        "architecture",
+        "cloud",
+        "diagrams",
+        "mermaid",
+        "nfr"
+      ],
+      "components": {
+        "skills": [],
+        "agents": [
+          "senior-cloud-architect"
+        ],
+        "commands": [],
+        "mcpServers": [],
+        "hooks": false
+      },
+      "install": {
+        "copilot": "senior-cloud-architect@ai-catalog",
+        "claude": "claude plugin install senior-cloud-architect",
+        "platforms": [
+          "copilot-cli",
+          "claude"
+        ],
+        "vscodeWorkspace": null,
+        "vscodeMcpDeeplink": null,
+        "rawFiles": [],
+        "zip": "dl/senior-cloud-architect.zip",
+        "repoPath": "catalog/plugins/senior-cloud-architect"
+      }
+    },
+    {
       "name": "value-stream-1-default",
       "description": "Default bundle for value stream 1: Confluence publishing, architecture doc generation, Jira ticketing from code, and Atlassian MCP.",
       "version": "1.0.0",

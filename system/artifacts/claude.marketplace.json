@@ -8,7 +8,7 @@
       "source": {
         "type": "git",
         "url": "https://github.com/danforceDJ/ai-catalog",
-        "path": "plugins/atlassian-mcp"
+        "path": "catalog/plugins/atlassian-mcp"
       },
       "manifest": "claude-plugin.json",
       "category": "integrations",
@@ -22,7 +22,7 @@
       "source": {
         "type": "git",
         "url": "https://github.com/danforceDJ/ai-catalog",
-        "path": "plugins/default-agent"
+        "path": "catalog/plugins/default-agent"
       },
       "manifest": "claude-plugin.json",
       "category": "governance",
@@ -35,7 +35,7 @@
       "source": {
         "type": "git",
         "url": "https://github.com/danforceDJ/ai-catalog",
-        "path": "plugins/jira-ticket-from-code"
+        "path": "catalog/plugins/jira-ticket-from-code"
       },
       "manifest": "claude-plugin.json",
       "category": "productivity",
@@ -49,7 +49,7 @@
       "source": {
         "type": "git",
         "url": "https://github.com/danforceDJ/ai-catalog",
-        "path": "plugins/pr-description-prompt"
+        "path": "catalog/plugins/pr-description-prompt"
       },
       "manifest": "claude-plugin.json",
       "category": "productivity",
@@ -59,11 +59,26 @@
       ]
     },
     {
+      "name": "senior-cloud-architect",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "catalog/plugins/senior-cloud-architect"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "development",
+      "tags": [
+        "architecture",
+        "cloud",
+        "design"
+      ]
+    },
+    {
       "name": "value-stream-1-default",
       "source": {
         "type": "git",
         "url": "https://github.com/danforceDJ/ai-catalog",
-        "path": "plugins/value-stream-1-default"
+        "path": "catalog/plugins/value-stream-1-default"
       },
       "manifest": "claude-plugin.json",
       "category": "bundles",
