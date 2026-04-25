@@ -19,7 +19,7 @@ FRONTMATTER_PATTERN = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 
 def write_vscode_mcp_json() -> None:
     """Merge all mcpServers/*/.mcp.json files into .vscode/mcp.json."""
-    mcp_servers_dir = REPO_ROOT / "catalog" / "integrations"
+    mcp_servers_dir = REPO_ROOT / "catalog" / "mcp"
     merged_servers = {}
 
     if not mcp_servers_dir.exists():

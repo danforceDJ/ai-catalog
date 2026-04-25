@@ -23,7 +23,7 @@ def load_mcp_servers(repo_root: Path, names: list[str]) -> dict:
     """Resolve a list of MCP server names to their actual server config objects."""
     merged: dict = {}
     for name in names:
-        mcp_path = repo_root / "catalog" / "integrations" / name / ".mcp.json"
+        mcp_path = repo_root / "catalog" / "mcp" / name / ".mcp.json"
         if mcp_path.is_file():
             data = json.loads(mcp_path.read_text())
             merged.update(data.get("servers", {}))

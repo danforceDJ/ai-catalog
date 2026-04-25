@@ -23,7 +23,7 @@ def claude_fake_repo(tmp_path, fixtures_dir):
     catalog_dir = tmp_path / "catalog"
     catalog_dir.mkdir()
     shutil.copytree(fixtures_dir / "catalog" / "plugins", catalog_dir / "plugins")
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "integrations")]:
+    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
         src = fixtures_dir / "catalog" / newname
         if src.exists():
             shutil.copytree(src, catalog_dir / newname)

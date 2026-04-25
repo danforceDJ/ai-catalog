@@ -25,7 +25,7 @@ def vscode_fake_repo(tmp_path, fixtures_dir):
     catalog_dir = tmp_path / "catalog"
     catalog_dir.mkdir()
     shutil.copytree(fixtures_dir / "catalog" / "plugins", catalog_dir / "plugins")
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "integrations")]:
+    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
         src = fixtures_dir / "catalog" / newname
         if src.exists():
             shutil.copytree(src, catalog_dir / newname)
@@ -73,7 +73,7 @@ def test_vscode_mcp_json_servers_format(vscode_fake_repo):
         assert isinstance(data["servers"], dict)
         
         # fixture-top-server should be present (from fixtures/mcpServers/fixture-top-mcp)
-        if vscode_fake_repo / "catalog" / "integrations" / "fixture-top-mcp" / ".mcp.json" in (vscode_fake_repo / "catalog" / "integrations").rglob(".mcp.json"):
+        if vscode_fake_repo / "catalog" / "mcp" / "fixture-top-mcp" / ".mcp.json" in (vscode_fake_repo / "catalog" / "mcp").rglob(".mcp.json"):
             # The server should keep its original fields including 'type' if present
             for server_name, server_config in data["servers"].items():
                 # Unlike Claude format, VS Code format should keep 'type' if present
@@ -235,7 +235,7 @@ def test_vscode_mcp_json_multiple_servers(vscode_fake_repo):
     mod = _load("generate_vscode_artifacts")
     
     # Create additional MCP server
-    mcp_dir = vscode_fake_repo / "catalog" / "integrations" / "additional-server"
+    mcp_dir = vscode_fake_repo / "catalog" / "mcp" / "additional-server"
     mcp_dir.mkdir(parents=True, exist_ok=True)
     (mcp_dir / ".mcp.json").write_text(json.dumps({
         "servers": {
@@ -284,7 +284,7 @@ def test_vscode_artifacts_no_crash_missing_dirs(vscode_fake_repo):
         
         # These should succeed without errors even with missing dirs
         # write_vscode_mcp_json creates .vscode if mcpServers exist
-        if (minimal_repo / "catalog" / "integrations").exists():
+        if (minimal_repo / "catalog" / "mcp").exists():
             assert (minimal_repo / ".vscode").exists()
     finally:
         mod.REPO_ROOT = original_root
@@ -408,7 +408,7 @@ def test_vscode_mcp_json_handles_invalid_json(vscode_fake_repo, capsys):
     mod = _load("generate_vscode_artifacts")
     
     # Create invalid JSON file
-    mcp_dir = vscode_fake_repo / "catalog" / "integrations" / "bad-server"
+    mcp_dir = vscode_fake_repo / "catalog" / "mcp" / "bad-server"
     mcp_dir.mkdir(parents=True, exist_ok=True)
     (mcp_dir / ".mcp.json").write_text("{ invalid json")
     

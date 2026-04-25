@@ -59,7 +59,7 @@ Web UI + Copilot CLI install
 
 | Type | Path | Metadata source |
 |------|------|-----------------|
-| MCP Server | `catalog/integrations/<name>/.mcp.json` | `plugin.json` at `catalog/plugins/<name>/` |
+| MCP Server | `catalog/mcp/<name>/.mcp.json` | `plugin.json` at `catalog/plugins/<name>/` |
 | Skill | `catalog/skills/<skill-name>/SKILL.md` | `plugin.json` (authoritative) + SKILL.md frontmatter (cross-checked) |
 | Agent Profile | `catalog/agents/<agent-name>.agent.md` | `plugin.json` + agent frontmatter |
 | Prompt (Command) | `catalog/prompts/<cmd-name>.md` | `plugin.json` + command frontmatter |

@@ -198,9 +198,9 @@ class Validator:
         mcp_value = manifest.get("mcpServers", ".mcp.json")
         if isinstance(mcp_value, list):
             for mcp_name in mcp_value:
-                mcp_path = self.repo / "catalog" / "integrations" / mcp_name / ".mcp.json"
+                mcp_path = self.repo / "catalog" / "mcp" / mcp_name / ".mcp.json"
                 if not mcp_path.is_file():
-                    self.fail(f"{plugin_dir}: referenced mcpServer '{mcp_name}' not found at catalog/integrations/{mcp_name}/.mcp.json")
+                    self.fail(f"{plugin_dir}: referenced mcpServer '{mcp_name}' not found at catalog/mcp/{mcp_name}/.mcp.json")
                 else:
                     self._scan_mcp_secrets(mcp_path)
 
@@ -372,7 +372,7 @@ class Validator:
         if commands_dir.is_dir():
             for p in sorted(commands_dir.glob("*.md")):
                 self.validate_standalone_command(p)
-        mcp_dir = self.repo / "catalog" / "integrations"
+        mcp_dir = self.repo / "catalog" / "mcp"
         if mcp_dir.is_dir():
             for d in sorted(s for s in mcp_dir.iterdir() if s.is_dir()):
                 self.validate_standalone_mcp(d)

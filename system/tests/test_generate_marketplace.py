@@ -20,7 +20,7 @@ def test_build_marketplace_from_fixtures(fixtures_dir, tmp_path):
     catalog_dir = root / "catalog"
     catalog_dir.mkdir()
     shutil.copytree(fixtures_dir / "catalog" / "plugins", catalog_dir / "plugins")
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "integrations")]:
+    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
         src = fixtures_dir / "catalog" / newname
         if src.exists():
             shutil.copytree(src, catalog_dir / newname)

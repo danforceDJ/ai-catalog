@@ -38,7 +38,7 @@ Frontmatter: `name` (**required**), `description` (**required**). Body: behavior
 
 Frontmatter: `name` (**required**, **must equal the filename stem**), `description` (**required**). Body: prompt template text.
 
-### MCP Server Config (`catalog/integrations/<name>/.mcp.json`)
+### MCP Server Config (`catalog/mcp/<name>/.mcp.json`)
 
 ```json
 {

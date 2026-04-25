@@ -77,7 +77,7 @@ def plugin_components(plugin_dir: Path, manifest: dict, repo_root: Path | None =
 
     # MCP servers: list of top-level dir names or a string .mcp.json path relative to plugin_dir
     if isinstance(mcp_value, list) and repo_root is not None:
-        mcp_paths = [repo_root / "catalog" / "integrations" / name / ".mcp.json" for name in mcp_value]
+        mcp_paths = [repo_root / "catalog" / "mcp" / name / ".mcp.json" for name in mcp_value]
     elif isinstance(mcp_value, str):
         mcp_paths = [plugin_dir / mcp_value]
     else:
@@ -113,7 +113,7 @@ def build_deeplink(plugin_dir: Path, manifest: dict, repo_root: Path | None = No
     if isinstance(mcp_value, list) and repo_root is not None:
         if len(mcp_value) != 1:
             return None
-        mcp_path = repo_root / "catalog" / "integrations" / mcp_value[0] / ".mcp.json"
+        mcp_path = repo_root / "catalog" / "mcp" / mcp_value[0] / ".mcp.json"
     elif isinstance(mcp_value, str):
         mcp_path = plugin_dir / mcp_value
     else:
@@ -353,7 +353,7 @@ def build_top_level_entries(
             })
 
     # Standalone MCP server configs
-    mcp_dir = repo_root / "catalog" / "integrations"
+    mcp_dir = repo_root / "catalog" / "mcp"
     if mcp_dir.is_dir():
         for mcp_server_dir in sorted(d for d in mcp_dir.iterdir() if d.is_dir()):
             mcp_path = mcp_server_dir / ".mcp.json"
@@ -383,7 +383,7 @@ def build_top_level_entries(
                     "vscodeMcpDeeplink": deeplink,
                     "rawFiles": [],
                     "zip": f"dl/{mcp_server_dir.name}.zip",
-                    "repoPath": f"catalog/integrations/{mcp_server_dir.name}",
+                    "repoPath": f"catalog/mcp/{mcp_server_dir.name}",
                 },
             })
 

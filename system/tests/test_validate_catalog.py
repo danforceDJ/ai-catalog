@@ -26,7 +26,7 @@ def fake_repo(tmp_path, fixtures_dir):
     (config_dir / "marketplace.config.json").write_text(
         (fixtures_dir / "marketplace.config.json").read_text()
     )
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "integrations")]:
+    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
         src = fixtures_dir / "catalog" / newname
         if src.exists():
             (catalog_dir / newname).symlink_to(src)
@@ -208,7 +208,7 @@ def test_standalone_mcp_secret_scan_fails(tmp_path, fixtures_dir):
     catalog_dir.mkdir()
     (catalog_dir / "plugins").mkdir()
     (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    mcp_dir = catalog_dir / "integrations" / "leaky-top-mcp"
+    mcp_dir = catalog_dir / "mcp" / "leaky-top-mcp"
     mcp_dir.mkdir(parents=True)
     (mcp_dir / ".mcp.json").write_text(json.dumps({
         "servers": {"leaky": {"command": "echo", "env": {"API_TOKEN": "ghp_" + "a" * 36}}}

@@ -29,7 +29,7 @@
         "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
         "rawFiles": [],
         "zip": "dl/atlassian.zip",
-        "repoPath": "catalog/integrations/atlassian"
+        "repoPath": "catalog/mcp/atlassian"
       }
     },
     {

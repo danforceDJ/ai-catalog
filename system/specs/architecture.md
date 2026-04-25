@@ -18,7 +18,7 @@ A company-wide AI configuration marketplace serving two outputs from one filesys
 
 ```
 catalog/plugins/  +  catalog/skills/  +  catalog/agents/
-catalog/prompts/  +  catalog/integrations/  +  catalog/templates/
+catalog/prompts/  +  catalog/mcp/  +  catalog/templates/
 system/config/marketplace.config.json
       │
       ▼
@@ -52,7 +52,7 @@ system/config/marketplace.config.json
 | Skill | `catalog/skills/<name>/` | `SKILL.md` |
 | Agent | `catalog/agents/` | `<name>.agent.md` |
 | Command | `catalog/prompts/` | `<name>.md` |
-| MCP Server | `catalog/integrations/<name>/` | `.mcp.json` |
+| MCP Server | `catalog/mcp/<name>/` | `.mcp.json` |
 | Template | `catalog/templates/<name>/` | `TEMPLATE.md` |
 
 Discoverable in the web UI. Not directly Copilot CLI installable unless wrapped in a plugin.

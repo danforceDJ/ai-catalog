@@ -21,7 +21,7 @@ def fake_repo(tmp_path, fixtures_dir):
     catalog_dir.mkdir()
     (catalog_dir / "plugins").symlink_to(fixtures_dir / "catalog" / "plugins")
     (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "integrations")]:
+    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
         src = fixtures_dir / "catalog" / newname
         if src.exists():
             (catalog_dir / newname).symlink_to(src)
@@ -93,7 +93,7 @@ def test_catalog_deeplink_size_cap(tmp_path, fixtures_dir):
     huge_args = ["x" * 3000]
     (big_plugin / ".mcp.json").write_text(json.dumps({"servers": {"big": {"command": "echo", "args": huge_args}}}))
     (catalog_dir / "templates").mkdir()
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "integrations")]:
+    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
         src = fixtures_dir / "catalog" / newname
         if src.exists():
             (catalog_dir / newname).symlink_to(src)

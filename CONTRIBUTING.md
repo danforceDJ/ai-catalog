@@ -30,7 +30,7 @@ uv run --script system/scripts/validate_catalog.py
 catalog/skills/<name>/SKILL.md          ← reusable skills
 catalog/agents/<name>.agent.md          ← agent profiles
 catalog/prompts/<name>.md               ← slash commands (filename stem must equal frontmatter name)
-catalog/integrations/<name>/.mcp.json   ← MCP server configs
+catalog/mcp/<name>/.mcp.json   ← MCP server configs
 catalog/plugins/<name>/plugin.json      ← wrapper or bundle referencing primitives by name list
 catalog/templates/<name>/TEMPLATE.md    ← raw-download-only templates
 ```
@@ -55,7 +55,7 @@ The skill appears in the web catalog with "Copy raw" and "Download zip" buttons.
 
 ## Adding a standalone MCP server config
 
-1. Create `catalog/integrations/<kebab-case-name>/.mcp.json` in the Copilot `{"servers": {...}}` shape.
+1. Create `catalog/mcp/<kebab-case-name>/.mcp.json` in the Copilot `{"servers": {...}}` shape.
 2. Validate (secret scan runs automatically), regenerate, commit.
 
 ## Adding a plugin wrapper (single primitive, Copilot CLI installable)
@@ -65,7 +65,7 @@ The skill appears in the web catalog with "Copy raw" and "Download zip" buttons.
    - **Skill** — `"skills": ["<name>"]` (resolves to `catalog/skills/<name>/SKILL.md`)
    - **Agent** — `"agents": ["<name>"]` (resolves to `catalog/agents/<name>.agent.md`)
    - **Command** — `"commands": ["<name>"]` (resolves to `catalog/prompts/<name>.md`)
-   - **MCP** — `"mcpServers": ["<name>"]` (resolves to `catalog/integrations/<name>/.mcp.json`)
+   - **MCP** — `"mcpServers": ["<name>"]` (resolves to `catalog/mcp/<name>/.mcp.json`)
 3. Regenerate marketplace metadata. This also materializes a Copilot-compatible plugin package at `catalog/plugins/<name>/.copilot-plugin/`.
 4. Validate, regenerate, commit, and open a PR.
 
