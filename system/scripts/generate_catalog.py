@@ -432,9 +432,6 @@ def main() -> None:
     catalog = build_catalog(REPO_ROOT)
     payload = json.dumps(catalog, indent=2, ensure_ascii=False) + "\n"
     (REPO_ROOT / "system" / "artifacts" / "catalog.json").write_text(payload)
-    docs_copy = REPO_ROOT / "docs" / "catalog.json"
-    docs_copy.parent.mkdir(parents=True, exist_ok=True)
-    docs_copy.write_text(payload)
     print(f"Wrote system/artifacts/catalog.json ({len(catalog['plugins'])} plugins/primitives, {len(catalog['templates'])} templates)")
 
 
