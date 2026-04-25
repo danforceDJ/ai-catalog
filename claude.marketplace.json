@@ -1,0 +1,77 @@
+{
+  "name": "ai-catalog",
+  "version": "1.0.0",
+  "description": "Company-wide AI configuration marketplace: MCP servers, skills, agent profiles, prompts.",
+  "plugins": [
+    {
+      "name": "atlassian-mcp",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "plugins/atlassian-mcp"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "integrations",
+      "tags": [
+        "atlassian",
+        "mcp"
+      ]
+    },
+    {
+      "name": "default-agent",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "plugins/default-agent"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "governance",
+      "tags": [
+        "default"
+      ]
+    },
+    {
+      "name": "jira-ticket-from-code",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "plugins/jira-ticket-from-code"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "productivity",
+      "tags": [
+        "jira",
+        "atlassian"
+      ]
+    },
+    {
+      "name": "pr-description-prompt",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "plugins/pr-description-prompt"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "productivity",
+      "tags": [
+        "github",
+        "prompt"
+      ]
+    },
+    {
+      "name": "value-stream-1-default",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "plugins/value-stream-1-default"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "bundles",
+      "tags": [
+        "atlassian",
+        "bundle",
+        "workflow"
+      ]
+    }
+  ]
+}

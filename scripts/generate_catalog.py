@@ -156,6 +156,40 @@ def raw_files(plugin_dir: Path, components: dict, manifest: dict | None = None) 
     return []
 
 
+def build_platform_fields(name: str, components: dict) -> dict:
+    """Return claude, platforms, and vscodeWorkspace install fields.
+    
+    Args:
+        name: Entry name for the claude install command
+        components: Component dict with keys: skills, agents, commands, mcpServers, hooks
+    
+    Returns:
+        Dict with keys: claude, platforms, vscodeWorkspace
+    """
+    has_mcp = bool(components.get("mcpServers"))
+    has_commands = bool(components.get("commands"))
+    has_agents = bool(components.get("agents"))
+    
+    # Claude install command if plugin has MCP, commands, or agents
+    claude_install = f"claude plugin install {name}" if (has_mcp or has_commands or has_agents) else None
+    
+    # Platforms list
+    platforms = ["copilot-cli"]
+    if has_mcp or has_commands or has_agents:
+        platforms.append("claude")
+    if has_mcp:
+        platforms.append("vscode")
+    
+    # VS Code workspace config path
+    vscode_workspace = ".vscode/mcp.json" if has_mcp else None
+    
+    return {
+        "claude": claude_install,
+        "platforms": platforms,
+        "vscodeWorkspace": vscode_workspace,
+    }
+
+
 def build_plugin_entry(plugin_dir: Path, repo_root: Path | None = None) -> dict | None:
     manifest_path = plugin_dir / "plugin.json"
     if not manifest_path.is_file():
@@ -175,6 +209,7 @@ def build_plugin_entry(plugin_dir: Path, repo_root: Path | None = None) -> dict 
         "components": components,
         "install": {
             "copilot": f"{manifest['name']}@ai-catalog",
+            **build_platform_fields(manifest["name"], components),
             "vscodeMcpDeeplink": deeplink,
             "rawFiles": raw_files(plugin_dir, components, manifest),
             "zip": f"dl/{plugin_dir.name}.zip",
@@ -241,6 +276,7 @@ def build_top_level_entries(
             if not skill_md.is_file():
                 continue
             fm = parse_frontmatter(skill_md.read_text())
+            components = {"skills": [skill_dir.name], "agents": [], "commands": [], "mcpServers": [], "hooks": False}
             entries.append({
                 "name": fm.get("name", skill_dir.name),
                 "description": fm.get("description", ""),
@@ -249,9 +285,10 @@ def build_top_level_entries(
                 "category": fm.get("category", ""),
                 "tags": fm.get("tags", []) or [],
                 "keywords": fm.get("keywords", []) or [],
-                "components": {"skills": [skill_dir.name], "agents": [], "commands": [], "mcpServers": [], "hooks": False},
+                "components": components,
                 "install": {
                     "copilot": None,
+                    **build_platform_fields(skill_dir.name, components),
                     "vscodeMcpDeeplink": None,
                     "rawFiles": ["SKILL.md"],
                     "zip": f"dl/{skill_dir.name}.zip",
@@ -267,6 +304,7 @@ def build_top_level_entries(
             if agent_name in covered_agents:
                 continue
             fm = parse_frontmatter(agent_path.read_text())
+            components = {"skills": [], "agents": [agent_name], "commands": [], "mcpServers": [], "hooks": False}
             entries.append({
                 "name": fm.get("name", agent_name),
                 "description": fm.get("description", ""),
@@ -275,9 +313,10 @@ def build_top_level_entries(
                 "category": fm.get("category", ""),
                 "tags": fm.get("tags", []) or [],
                 "keywords": fm.get("keywords", []) or [],
-                "components": {"skills": [], "agents": [agent_name], "commands": [], "mcpServers": [], "hooks": False},
+                "components": components,
                 "install": {
                     "copilot": None,
+                    **build_platform_fields(agent_name, components),
                     "vscodeMcpDeeplink": None,
                     "rawFiles": [agent_path.name],
                     "zip": f"dl/{agent_name}.zip",
@@ -293,6 +332,7 @@ def build_top_level_entries(
             if cmd_name in covered_commands:
                 continue
             fm = parse_frontmatter(cmd_path.read_text())
+            components = {"skills": [], "agents": [], "commands": [cmd_name], "mcpServers": [], "hooks": False}
             entries.append({
                 "name": fm.get("name", cmd_name),
                 "description": fm.get("description", ""),
@@ -301,9 +341,10 @@ def build_top_level_entries(
                 "category": fm.get("category", ""),
                 "tags": fm.get("tags", []) or [],
                 "keywords": fm.get("keywords", []) or [],
-                "components": {"skills": [], "agents": [], "commands": [cmd_name], "mcpServers": [], "hooks": False},
+                "components": components,
                 "install": {
                     "copilot": None,
+                    **build_platform_fields(cmd_name, components),
                     "vscodeMcpDeeplink": None,
                     "rawFiles": [cmd_path.name],
                     "zip": f"dl/{cmd_name}.zip",
@@ -326,6 +367,7 @@ def build_top_level_entries(
             if not server_names:
                 continue
             deeplink = _deeplink_from_mcp_path(mcp_path)
+            components = {"skills": [], "agents": [], "commands": [], "mcpServers": server_names, "hooks": False}
             entries.append({
                 "name": mcp_server_dir.name,
                 "description": "",
@@ -334,9 +376,10 @@ def build_top_level_entries(
                 "category": "",
                 "tags": [],
                 "keywords": [],
-                "components": {"skills": [], "agents": [], "commands": [], "mcpServers": server_names, "hooks": False},
+                "components": components,
                 "install": {
                     "copilot": None,
+                    **build_platform_fields(mcp_server_dir.name, components),
                     "vscodeMcpDeeplink": deeplink,
                     "rawFiles": [],
                     "zip": f"dl/{mcp_server_dir.name}.zip",

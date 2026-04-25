@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/danforceDJ/ai-catalog/specs/schemas/mcp-config.schema.json",
+  "title": "MCP Server Config (.mcp.json)",
+  "description": "Model Context Protocol server configuration. Used by Copilot CLI and VS Code.",
+  "type": "object",
+  "required": ["servers"],
+  "properties": {
+    "servers": {
+      "type": "object",
+      "description": "Map of server name → MCP server configuration.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["stdio", "sse", "http"],
+            "description": "Transport mechanism."
+          },
+          "command": {
+            "type": "string",
+            "description": "Executable command. Required for stdio type."
+          },
+          "args": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Command arguments."
+          },
+          "env": {
+            "type": "object",
+            "description": "Environment variables. MUST NOT contain secrets.",
+            "additionalProperties": { "type": "string" }
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Server URL. Required for sse and http types."
+          },
+          "headers": {
+            "type": "object",
+            "description": "HTTP headers (VS Code only). Use ${env:VAR} substitution for secrets.",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

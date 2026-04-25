@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/danforceDJ/ai-catalog/specs/schemas/copilot-marketplace.schema.json",
+  "title": "Copilot CLI marketplace.json",
+  "description": "Marketplace index for GitHub Copilot CLI plugin discovery.",
+  "type": "object",
+  "required": ["name", "owner", "plugins"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Marketplace identifier. kebab-case, ≤ 64 chars.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "owner": {
+      "type": "object",
+      "description": "Marketplace owner (the git repository owner).",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "description": "Owner username or org name." },
+        "email": { "type": "string", "format": "email" }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Freeform marketplace metadata.",
+      "properties": {
+        "description": { "type": "string" },
+        "version": { "type": "string" },
+        "homepage": { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": true
+    },
+    "plugins": {
+      "type": "array",
+      "description": "Ordered list of plugin entries in this marketplace.",
+      "items": {
+        "type": "object",
+        "required": ["name", "source"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "maxLength": 64,
+            "description": "Plugin name matching plugin.json name."
+          },
+          "source": {
+            "description": "Path to plugin directory relative to repo root. For list-reference plugins, points to .copilot-plugin/ subdir.",
+            "oneOf": [
+              { "type": "string", "description": "Relative directory path." },
+              { "type": "object", "description": "Config object (future extension)." }
+            ]
+          },
+          "description": { "type": "string" },
+          "version": { "type": "string" },
+          "author": { "type": "object" },
+          "license": { "type": "string" },
+          "homepage": { "type": "string" },
+          "keywords": { "type": "array", "items": { "type": "string" } },
+          "category": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "string", "description": "Materialized skill directory path." },
+          "agents": { "type": "string", "description": "Materialized agents directory path." },
+          "commands": { "type": "string", "description": "Materialized commands directory path." },
+          "mcpServers": {
+            "description": "Resolved MCP server config objects (not raw name list).",
+            "oneOf": [
+              { "type": "string", "description": "Legacy path to .mcp.json" },
+              { "type": "object", "description": "Inline server config map." }
+            ]
+          },
+          "hooks": { "oneOf": [{ "type": "string" }, { "type": "object" }] },
+          "lspServers": { "oneOf": [{ "type": "string" }, { "type": "object" }] }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,31 @@
+{
+  "name": "atlassian-mcp",
+  "description": "Atlassian Rovo MCP Server via OAuth 2.1 (SSO). No API tokens required in this repository.",
+  "version": "1.0.0",
+  "author": {
+    "name": "danforceDJ"
+  },
+  "license": "MIT",
+  "keywords": [
+    "atlassian",
+    "jira",
+    "confluence",
+    "rovo",
+    "mcp"
+  ],
+  "category": "integrations",
+  "tags": [
+    "atlassian",
+    "mcp"
+  ],
+  "mcpServers": {
+    "atlassian": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "https://mcp.atlassian.com/v1/sse"
+      ]
+    }
+  }
+}

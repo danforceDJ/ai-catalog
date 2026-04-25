@@ -19,6 +19,13 @@
       },
       "install": {
         "copilot": null,
+        "claude": "claude plugin install atlassian",
+        "platforms": [
+          "copilot-cli",
+          "claude",
+          "vscode"
+        ],
+        "vscodeWorkspace": ".vscode/mcp.json",
         "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
         "rawFiles": [],
         "zip": "dl/atlassian.zip",
@@ -53,6 +60,13 @@
       },
       "install": {
         "copilot": "atlassian-mcp@ai-catalog",
+        "claude": "claude plugin install atlassian-mcp",
+        "platforms": [
+          "copilot-cli",
+          "claude",
+          "vscode"
+        ],
+        "vscodeWorkspace": ".vscode/mcp.json",
         "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
         "rawFiles": [],
         "zip": "dl/atlassian-mcp.zip",
@@ -85,6 +99,12 @@
       },
       "install": {
         "copilot": "default-agent@ai-catalog",
+        "claude": "claude plugin install default-agent",
+        "platforms": [
+          "copilot-cli",
+          "claude"
+        ],
+        "vscodeWorkspace": null,
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/default-agent.zip",
@@ -118,6 +138,11 @@
       },
       "install": {
         "copilot": "jira-ticket-from-code@ai-catalog",
+        "claude": null,
+        "platforms": [
+          "copilot-cli"
+        ],
+        "vscodeWorkspace": null,
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/jira-ticket-from-code.zip",
@@ -151,6 +176,12 @@
       },
       "install": {
         "copilot": "pr-description-prompt@ai-catalog",
+        "claude": "claude plugin install pr-description-prompt",
+        "platforms": [
+          "copilot-cli",
+          "claude"
+        ],
+        "vscodeWorkspace": null,
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/pr-description-prompt.zip",
@@ -190,6 +221,13 @@
       },
       "install": {
         "copilot": "value-stream-1-default@ai-catalog",
+        "claude": "claude plugin install value-stream-1-default",
+        "platforms": [
+          "copilot-cli",
+          "claude",
+          "vscode"
+        ],
+        "vscodeWorkspace": ".vscode/mcp.json",
         "vscodeMcpDeeplink": "vscode:mcp/install?name=atlassian&config=eyJuYW1lIjoiYXRsYXNzaWFuIiwidHlwZSI6InN0ZGlvIiwiY29tbWFuZCI6Im5weCIsImFyZ3MiOlsiLXkiLCJtY3AtcmVtb3RlQGxhdGVzdCIsImh0dHBzOi8vbWNwLmF0bGFzc2lhbi5jb20vdjEvc3NlIl19",
         "rawFiles": [],
         "zip": "dl/value-stream-1-default.zip",
