@@ -34,10 +34,10 @@ def score_item(item: dict, q: str) -> int:
     return s
 
 
-def render_site(catalog: dict, out_path: Path, scripts_dir: Path | None = None) -> None:
-    scripts_dir = scripts_dir or (REPO_ROOT / "system" / "scripts")
+def render_site(catalog: dict, out_path: Path, template_dir: Path | None = None) -> None:
+    template_dir = template_dir or (REPO_ROOT / "system" / "web")
     env = Environment(
-        loader=FileSystemLoader(scripts_dir / "templates"),
+        loader=FileSystemLoader(template_dir),
         autoescape=select_autoescape(enabled_extensions=("j2",)),
     )
     template = env.get_template("index.html.j2")

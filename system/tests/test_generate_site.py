@@ -40,7 +40,7 @@ SAMPLE_CATALOG = {
 def test_render_site_contains_cards_and_search(tmp_path):
     mod = _load("generate_site")
     out = tmp_path / "index.html"
-    mod.render_site(SAMPLE_CATALOG, out, scripts_dir=SCRIPTS)
+    mod.render_site(SAMPLE_CATALOG, out, template_dir=SCRIPTS.parent / "web")
     html = out.read_text()
     assert "sample-skill" in html
     assert "sample-template" in html
