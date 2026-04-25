@@ -24,25 +24,15 @@ uv run --script system/scripts/validate_catalog.py
 
 > **Note:** The regeneration hook runs against the full working tree, not just your staged files. If you use `git add -p` (partial staging), regenerate manually and stage the result before committing.
 
-## Structure overview
-
-The catalog lives under `catalog/`. Primitives are shareable across bundle plugins:
+## Catalog layout
 
 ```
-catalog/skills/<name>/SKILL.md          ← reusable standalone skills
-catalog/agents/<name>.agent.md          ← standalone agent profiles
-catalog/prompts/<name>.md               ← standalone slash commands (must match frontmatter name)
-catalog/integrations/<name>/.mcp.json   ← standalone MCP server configs
-catalog/plugins/<name>/plugin.json      ← wrapper (single primitive) or bundle (multiple primitives)
-catalog/templates/<name>/TEMPLATE.md    ← raw-download-only document templates
-```
-
-Developer tooling lives under `system/`:
-```
-system/scripts/   ← generators, validators, install scripts
-system/tests/     ← test suite
-system/config/    ← marketplace.config.json
-system/artifacts/ ← generated catalog.json, claude.marketplace.json
+catalog/skills/<name>/SKILL.md          ← reusable skills
+catalog/agents/<name>.agent.md          ← agent profiles
+catalog/prompts/<name>.md               ← slash commands (filename stem must equal frontmatter name)
+catalog/integrations/<name>/.mcp.json   ← MCP server configs
+catalog/plugins/<name>/plugin.json      ← wrapper or bundle referencing primitives by name list
+catalog/templates/<name>/TEMPLATE.md    ← raw-download-only templates
 ```
 
 ## Adding a standalone skill
@@ -76,10 +66,8 @@ The skill appears in the web catalog with "Copy raw" and "Download zip" buttons.
    - **Agent** — `"agents": ["<name>"]` (resolves to `catalog/agents/<name>.agent.md`)
    - **Command** — `"commands": ["<name>"]` (resolves to `catalog/prompts/<name>.md`)
    - **MCP** — `"mcpServers": ["<name>"]` (resolves to `catalog/integrations/<name>/.mcp.json`)
-3. Regenerate marketplace metadata. This also materializes a Copilot-compatible plugin package at `catalog/plugins/<name>/.copilot-plugin/` (with generated `plugin.json`, copied primitive files, and generated `.mcp.json` when needed).
+3. Regenerate marketplace metadata. This also materializes a Copilot-compatible plugin package at `catalog/plugins/<name>/.copilot-plugin/`.
 4. Validate, regenerate, commit, and open a PR.
-
-> **Backward compatibility:** You may still embed content inside a plugin directory using string paths (`"skills": "skills"`, `"agents": "agents"`, etc.). This is supported but not recommended for new plugins — use top-level primitives for shareability.
 
 ## Adding a bundle plugin
 

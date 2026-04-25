@@ -28,6 +28,5 @@ These instructions apply to agents working on this AI catalog repository.
   - Prompts (slash commands) go under `catalog/prompts/<command-name>.md`.
   - MCP configs go in `catalog/integrations/<name>/.mcp.json`.
 - Add plugin wrappers/bundles under `catalog/plugins/<name>/` with a `plugin.json` manifest that references primitive names (for example: `"skills": ["jira-ticket-from-code"]`, `"mcpServers": ["atlassian"]`).
-- Nested component paths under `catalog/plugins/<name>/...` are legacy compatibility paths; do not use them for new catalog content.
 - Add templates (raw-download-only) under `catalog/templates/<name>/TEMPLATE.md`.
 - CI also regenerates `system/artifacts/catalog.json`, `.github/plugin/marketplace.json`, and `docs/` on merge to main. For PRs, regenerate and commit the tracked artefacts (`system/artifacts/catalog.json` and `.github/plugin/marketplace.json`) with your changes; `docs/` remains CI-managed.
