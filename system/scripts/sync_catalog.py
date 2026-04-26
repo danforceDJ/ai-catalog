@@ -36,7 +36,7 @@ def run_script(script: str, label: str | None = None) -> bool:
     display = label or script
     print(f"  > {display} ...", end=" ", flush=True)
     t0 = time.monotonic()
-    result = subprocess.run([sys.executable, str(path)], capture_output=True, text=True)
+    result = subprocess.run(["uv", "run", "--script", str(path)], capture_output=True, text=True)
     elapsed = time.monotonic() - t0
     if result.returncode == 0:
         summary = next((line for line in reversed(result.stdout.splitlines()) if line.strip()), "")
