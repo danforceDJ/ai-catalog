@@ -13,4 +13,4 @@ repos:
         entry: system/scripts/hooks/validate-catalog.sh
         language: script
         pass_filenames: false
-        files: ^(catalog/plugins/.*|catalog/templates/.*|system/config/marketplace\.config\.json|system/artifacts/catalog\.json|\.github/plugin/marketplace\.json)$
+        files: ^(catalog/plugins/.*|catalog/templates/.*|catalog/skills/.*|catalog/agents/.*|catalog/prompts/.*|catalog/mcp/.*|system/config/marketplace\.config\.json|system/artifacts/catalog\.json|\.github/plugin/marketplace\.json)$
