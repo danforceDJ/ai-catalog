@@ -22,8 +22,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = REPO_ROOT / "system" / "scripts"
 
 GENERATORS = [
-    "generate_catalog.py",
     "generate_marketplace.py",
+    "generate_catalog.py",
     "generate_claude_marketplace.py",
     "generate_vscode_artifacts.py",
 ]
