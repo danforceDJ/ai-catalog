@@ -53,12 +53,13 @@ def _kebab(name: str) -> str:
 
 
 def _write(path: Path, content: str, force: bool) -> None:
-    if path.exists() and not force:
+    existed = path.exists()
+    if existed and not force:
         print(f"  [skip]   {path.relative_to(REPO_ROOT)}  (already exists; use --force to overwrite)")
         return
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content)
-    status = "[overwrite]" if path.exists() else "[create]"
+    status = "[overwrite]" if existed else "[create]"
     print(f"  {status}  {path.relative_to(REPO_ROOT)}")
 
 
