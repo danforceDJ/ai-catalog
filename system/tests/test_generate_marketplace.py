@@ -15,6 +15,121 @@ def _load(name: str):
     return mod
 
 
+def test_auto_create_plugin_from_mcp_xcatalog(fixtures_dir, tmp_path):
+    """When catalog/mcp/<name>/.mcp.json has x-catalog but catalog/plugins/<name>/plugin.json
+    is absent, build_marketplace() auto-creates the plugin wrapper and produces .copilot-plugin/ output."""
+    root = tmp_path
+    catalog_dir = root / "catalog"
+    catalog_dir.mkdir()
+
+    # Only copy the xcatalog MCP fixture — no plugin.json wrapper exists yet
+    mcp_dir = catalog_dir / "mcp" / "fixture-xcatalog-mcp"
+    mcp_dir.mkdir(parents=True)
+    shutil.copy2(
+        fixtures_dir / "catalog" / "mcp" / "fixture-xcatalog-mcp" / ".mcp.json",
+        mcp_dir / ".mcp.json",
+    )
+    (catalog_dir / "plugins").mkdir()
+
+    config_dir = root / "system" / "config"
+    config_dir.mkdir(parents=True)
+    (config_dir / "marketplace.config.json").write_text(
+        (fixtures_dir / "marketplace.config.json").read_text()
+    )
+
+    plugin_json = catalog_dir / "plugins" / "fixture-xcatalog-mcp" / "plugin.json"
+    assert not plugin_json.exists(), "plugin.json must not exist before the run"
+
+    mod = _load("generate_marketplace")
+    result = mod.build_marketplace(root)
+
+    # plugin.json was auto-created with correct fields from x-catalog
+    assert plugin_json.is_file(), "plugin.json was not auto-created"
+    manifest = json.loads(plugin_json.read_text())
+    assert manifest["name"] == "fixture-xcatalog-mcp"
+    assert manifest["description"] == "A fixture MCP server with x-catalog metadata."
+    assert manifest["version"] == "2.3.4"
+    assert manifest["category"] == "testing"
+    assert manifest["tags"] == ["fixture", "xcatalog"]
+    assert manifest["keywords"] == ["test", "metadata"]
+    assert manifest["mcpServers"] == ["fixture-xcatalog-mcp"]
+
+    # .copilot-plugin/ output is produced (list-ref plugin → compat dir)
+    compat_dir = catalog_dir / "plugins" / "fixture-xcatalog-mcp" / ".copilot-plugin"
+    assert compat_dir.is_dir(), ".copilot-plugin/ directory was not generated"
+    compat_mcp = compat_dir / ".mcp.json"
+    assert compat_mcp.is_file(), ".copilot-plugin/.mcp.json was not generated"
+    servers = json.loads(compat_mcp.read_text())["servers"]
+    assert servers == {"fixture-xcatalog-server": {"command": "echo", "args": ["xcatalog"]}}
+
+    # Entry appears in the marketplace output
+    names = [p["name"] for p in result["plugins"]]
+    assert "fixture-xcatalog-mcp" in names
+    entry = next(p for p in result["plugins"] if p["name"] == "fixture-xcatalog-mcp")
+    assert entry["source"] == "catalog/plugins/fixture-xcatalog-mcp/.copilot-plugin"
+
+
+def test_auto_create_plugin_skips_mcp_without_xcatalog(fixtures_dir, tmp_path):
+    """catalog/mcp/<name>/.mcp.json without x-catalog is NOT auto-promoted to a plugin wrapper."""
+    root = tmp_path
+    catalog_dir = root / "catalog"
+    catalog_dir.mkdir()
+
+    mcp_dir = catalog_dir / "mcp" / "fixture-no-xcatalog-mcp"
+    mcp_dir.mkdir(parents=True)
+    shutil.copy2(
+        fixtures_dir / "catalog" / "mcp" / "fixture-no-xcatalog-mcp" / ".mcp.json",
+        mcp_dir / ".mcp.json",
+    )
+    (catalog_dir / "plugins").mkdir()
+
+    config_dir = root / "system" / "config"
+    config_dir.mkdir(parents=True)
+    (config_dir / "marketplace.config.json").write_text(
+        (fixtures_dir / "marketplace.config.json").read_text()
+    )
+
+    mod = _load("generate_marketplace")
+    mod.build_marketplace(root)
+
+    plugin_json = catalog_dir / "plugins" / "fixture-no-xcatalog-mcp" / "plugin.json"
+    assert not plugin_json.exists(), "plugin.json must NOT be created when x-catalog is absent"
+
+
+def test_auto_create_plugin_skips_existing_plugin_json(fixtures_dir, tmp_path):
+    """When catalog/plugins/<name>/plugin.json already exists, _auto_create_plugin_from_mcp
+    leaves it untouched."""
+    root = tmp_path
+    catalog_dir = root / "catalog"
+    catalog_dir.mkdir()
+
+    mcp_dir = catalog_dir / "mcp" / "fixture-xcatalog-mcp"
+    mcp_dir.mkdir(parents=True)
+    shutil.copy2(
+        fixtures_dir / "catalog" / "mcp" / "fixture-xcatalog-mcp" / ".mcp.json",
+        mcp_dir / ".mcp.json",
+    )
+
+    # Pre-existing plugin.json with different content
+    plugin_dir = catalog_dir / "plugins" / "fixture-xcatalog-mcp"
+    plugin_dir.mkdir(parents=True)
+    pre_existing = {"name": "fixture-xcatalog-mcp", "version": "0.0.1", "mcpServers": ".mcp.json"}
+    plugin_json = plugin_dir / "plugin.json"
+    plugin_json.write_text(json.dumps(pre_existing))
+
+    config_dir = root / "system" / "config"
+    config_dir.mkdir(parents=True)
+    (config_dir / "marketplace.config.json").write_text(
+        (fixtures_dir / "marketplace.config.json").read_text()
+    )
+
+    mod = _load("generate_marketplace")
+    mod.build_marketplace(root)
+
+    # plugin.json is unchanged
+    assert json.loads(plugin_json.read_text()) == pre_existing
+
+
 def test_build_marketplace_from_fixtures(fixtures_dir, tmp_path):
     root = tmp_path
     catalog_dir = root / "catalog"
