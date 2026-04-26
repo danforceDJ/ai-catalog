@@ -54,10 +54,12 @@ GitHub Actions runs `validate_catalog.py` + `pytest` + a freshness check on ever
 
 ```
 Filesystem (catalog/mcp/ + catalog/plugins/ + catalog/templates/ + system/config/marketplace.config.json)
-    ↓  generate_marketplace.py  (auto-creates plugin.json from x-catalog metadata if absent)
-    ↓  generate_catalog.py + generate_marketplace.py + generate_claude_marketplace.py + generate_vscode_artifacts.py
-system/artifacts/catalog.json  (search index)
+    ↓  generate_marketplace.py  (auto-creates plugin.json from x-catalog metadata if absent; emits .github/plugin/marketplace.json)
 .github/plugin/marketplace.json  (Copilot CLI manifest)
+    ↓  generate_catalog.py
+system/artifacts/catalog.json  (search index)
+    ↓  generate_claude_marketplace.py + generate_vscode_artifacts.py
+Claude / VSCode marketplace artifacts
     ↓  system/scripts/generate_site.py + generate_zips.py
 docs/index.html + docs/dl/*.zip
     ↓  GitHub Pages / git consumers
