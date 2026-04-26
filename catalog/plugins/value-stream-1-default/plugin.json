@@ -8,5 +8,5 @@
   "category": "bundles",
   "tags": ["atlassian", "bundle", "workflow"],
   "skills": ["publish-to-confluence", "generate-architecture-doc", "jira-ticket-from-code"],
-  "mcpServers": ["atlassian"]
+  "mcpServers": ["atlassian","aws-documentation-mcp"]
 }
