@@ -6,7 +6,7 @@ repos:
         entry: system/scripts/hooks/regenerate-catalog.sh
         language: script
         pass_filenames: false
-        files: ^(catalog/plugins/.*|catalog/templates/.*|system/config/marketplace\.config\.json$)
+        files: ^(catalog/plugins/.*|catalog/templates/.*|catalog/skills/.*|catalog/agents/.*|catalog/prompts/.*|catalog/mcp/.*|system/config/marketplace\.config\.json$)
 
       - id: validate-catalog
         name: Validate catalog
