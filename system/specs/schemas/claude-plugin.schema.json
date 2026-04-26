@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/danforceDJ/ai-catalog/specs/schemas/claude-plugin.schema.json",
+  "title": "Claude Code claude-plugin.json",
+  "description": "Plugin manifest for Claude Code (claude CLI) installable packages.",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin identifier. kebab-case, ≤ 64 chars.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "description": { "type": "string", "maxLength": 1024 },
+    "version": { "type": "string" },
+    "author": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "license": { "type": "string" },
+    "mcpServers": {
+      "type": "object",
+      "description": "MCP servers in Claude Desktop format (mcpServers, not servers).",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "command": { "type": "string" },
+          "args": { "type": "array", "items": { "type": "string" } },
+          "env": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      }
+    },
+    "slashCommands": {
+      "type": "array",
+      "description": "Slash command definitions.",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "description": { "type": "string" },
+          "prompt": { "type": "string", "description": "Relative path to Markdown prompt file." }
+        }
+      }
+    },
+    "instructions": {
+      "description": "Path(s) to instruction/context Markdown files.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    }
+  },
+  "additionalProperties": true
+}

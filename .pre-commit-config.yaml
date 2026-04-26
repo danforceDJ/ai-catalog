@@ -3,14 +3,14 @@ repos:
     hooks:
       - id: regenerate-catalog
         name: Regenerate catalog + marketplace manifest
-        entry: scripts/hooks/regenerate-catalog.sh
+        entry: system/scripts/hooks/regenerate-catalog.sh
         language: script
         pass_filenames: false
-        files: ^(plugins/.*|templates/.*|marketplace\.config\.json$)
+        files: ^(catalog/plugins/.*|catalog/templates/.*|catalog/skills/.*|catalog/agents/.*|catalog/prompts/.*|catalog/mcp/.*|system/config/marketplace\.config\.json$)
 
       - id: validate-catalog
         name: Validate catalog
-        entry: scripts/hooks/validate-catalog.sh
+        entry: system/scripts/hooks/validate-catalog.sh
         language: script
         pass_filenames: false
-        files: ^(plugins/.*|templates/.*|marketplace\.config\.json|catalog\.json|\.github/plugin/marketplace\.json)$
+        files: ^(catalog/plugins/.*|catalog/templates/.*|catalog/skills/.*|catalog/agents/.*|catalog/prompts/.*|catalog/mcp/.*|system/config/marketplace\.config\.json|system/artifacts/catalog\.json|\.github/plugin/marketplace\.json)$

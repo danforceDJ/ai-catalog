@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/danforceDJ/ai-catalog/specs/schemas/claude-marketplace.schema.json",
+  "title": "Claude Code marketplace index",
+  "description": "Marketplace index for Claude Code plugin discovery.",
+  "type": "object",
+  "required": ["name", "plugins"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Marketplace identifier.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "version": { "type": "string" },
+    "description": { "type": "string" },
+    "plugins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "source"],
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "version": { "type": "string" },
+          "source": {
+            "type": "object",
+            "required": ["type", "url"],
+            "properties": {
+              "type": { "type": "string", "enum": ["git", "url", "local"] },
+              "url": { "type": "string" },
+              "path": { "type": "string", "description": "Sub-path within the git repo." },
+              "ref": { "type": "string", "description": "Git branch, tag, or SHA." }
+            }
+          },
+          "manifest": {
+            "type": "string",
+            "description": "Manifest filename within the plugin directory.",
+            "default": "claude-plugin.json"
+          },
+          "category": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -26,8 +26,8 @@ jobs:
 
       - name: Generate Pages artefacts
         run: |
-          uv run --script scripts/generate_zips.py
-          uv run --script scripts/generate_site.py
+          uv run --script system/scripts/generate_zips.py
+          uv run --script system/scripts/generate_site.py
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

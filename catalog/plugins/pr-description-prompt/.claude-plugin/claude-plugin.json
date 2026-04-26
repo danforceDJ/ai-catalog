@@ -1,0 +1,27 @@
+{
+  "name": "pr-description-prompt",
+  "description": "Slash command that emits a standard PR description with summary, test plan, and checklist.",
+  "version": "1.0.0",
+  "author": {
+    "name": "danforceDJ"
+  },
+  "license": "MIT",
+  "keywords": [
+    "pr",
+    "pull-request",
+    "prompt",
+    "template"
+  ],
+  "category": "productivity",
+  "tags": [
+    "github",
+    "prompt"
+  ],
+  "slashCommands": [
+    {
+      "name": "pr-description",
+      "description": "Standard pull request description with summary, test plan, and checklist sections.",
+      "prompt": "commands/pr-description.md"
+    }
+  ]
+}

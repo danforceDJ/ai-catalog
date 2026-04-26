@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/danforceDJ/ai-catalog/specs/schemas/copilot-plugin.schema.json",
+  "title": "Copilot CLI plugin.json",
+  "description": "Plugin manifest for GitHub Copilot CLI installable packages.",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique plugin identifier. Must match the directory name.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description shown in the marketplace.",
+      "maxLength": 1024
+    },
+    "version": {
+      "type": "string",
+      "description": "Plugin version. Semver recommended (e.g., '1.0.0')."
+    },
+    "author": {
+      "type": "object",
+      "description": "Plugin author information.",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "url": { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": false
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "description": "Plugin documentation URL."
+    },
+    "repository": {
+      "type": "string",
+      "description": "Source repository URL (URI or shorthand)."
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX license identifier (e.g., 'MIT', 'Apache-2.0')."
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Search keywords.",
+      "items": { "type": "string" }
+    },
+    "category": {
+      "type": "string",
+      "description": "Catalog category (e.g., 'integrations', 'productivity', 'agents')."
+    },
+    "tags": {
+      "type": "array",
+      "description": "Display tags.",
+      "items": { "type": "string" }
+    },
+    "skills": {
+      "description": "Skills: list of top-level skill names OR a relative directory path.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "description": "List-reference style: names of skill directories under top-level skills/"
+        },
+        {
+          "type": "string",
+          "description": "Legacy string style: path to skills directory relative to plugin dir."
+        }
+      ]
+    },
+    "agents": {
+      "description": "Agent profiles: list of top-level agent names OR a relative directory path.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "description": "List-reference style: names of *.agent.md files under top-level agents/"
+        },
+        {
+          "type": "string",
+          "description": "Legacy string style: path to agents directory relative to plugin dir."
+        }
+      ]
+    },
+    "commands": {
+      "description": "Slash commands/prompts: list of top-level command names OR a relative directory path.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "description": "List-reference style: names of *.md files under top-level commands/"
+        },
+        {
+          "type": "string",
+          "description": "Legacy string style: path to commands directory relative to plugin dir."
+        }
+      ]
+    },
+    "mcpServers": {
+      "description": "MCP servers: list of top-level server names, a path to .mcp.json, or inline server configs.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List-reference style: names of directories under top-level mcpServers/"
+        },
+        {
+          "type": "string",
+          "description": "Legacy string style: path to .mcp.json relative to plugin dir (e.g., '.mcp.json')"
+        },
+        {
+          "type": "object",
+          "description": "Inline MCP server config object (server name → MCP server config).",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["stdio", "sse", "http"] },
+              "command": { "type": "string" },
+              "args": { "type": "array", "items": { "type": "string" } },
+              "env": { "type": "object", "additionalProperties": { "type": "string" } },
+              "url": { "type": "string" }
+            }
+          }
+        }
+      ]
+    },
+    "lspServers": {
+      "description": "LSP server configurations (advanced use).",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" }
+      ]
+    },
+    "hooks": {
+      "description": "Lifecycle hooks (install, update, remove scripts).",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "install": { "type": "string" },
+            "update": { "type": "string" },
+            "remove": { "type": "string" }
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": true
+}

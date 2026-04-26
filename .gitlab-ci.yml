@@ -10,9 +10,9 @@ validate:
     - curl -LsSf https://astral.sh/uv/install.sh | sh
     - source $HOME/.local/bin/env
   script:
-    - chmod +x scripts/generate-catalog.sh scripts/validate-catalog.sh
-    - ./scripts/generate-catalog.sh
-    - ./scripts/validate-catalog.sh
+    - chmod +x system/scripts/generate-catalog.sh system/scripts/validate-catalog.sh
+    - ./system/scripts/generate-catalog.sh
+    - ./system/scripts/validate-catalog.sh
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
@@ -24,9 +24,9 @@ pages:
     - curl -LsSf https://astral.sh/uv/install.sh | sh
     - source $HOME/.local/bin/env
   script:
-    - chmod +x scripts/generate-catalog.sh scripts/generate-site.sh
-    - ./scripts/generate-catalog.sh
-    - ./scripts/generate-site.sh
+    - chmod +x system/scripts/generate-catalog.sh system/scripts/generate-site.sh
+    - ./system/scripts/generate-catalog.sh
+    - ./system/scripts/generate-site.sh
     - mv docs public
   artifacts:
     paths:

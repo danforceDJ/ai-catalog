@@ -1,0 +1,20 @@
+{
+  "name": "default-agent",
+  "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
+  "version": "1.0.0",
+  "author": {
+    "name": "danforceDJ"
+  },
+  "license": "MIT",
+  "keywords": [
+    "agent",
+    "conventions",
+    "git",
+    "security"
+  ],
+  "category": "governance",
+  "tags": [
+    "default"
+  ],
+  "instructions": "agents/default.agent.md"
+}

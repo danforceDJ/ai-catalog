@@ -1,0 +1,92 @@
+{
+  "name": "ai-catalog",
+  "version": "1.0.0",
+  "description": "Company-wide AI configuration marketplace: MCP servers, skills, agent profiles, prompts.",
+  "plugins": [
+    {
+      "name": "atlassian-mcp",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "catalog/plugins/atlassian-mcp"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "integrations",
+      "tags": [
+        "atlassian",
+        "mcp"
+      ]
+    },
+    {
+      "name": "default-agent",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "catalog/plugins/default-agent"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "governance",
+      "tags": [
+        "default"
+      ]
+    },
+    {
+      "name": "jira-ticket-from-code",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "catalog/plugins/jira-ticket-from-code"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "productivity",
+      "tags": [
+        "jira",
+        "atlassian"
+      ]
+    },
+    {
+      "name": "pr-description-prompt",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "catalog/plugins/pr-description-prompt"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "productivity",
+      "tags": [
+        "github",
+        "prompt"
+      ]
+    },
+    {
+      "name": "senior-cloud-architect",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "catalog/plugins/senior-cloud-architect"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "development",
+      "tags": [
+        "architecture",
+        "cloud",
+        "design"
+      ]
+    },
+    {
+      "name": "value-stream-1-default",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "catalog/plugins/value-stream-1-default"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "bundles",
+      "tags": [
+        "atlassian",
+        "bundle",
+        "workflow"
+      ]
+    }
+  ]
+}
