@@ -35,18 +35,17 @@ def vscode_fake_repo(tmp_path, fixtures_dir):
 def test_vscode_mcp_json_generated(vscode_fake_repo):
     """All mcpServers are merged into .vscode/mcp.json."""
     mod = _load("generate_vscode_artifacts")
-    mod.write_vscode_mcp_json()
-    
-    # Temporarily change to repo root (script uses REPO_ROOT)
+
+    # Patch REPO_ROOT before making any calls so the real repo is never touched
     original_root = mod.REPO_ROOT
     mod.REPO_ROOT = vscode_fake_repo
-    
+
     try:
         mod.write_vscode_mcp_json()
-        
+
         mcp_file = vscode_fake_repo / ".vscode" / "mcp.json"
         assert mcp_file.exists()
-        
+
         data = json.loads(mcp_file.read_text())
         assert "servers" in data
     finally:
