@@ -136,6 +136,8 @@ def test_catalog_standalone_entries_for_uncovered_primitives(fake_repo):
     names = {p["name"] for p in catalog["plugins"]}
     # fixture-top-skill is covered by fixture-list-bundle → no standalone entry
     assert "fixture-top-skill" not in names
+    # fixture-top-mcp is covered by fixture-list-bundle → no standalone entry
+    assert "fixture-top-mcp" not in names
     # fixture-top-agent/command are NOT referenced by any plugin → standalone entries appear
     assert "fixture-top-agent" in names
     assert "fixture-top-command" in names
@@ -162,7 +164,6 @@ def test_catalog_standalone_command_install(fake_repo):
 
 def test_catalog_missing_top_level_ref_resolves_gracefully(tmp_path, fixtures_dir):
     mod = _load("generate_catalog")
-    import shutil
     catalog_dir = tmp_path / "catalog"
     catalog_dir.mkdir()
     plugins_root = catalog_dir / "plugins"

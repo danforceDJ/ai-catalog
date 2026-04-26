@@ -262,6 +262,7 @@ def build_top_level_entries(
     covered_skills: set[str],
     covered_agents: set[str],
     covered_commands: set[str],
+    covered_mcp_dirs: set[str] | None = None,
 ) -> list[dict]:
     """Build catalog entries for top-level primitives not already wrapped by a plugin."""
     entries: list[dict] = []
@@ -356,6 +357,8 @@ def build_top_level_entries(
     mcp_dir = repo_root / "catalog" / "mcp"
     if mcp_dir.is_dir():
         for mcp_server_dir in sorted(d for d in mcp_dir.iterdir() if d.is_dir()):
+            if covered_mcp_dirs and mcp_server_dir.name in covered_mcp_dirs:
+                continue
             mcp_path = mcp_server_dir / ".mcp.json"
             if not mcp_path.is_file():
                 continue
@@ -404,13 +407,26 @@ def build_catalog(repo_root: Path) -> dict:
     covered_skills: set[str] = set()
     covered_agents: set[str] = set()
     covered_commands: set[str] = set()
+    covered_mcp_dirs: set[str] = set()
     for entry in plugins:
         covered_skills.update(entry["components"]["skills"])
         covered_agents.update(entry["components"]["agents"])
         covered_commands.update(entry["components"]["commands"])
+    # Track which catalog/mcp/<name> dirs are already wrapped by a plugin via list-reference
+    if plugins_dir.is_dir():
+        for d in sorted(plugins_dir.iterdir()):
+            manifest_path = d / "plugin.json"
+            if d.is_dir() and manifest_path.is_file():
+                try:
+                    manifest = json.loads(manifest_path.read_text())
+                    mcp_value = manifest.get("mcpServers")
+                    if isinstance(mcp_value, list):
+                        covered_mcp_dirs.update(mcp_value)
+                except (json.JSONDecodeError, KeyError):
+                    pass
 
     # Add standalone catalog entries for uncovered top-level primitives
-    standalone = build_top_level_entries(repo_root, covered_skills, covered_agents, covered_commands)
+    standalone = build_top_level_entries(repo_root, covered_skills, covered_agents, covered_commands, covered_mcp_dirs)
     plugins.extend(standalone)
     plugins.sort(key=lambda p: p["name"])
 

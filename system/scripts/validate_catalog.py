@@ -249,6 +249,7 @@ class Validator:
         self._scan_mcp_secrets(mcp_path)
 
     def validate_standalone_skill(self, skill_dir: Path) -> None:
+        self.check_kebab(skill_dir.name, str(skill_dir.relative_to(self.repo)))
         skill_md = skill_dir / "SKILL.md"
         if not skill_md.is_file():
             self.fail(f"{skill_dir.relative_to(self.repo)}: missing SKILL.md")
@@ -256,17 +257,28 @@ class Validator:
         fm = parse_frontmatter(skill_md.read_text())
         if not fm.get("name"):
             self.fail(f"{skill_md}: missing frontmatter 'name'")
+        else:
+            self.check_kebab(fm["name"], str(skill_md))
+            if fm["name"] != skill_dir.name:
+                self.fail(f"{skill_md}: frontmatter name '{fm['name']}' != directory name '{skill_dir.name}'")
         if not fm.get("description"):
             self.fail(f"{skill_md}: missing frontmatter 'description'")
 
     def validate_standalone_agent(self, agent_path: Path) -> None:
+        agent_slug = agent_path.name.removesuffix(".agent.md")
+        self.check_kebab(agent_slug, str(agent_path.relative_to(self.repo)))
         fm = parse_frontmatter(agent_path.read_text())
         if not fm.get("name"):
             self.fail(f"{agent_path}: missing frontmatter 'name'")
+        else:
+            self.check_kebab(fm["name"], str(agent_path))
+            if fm["name"] != agent_slug:
+                self.fail(f"{agent_path}: frontmatter name '{fm['name']}' != filename slug '{agent_slug}'")
         if not fm.get("description"):
             self.fail(f"{agent_path}: missing frontmatter 'description'")
 
     def validate_standalone_command(self, cmd_path: Path) -> None:
+        self.check_kebab(cmd_path.stem, str(cmd_path.relative_to(self.repo)))
         fm = parse_frontmatter(cmd_path.read_text())
         if not fm.get("name") or not fm.get("description"):
             self.fail(f"{cmd_path}: missing name/description frontmatter")
@@ -274,6 +286,7 @@ class Validator:
             self.fail(f"{cmd_path}: frontmatter name '{fm['name']}' != filename '{cmd_path.stem}'")
 
     def validate_standalone_mcp(self, mcp_server_dir: Path) -> None:
+        self.check_kebab(mcp_server_dir.name, str(mcp_server_dir.relative_to(self.repo)))
         mcp_path = mcp_server_dir / ".mcp.json"
         if not mcp_path.is_file():
             self.fail(f"{mcp_server_dir.relative_to(self.repo)}: missing .mcp.json")
@@ -339,6 +352,7 @@ class Validator:
                 self.fail(f"{mp}: plugin '{entry.get('name')}' source '{src}' not found")
 
     def validate_template(self, template_dir: Path) -> None:
+        self.check_kebab(template_dir.name, str(template_dir.relative_to(self.repo)))
         tpl = template_dir / "TEMPLATE.md"
         if not tpl.is_file():
             self.fail(f"{template_dir.relative_to(self.repo)}: missing TEMPLATE.md")
