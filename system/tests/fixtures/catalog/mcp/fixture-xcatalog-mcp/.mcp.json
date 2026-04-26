@@ -1,0 +1,15 @@
+{
+  "servers": {
+    "fixture-xcatalog-server": {
+      "command": "echo",
+      "args": ["xcatalog"]
+    }
+  },
+  "x-catalog": {
+    "description": "A fixture MCP server with x-catalog metadata.",
+    "version": "2.3.4",
+    "category": "testing",
+    "tags": ["fixture", "xcatalog"],
+    "keywords": ["test", "metadata"]
+  }
+}

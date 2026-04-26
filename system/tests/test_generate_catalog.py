@@ -162,6 +162,39 @@ def test_catalog_standalone_command_install(fake_repo):
     assert cmd["install"]["rawFiles"] == ["fixture-top-command.md"]
 
 
+def test_catalog_standalone_mcp_xcatalog_fields(fake_repo):
+    """Standalone MCP .mcp.json with x-catalog block → catalog entry carries all metadata fields."""
+    mod = _load("generate_catalog")
+    catalog = mod.build_catalog(fake_repo)
+    entry = next((p for p in catalog["plugins"] if p["name"] == "fixture-xcatalog-mcp"), None)
+    assert entry is not None, "fixture-xcatalog-mcp should appear as a standalone entry"
+    assert entry["type"] == "mcp"
+    assert entry["description"] == "A fixture MCP server with x-catalog metadata."
+    assert entry["version"] == "2.3.4"
+    assert entry["category"] == "testing"
+    assert entry["tags"] == ["fixture", "xcatalog"]
+    assert entry["keywords"] == ["test", "metadata"]
+    assert entry["components"]["mcpServers"] == ["fixture-xcatalog-server"]
+    assert entry["install"]["repoPath"] == "catalog/mcp/fixture-xcatalog-mcp"
+    assert entry["install"]["zip"] == "dl/fixture-xcatalog-mcp.zip"
+    assert entry["install"]["copilot"] is None
+
+
+def test_catalog_standalone_mcp_no_xcatalog_defaults(fake_repo):
+    """Standalone MCP .mcp.json without x-catalog block → catalog entry uses empty defaults."""
+    mod = _load("generate_catalog")
+    catalog = mod.build_catalog(fake_repo)
+    entry = next((p for p in catalog["plugins"] if p["name"] == "fixture-no-xcatalog-mcp"), None)
+    assert entry is not None, "fixture-no-xcatalog-mcp should appear as a standalone entry"
+    assert entry["type"] == "mcp"
+    assert entry["description"] == ""
+    assert entry["version"] == ""
+    assert entry["category"] == ""
+    assert entry["tags"] == []
+    assert entry["keywords"] == []
+    assert entry["components"]["mcpServers"] == ["fixture-no-xcatalog-server"]
+
+
 def test_catalog_missing_top_level_ref_resolves_gracefully(tmp_path, fixtures_dir):
     mod = _load("generate_catalog")
     catalog_dir = tmp_path / "catalog"

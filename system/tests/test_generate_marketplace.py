@@ -38,7 +38,7 @@ def test_build_marketplace_from_fixtures(fixtures_dir, tmp_path):
     names = [p["name"] for p in result["plugins"]]
     assert names == sorted(names), "plugins must be sorted by name"
     assert set(names) == {"fixture-agent", "fixture-bundle", "fixture-list-bundle", "fixture-mcp",
-                          "fixture-prompt", "fixture-skill"}
+                          "fixture-prompt", "fixture-skill", "fixture-xcatalog-mcp"}
     bundle = next(p for p in result["plugins"] if p["name"] == "fixture-bundle")
     assert bundle["source"] == "catalog/plugins/fixture-bundle"
     assert bundle["version"] == "1.0.0"
