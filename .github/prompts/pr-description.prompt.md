@@ -1,7 +1,6 @@
 ---
 mode: ask
-description: Standard pull request description with summary, test plan, and checklist
-  sections.
+description: Standard pull request description with summary, test plan, and checklist sections.
 ---
 
 ## Summary

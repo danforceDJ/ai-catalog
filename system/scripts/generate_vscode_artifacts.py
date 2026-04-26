@@ -87,8 +87,8 @@ def write_github_prompts() -> None:
                 "description"
             ]
 
-        frontmatter_yaml = yaml.dump(
-            new_frontmatter_dict, default_flow_style=False, sort_keys=False
+        frontmatter_yaml = yaml.safe_dump(
+            new_frontmatter_dict, default_flow_style=False, sort_keys=False, width=4096
         ).rstrip()
 
         output_file = prompts_dir / f"{cmd_file.stem}.prompt.md"
@@ -122,8 +122,8 @@ def write_github_instructions() -> None:
     merged_content = "\n\n".join(agent_bodies)
 
     output_file = instructions_dir / "catalog-agent.instructions.md"
-    frontmatter = yaml.dump(
-        {"applyTo": "**"}, default_flow_style=False, sort_keys=False
+    frontmatter = yaml.safe_dump(
+        {"applyTo": "**"}, default_flow_style=False, sort_keys=False, width=4096
     ).rstrip()
 
     with open(output_file, "w") as f:
