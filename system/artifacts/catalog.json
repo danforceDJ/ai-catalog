@@ -42,6 +42,46 @@
       }
     },
     {
+      "name": "aws-documentation-mcp",
+      "description": "AWS Documentation MCP Server — search and read AWS docs directly from your AI assistant.",
+      "version": "1.0.0",
+      "type": "mcp",
+      "category": "integrations",
+      "tags": [
+        "aws",
+        "mcp"
+      ],
+      "keywords": [
+        "aws",
+        "documentation",
+        "mcp",
+        "cloud"
+      ],
+      "components": {
+        "skills": [],
+        "agents": [],
+        "commands": [],
+        "mcpServers": [
+          "AWS Documentation MCP Server"
+        ],
+        "hooks": false
+      },
+      "install": {
+        "copilot": "aws-documentation-mcp@ai-catalog",
+        "claude": "claude plugin install aws-documentation-mcp",
+        "platforms": [
+          "copilot-cli",
+          "claude",
+          "vscode"
+        ],
+        "vscodeWorkspace": ".vscode/mcp.json",
+        "vscodeMcpDeeplink": "vscode:mcp/install?name=AWS Documentation MCP Server&config=eyJuYW1lIjoiQVdTIERvY3VtZW50YXRpb24gTUNQIFNlcnZlciIsImNvbW1hbmQiOiJ1dngiLCJhcmdzIjpbImF3c2xhYnMuYXdzLWRvY3VtZW50YXRpb24tbWNwLXNlcnZlckBsYXRlc3QiXSwiZW52Ijp7IkZBU1RNQ1BfTE9HX0xFVkVMIjoiRVJST1IiLCJBV1NfRE9DVU1FTlRBVElPTl9QQVJUSVRJT04iOiJhd3MifSwiZGlzYWJsZWQiOmZhbHNlLCJhdXRvQXBwcm92ZSI6W10sInR5cGUiOiJzdGRpbyJ9",
+        "rawFiles": [],
+        "zip": "dl/aws-documentation-mcp.zip",
+        "repoPath": "catalog/plugins/aws-documentation-mcp"
+      }
+    },
+    {
       "name": "default-agent",
       "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
       "version": "1.0.0",

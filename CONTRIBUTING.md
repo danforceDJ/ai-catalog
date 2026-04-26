@@ -37,12 +37,51 @@ uv run --script system/scripts/generate_catalog.py
 uv run --script system/scripts/generate_marketplace.py
 ```
 
+To run **all** generators + validate in one shot (recommended after adding any item):
+```bash
+uv run --script system/scripts/sync_catalog.py
+# Options:
+#   --no-validate     skip validation step
+#   --include-zips    also build downloadable zips + static site (slow)
+#   --skip <script>   skip a specific generator by filename
+```
+
 To validate the catalog without committing:
 ```bash
 uv run --script system/scripts/validate_catalog.py
 ```
 
 > **Note:** The regeneration hook runs against the full working tree, not just your staged files. If you use `git add -p` (partial staging), regenerate manually and stage the result before committing.
+
+## Quick scaffold (recommended)
+
+Use `scaffold.py` to create all required files with a single command:
+
+```bash
+# MCP server (creates catalog/mcp/<name>/.mcp.json + catalog/plugins/<name>/plugin.json)
+uv run --script system/scripts/scaffold.py mcp --name my-mcp \
+    --description "My MCP server" --category integrations --tags "my-tag,mcp"
+
+# Skill (creates catalog/skills/<name>/SKILL.md + catalog/plugins/<name>/plugin.json)
+uv run --script system/scripts/scaffold.py skill --name my-skill \
+    --description "What this skill does"
+
+# Agent profile (creates catalog/agents/<name>.agent.md + catalog/plugins/<name>/plugin.json)
+uv run --script system/scripts/scaffold.py agent --name my-agent
+
+# Slash command / prompt (creates catalog/prompts/<name>.md + catalog/plugins/<name>/plugin.json)
+uv run --script system/scripts/scaffold.py prompt --name my-prompt
+```
+
+All flags: `--name` (required), `--description`, `--version`, `--author`, `--license`, `--category`, `--tags` (comma-separated), `--keywords` (comma-separated), `--force` (overwrite existing files).
+
+After scaffolding, edit the generated TODO placeholders, then:
+
+```bash
+uv run --script system/scripts/sync_catalog.py   # validate + regenerate all artefacts
+```
+
+The manual steps below are still valid if you prefer to create files by hand.
 
 ## Catalog layout
 
@@ -77,8 +116,56 @@ The skill appears in the web catalog with "Copy raw" and "Download zip" buttons.
 
 ## Adding a standalone MCP server config
 
-1. Create `catalog/mcp/<kebab-case-name>/.mcp.json` in the Copilot `{"servers": {...}}` shape.
-2. Validate (secret scan runs automatically), regenerate, commit.
+### Option A — x-catalog (single file, fully installable)
+
+Add an `x-catalog` metadata block inside `.mcp.json`. When you run `sync_catalog.py`, the generator **automatically creates** `catalog/plugins/<name>/plugin.json` and the Copilot CLI–compatible `.copilot-plugin/` package from that metadata — no separate `plugin.json` to write by hand.
+
+```json
+{
+  "x-catalog": {
+    "description": "Fetch AWS documentation from your AI assistant.",
+    "version": "1.0.0",
+    "category": "integrations",
+    "tags": ["aws", "mcp"],
+    "keywords": ["aws", "documentation", "cloud"],
+    "author": "yourHandle"
+  },
+  "servers": {
+    "my-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "my-mcp@latest"]
+    }
+  }
+}
+```
+
+After dropping the file:
+
+```bash
+uv run --script system/scripts/sync_catalog.py   # auto-creates plugin.json + .copilot-plugin/
+```
+
+The item appears in the **web marketplace** and is **installable via Copilot CLI** — all from one file.
+
+> **Note:** Once `plugin.json` is auto-created you should commit it alongside your `.mcp.json` so CI doesn't re-generate it on every run.
+
+### Option B — scaffold (recommended for new items)
+
+Use `scaffold.py` (see **Quick scaffold** above):
+
+```bash
+uv run --script system/scripts/scaffold.py mcp --name my-mcp \
+    --description "My MCP server" --tags "my-tag,mcp" --author "yourHandle"
+```
+
+This creates both `.mcp.json` and `plugin.json` immediately — no need for `x-catalog`.
+
+### Option C — manual
+
+1. Create `catalog/mcp/<kebab-case-name>/.mcp.json` in the `{"servers": {...}}` shape.
+2. Create `catalog/plugins/<name>/plugin.json` referencing the MCP by name.
+3. Validate (secret scan runs automatically), regenerate, commit.
 
 ## Adding a plugin wrapper (single primitive, Copilot CLI installable)
 
@@ -145,9 +232,11 @@ No extra dependencies are required beyond `uv` and Python 3.11+. Because the sea
 Stage your files and commit. If you installed the pre-commit hook (see **Local development setup** above), `system/artifacts/catalog.json` and `.github/plugin/marketplace.json` are regenerated and staged automatically. If you skipped hook setup, regenerate manually first:
 
 ```bash
-uv run --script system/scripts/generate_catalog.py
-uv run --script system/scripts/generate_marketplace.py
-git add system/artifacts/catalog.json .github/plugin/marketplace.json
+uv run --script system/scripts/sync_catalog.py
+git add system/artifacts/catalog.json .github/plugin/marketplace.json \
+        system/artifacts/claude.marketplace.json .vscode/mcp.json \
+        .github/prompts/ .github/instructions/catalog-agent.instructions.md \
+        catalog/plugins/
 ```
 
 Open a PR. CI validates and checks that the tracked artefacts match the generated output; on merge the deploy workflow publishes `docs/` to GitHub Pages.

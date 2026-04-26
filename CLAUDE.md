@@ -16,17 +16,25 @@ The web UI and marketplace manifest are both auto-generated from a single source
 Everything is Python via `uv` (single-file PEP 723 scripts).
 
 ```bash
-# Generate .github/plugin/marketplace.json from catalog/plugins/ + system/config/marketplace.config.json
-uv run --script system/scripts/generate_marketplace.py
+# Run ALL generators + validate in one shot (recommended after any catalog change)
+uv run --script system/scripts/sync_catalog.py
+#   --no-validate      skip validation step
+#   --include-zips     also build zips + static site (slow)
+#   --skip <script>    skip a specific generator by filename
 
-# Generate system/artifacts/catalog.json (search index) from catalog/plugins/ and catalog/templates/
-uv run --script system/scripts/generate_catalog.py
+# Scaffold a new catalog item (creates all required files from one command)
+uv run --script system/scripts/scaffold.py mcp    --name my-mcp --description "..."
+uv run --script system/scripts/scaffold.py skill  --name my-skill
+uv run --script system/scripts/scaffold.py agent  --name my-agent
+uv run --script system/scripts/scaffold.py prompt --name my-prompt
 
-# Generate docs/dl/<name>.zip for every plugin and template
-uv run --script system/scripts/generate_zips.py
-
-# Render docs/index.html from system/artifacts/catalog.json + Jinja template
-uv run --script system/scripts/generate_site.py
+# Individual generators (run by sync_catalog.py automatically):
+uv run --script system/scripts/generate_marketplace.py    # → .github/plugin/marketplace.json
+uv run --script system/scripts/generate_catalog.py        # → system/artifacts/catalog.json
+uv run --script system/scripts/generate_claude_marketplace.py
+uv run --script system/scripts/generate_vscode_artifacts.py
+uv run --script system/scripts/generate_zips.py           # → docs/dl/*.zip  (slow)
+uv run --script system/scripts/generate_site.py           # → docs/index.html (slow)
 
 # Validate the catalog (schemas, naming, secrets, uniqueness, drift warnings)
 uv run --script system/scripts/validate_catalog.py
@@ -45,8 +53,9 @@ GitHub Actions runs `validate_catalog.py` + `pytest` + a freshness check on ever
 **Data flow:**
 
 ```
-Filesystem (catalog/plugins/ + catalog/templates/ + system/config/marketplace.config.json)
-    ↓  system/scripts/generate_catalog.py + generate_marketplace.py
+Filesystem (catalog/mcp/ + catalog/plugins/ + catalog/templates/ + system/config/marketplace.config.json)
+    ↓  generate_marketplace.py  (auto-creates plugin.json from x-catalog metadata if absent)
+    ↓  generate_catalog.py + generate_marketplace.py + generate_claude_marketplace.py + generate_vscode_artifacts.py
 system/artifacts/catalog.json  (search index)
 .github/plugin/marketplace.json  (Copilot CLI manifest)
     ↓  system/scripts/generate_site.py + generate_zips.py
@@ -59,7 +68,7 @@ Web UI + Copilot CLI install
 
 | Type | Path | Metadata source |
 |------|------|-----------------|
-| MCP Server | `catalog/mcp/<name>/.mcp.json` | `plugin.json` at `catalog/plugins/<name>/` |
+| MCP Server | `catalog/mcp/<name>/.mcp.json` | `plugin.json` at `catalog/plugins/<name>/` **or** `x-catalog` block inside `.mcp.json` (auto-generates `plugin.json`) |
 | Skill | `catalog/skills/<skill-name>/SKILL.md` | `plugin.json` (authoritative) + SKILL.md frontmatter (cross-checked) |
 | Agent Profile | `catalog/agents/<agent-name>.agent.md` | `plugin.json` + agent frontmatter |
 | Prompt (Command) | `catalog/prompts/<cmd-name>.md` | `plugin.json` + command frontmatter |
