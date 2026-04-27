@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "fixture-no-xcatalog-server": {
+      "command": "echo",
+      "args": ["no-xcatalog"]
+    }
+  }
+}

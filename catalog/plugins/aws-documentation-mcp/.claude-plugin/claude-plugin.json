@@ -1,0 +1,32 @@
+{
+  "name": "aws-documentation-mcp",
+  "description": "AWS Documentation MCP Server — search and read AWS docs directly from your AI assistant.",
+  "version": "1.0.0",
+  "author": {
+    "name": "danforceDJ"
+  },
+  "license": "MIT",
+  "keywords": [
+    "aws",
+    "documentation",
+    "mcp",
+    "cloud"
+  ],
+  "category": "integrations",
+  "tags": [
+    "aws",
+    "mcp"
+  ],
+  "mcpServers": {
+    "AWS Documentation MCP Server": {
+      "command": "uvx",
+      "args": [
+        "awslabs.aws-documentation-mcp-server@latest"
+      ],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR",
+        "AWS_DOCUMENTATION_PARTITION": "aws"
+      }
+    }
+  }
+}

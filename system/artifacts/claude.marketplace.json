@@ -18,6 +18,20 @@
       ]
     },
     {
+      "name": "aws-documentation-mcp",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/danforceDJ/ai-catalog",
+        "path": "catalog/plugins/aws-documentation-mcp"
+      },
+      "manifest": "claude-plugin.json",
+      "category": "integrations",
+      "tags": [
+        "aws",
+        "mcp"
+      ]
+    },
+    {
       "name": "default-agent",
       "source": {
         "type": "git",
