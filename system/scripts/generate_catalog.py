@@ -5,9 +5,9 @@
 # ///
 """Generate catalog.json (search index) from plugins/ and templates/."""
 from __future__ import annotations
-import base64
 import json
 import re
+import urllib.parse
 from pathlib import Path
 from typing import Any
 import yaml
@@ -131,8 +131,8 @@ def build_deeplink(plugin_dir: Path, manifest: dict, repo_root: Path | None = No
     payload = json.dumps({"name": name, **server_cfg}, separators=(",", ":"))
     if len(payload.encode()) > DEEPLINK_MAX_BYTES:
         return None
-    encoded = base64.urlsafe_b64encode(payload.encode()).decode().rstrip("=")
-    return f"vscode:mcp/install?name={name}&config={encoded}"
+    encoded = urllib.parse.quote(payload, safe="")
+    return f"vscode:mcp/install?config={encoded}"
 
 
 def raw_files(plugin_dir: Path, components: dict, manifest: dict | None = None) -> list[str]:
@@ -253,8 +253,8 @@ def _deeplink_from_mcp_path(mcp_path: Path) -> str | None:
     payload = json.dumps({"name": name, **server_cfg}, separators=(",", ":"))
     if len(payload.encode()) > DEEPLINK_MAX_BYTES:
         return None
-    encoded = base64.urlsafe_b64encode(payload.encode()).decode().rstrip("=")
-    return f"vscode:mcp/install?name={name}&config={encoded}"
+    encoded = urllib.parse.quote(payload, safe="")
+    return f"vscode:mcp/install?config={encoded}"
 
 
 def build_top_level_entries(
