@@ -75,7 +75,7 @@
           "vscode"
         ],
         "vscodeWorkspace": ".vscode/mcp.json",
-        "vscodeMcpDeeplink": "vscode:mcp/install?name=AWS Documentation MCP Server&config=eyJuYW1lIjoiQVdTIERvY3VtZW50YXRpb24gTUNQIFNlcnZlciIsImNvbW1hbmQiOiJ1dngiLCJhcmdzIjpbImF3c2xhYnMuYXdzLWRvY3VtZW50YXRpb24tbWNwLXNlcnZlckBsYXRlc3QiXSwiZW52Ijp7IkZBU1RNQ1BfTE9HX0xFVkVMIjoiRVJST1IiLCJBV1NfRE9DVU1FTlRBVElPTl9QQVJUSVRJT04iOiJhd3MifSwiZGlzYWJsZWQiOmZhbHNlLCJhdXRvQXBwcm92ZSI6W10sInR5cGUiOiJzdGRpbyJ9",
+        "vscodeMcpDeeplink": "vscode:mcp/install?%7B%22name%22%3A%22AWS%20Documentation%20MCP%20Server%22%2C%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22awslabs.aws-documentation-mcp-server%40latest%22%5D%2C%22env%22%3A%7B%22FASTMCP_LOG_LEVEL%22%3A%22ERROR%22%2C%22AWS_DOCUMENTATION_PARTITION%22%3A%22aws%22%7D%2C%22type%22%3A%22stdio%22%7D",
         "rawFiles": [],
         "zip": "dl/aws-documentation-mcp.zip",
         "repoPath": "catalog/plugins/aws-documentation-mcp"

@@ -15,6 +15,9 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 DEEPLINK_MAX_BYTES = 2048
+# Fields accepted by VS Code's vscode:mcp/install handler.
+# Workspace-only settings (disabled, autoApprove) must be stripped from deeplinks.
+_VSCODE_DEEPLINK_FIELDS = {"command", "args", "env", "type", "url", "headers"}
 
 
 def parse_frontmatter(text: str) -> dict:
@@ -130,7 +133,9 @@ def build_deeplink(plugin_dir: Path, manifest: dict, repo_root: Path | None = No
     name, server_cfg = next(iter(servers.items()))
     # config payload includes name; entire JSON is the query string per VS Code docs:
     # vscode:mcp/install?${encodeURIComponent(JSON.stringify({name, ...serverConfig}))}
-    payload = json.dumps({"name": name, **server_cfg}, separators=(",", ":"))
+    # Strip workspace-only fields (disabled, autoApprove) not accepted by the deeplink handler.
+    clean_cfg = {k: v for k, v in server_cfg.items() if k in _VSCODE_DEEPLINK_FIELDS}
+    payload = json.dumps({"name": name, **clean_cfg}, separators=(",", ":"))
     if len(payload.encode()) > DEEPLINK_MAX_BYTES:
         return None
     encoded = urllib.parse.quote(payload, safe="")
@@ -254,7 +259,9 @@ def _deeplink_from_mcp_path(mcp_path: Path) -> str | None:
     name, server_cfg = next(iter(servers.items()))
     # config payload includes name; entire JSON is the query string per VS Code docs:
     # vscode:mcp/install?${encodeURIComponent(JSON.stringify({name, ...serverConfig}))}
-    payload = json.dumps({"name": name, **server_cfg}, separators=(",", ":"))
+    # Strip workspace-only fields (disabled, autoApprove) not accepted by the deeplink handler.
+    clean_cfg = {k: v for k, v in server_cfg.items() if k in _VSCODE_DEEPLINK_FIELDS}
+    payload = json.dumps({"name": name, **clean_cfg}, separators=(",", ":"))
     if len(payload.encode()) > DEEPLINK_MAX_BYTES:
         return None
     encoded = urllib.parse.quote(payload, safe="")
