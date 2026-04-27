@@ -382,14 +382,16 @@ def build_top_level_entries(
                 continue
             deeplink = _deeplink_from_mcp_path(mcp_path)
             components = {"skills": [], "agents": [], "commands": [], "mcpServers": server_names, "hooks": False}
+            # Allow optional x-catalog metadata block inside .mcp.json for zero-plugin-json workflow
+            xcatalog = cfg.get("x-catalog", {}) or {}
             entries.append({
                 "name": mcp_server_dir.name,
-                "description": "",
-                "version": "",
+                "description": xcatalog.get("description", ""),
+                "version": xcatalog.get("version", ""),
                 "type": "mcp",
-                "category": "",
-                "tags": [],
-                "keywords": [],
+                "category": xcatalog.get("category", ""),
+                "tags": xcatalog.get("tags", []) or [],
+                "keywords": xcatalog.get("keywords", []) or [],
                 "components": components,
                 "install": {
                     "copilot": None,

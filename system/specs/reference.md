@@ -48,6 +48,27 @@ Frontmatter: `name` (**required**, **must equal the filename stem**), `descripti
 }
 ```
 
+An optional `x-catalog` top-level key can carry catalog metadata. When present and no corresponding `catalog/plugins/<name>/plugin.json` exists, `generate_marketplace.py` **auto-creates** one (and the full `.copilot-plugin/` package), making the MCP fully installable via Copilot CLI from a single file:
+
+> **Why `x-catalog`?** The `x-` prefix is a standard convention for *extension fields* — custom keys that are outside the official spec of the file format. Since `.mcp.json` only officially defines `servers`, prefixing with `x-` signals that this metadata is catalog-specific and will be silently ignored by any other tool that processes `.mcp.json` (e.g. VS Code, Claude Desktop). It's the same pattern used in OpenAPI (`x-logo`, `x-internal`), HTTP headers (`X-Request-ID`), and JSON Schema extensions.
+
+```json
+{
+  "x-catalog": {
+    "description": "Short description shown in the marketplace.",
+    "version": "1.0.0",
+    "category": "integrations",
+    "tags": ["my-tag", "mcp"],
+    "keywords": ["keyword"],
+    "author": "yourHandle",
+    "license": "MIT"
+  },
+  "servers": {
+    "<server-name>": { "type": "stdio", "command": "<executable>", "args": ["..."] }
+  }
+}
+```
+
 Never hardcode credentials. All `.mcp.json` files are secret-scanned on every validate/generate run.
 
 ### Template (`catalog/templates/<name>/TEMPLATE.md`)
@@ -109,5 +130,6 @@ Frontmatter must have `name`, `description`, `version`, `category` — all Error
 | Plugin (mcp) | ✅ | ✅ if ≤ 2 KB | ❌ | ✅ |
 | Plugin (skill/agent/prompt) | ✅ | ❌ | ✅ | ✅ |
 | Plugin (bundle) | ✅ | ✅ if has MCP ≤ 2 KB | ❌ | ✅ |
-| Standalone primitive | ❌ | ❌ | ✅ | ❌ |
+| MCP with `x-catalog` (auto-plugin) | ✅ | ✅ if ≤ 2 KB | ❌ | ✅ |
+| Standalone primitive (no wrapper) | ❌ | ❌ | ✅ | ❌ |
 | Template | ❌ | ❌ | ✅ | ✅ |

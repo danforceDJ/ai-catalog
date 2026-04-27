@@ -82,7 +82,52 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
     return compat_dir
 
 
+def _auto_create_plugin_from_mcp(repo_root: Path) -> list[Path]:
+    """For every catalog/mcp/<name>/.mcp.json that has x-catalog metadata but no
+    corresponding catalog/plugins/<name>/plugin.json, auto-generate plugin.json.
+    Returns list of plugin dirs that were created."""
+    created: list[Path] = []
+    mcp_root = repo_root / "catalog" / "mcp"
+    plugins_root = repo_root / "catalog" / "plugins"
+    if not mcp_root.is_dir():
+        return created
+    for mcp_dir in sorted(mcp_root.iterdir()):
+        mcp_path = mcp_dir / ".mcp.json"
+        if not mcp_dir.is_dir() or not mcp_path.is_file():
+            continue
+        plugin_path = plugins_root / mcp_dir.name / "plugin.json"
+        if plugin_path.exists():
+            continue  # already has a plugin wrapper – nothing to do
+        try:
+            cfg = json.loads(mcp_path.read_text())
+        except json.JSONDecodeError:
+            continue
+        xcatalog = cfg.get("x-catalog")
+        if not xcatalog:
+            continue  # no metadata – skip (won't be Copilot-installable)
+        manifest = {
+            "name": mcp_dir.name,
+            "description": xcatalog.get("description", f"{mcp_dir.name} MCP server."),
+            "version": xcatalog.get("version", "1.0.0"),
+            "license": xcatalog.get("license", "MIT"),
+            "keywords": xcatalog.get("keywords", [mcp_dir.name]),
+            "category": xcatalog.get("category", "integrations"),
+            "tags": xcatalog.get("tags", [mcp_dir.name, "mcp"]),
+            "mcpServers": [mcp_dir.name],
+        }
+        if xcatalog.get("author"):
+            manifest["author"] = {"name": xcatalog["author"]}
+        plugin_path.parent.mkdir(parents=True, exist_ok=True)
+        plugin_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+        print(f"  [auto-generated] {plugin_path.relative_to(repo_root)}")
+        created.append(plugin_path.parent)
+    return created
+
+
 def build_marketplace(repo_root: Path) -> dict:
+    # Auto-create plugin.json wrappers for any mcp with x-catalog metadata
+    _auto_create_plugin_from_mcp(repo_root)
+
     config = json.loads((repo_root / "system" / "config" / "marketplace.config.json").read_text())
     plugins_dir = repo_root / "catalog" / "plugins"
     entries: list[dict] = []
