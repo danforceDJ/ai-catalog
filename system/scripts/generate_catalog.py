@@ -132,7 +132,7 @@ def build_deeplink(plugin_dir: Path, manifest: dict, repo_root: Path | None = No
     if len(payload.encode()) > DEEPLINK_MAX_BYTES:
         return None
     encoded = urllib.parse.quote(payload, safe="")
-    return f"vscode:mcp/install?config={encoded}"
+    return f"vscode:mcp/install?{encoded}"
 
 
 def raw_files(plugin_dir: Path, components: dict, manifest: dict | None = None) -> list[str]:
@@ -254,7 +254,7 @@ def _deeplink_from_mcp_path(mcp_path: Path) -> str | None:
     if len(payload.encode()) > DEEPLINK_MAX_BYTES:
         return None
     encoded = urllib.parse.quote(payload, safe="")
-    return f"vscode:mcp/install?config={encoded}"
+    return f"vscode:mcp/install?{encoded}"
 
 
 def build_top_level_entries(

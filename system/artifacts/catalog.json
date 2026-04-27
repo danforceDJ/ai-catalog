@@ -35,7 +35,7 @@
           "vscode"
         ],
         "vscodeWorkspace": ".vscode/mcp.json",
-        "vscodeMcpDeeplink": "vscode:mcp/install?config=%7B%22name%22%3A%22atlassian%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22mcp-remote%40latest%22%2C%22https%3A%2F%2Fmcp.atlassian.com%2Fv1%2Fsse%22%5D%7D",
+        "vscodeMcpDeeplink": "vscode:mcp/install?%7B%22name%22%3A%22atlassian%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22mcp-remote%40latest%22%2C%22https%3A%2F%2Fmcp.atlassian.com%2Fv1%2Fsse%22%5D%7D",
         "rawFiles": [],
         "zip": "dl/atlassian-mcp.zip",
         "repoPath": "catalog/plugins/atlassian-mcp"
