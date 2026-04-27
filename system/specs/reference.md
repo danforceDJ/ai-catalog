@@ -98,7 +98,7 @@ Frontmatter must have `name`, `description`, `version`, `category` — all Error
 | Method | Available for | How |
 |---|---|---|
 | **Copilot CLI** | All 5 plugins | `copilot plugin install <name>@ai-catalog` |
-| **VSCode MCP deeplink** | MCP plugins where config ≤ 2 KB | `https://vscode.dev/redirect/mcp/install?name=<url-encoded-name>&config=<url-encoded-json>` |
+| **VSCode MCP deeplink** | MCP plugins where config ≤ 2 KB | `vscode:mcp/install?<url-encoded-json>` where JSON = `{"name":"…",…serverConfig}` |
 | **Copy raw** | Single-file primitives and templates | Web modal fetches from `raw.githubusercontent.com` |
 | **Download zip** | All plugins and templates | `docs/dl/<name>.zip` |
 

@@ -128,13 +128,13 @@ def build_deeplink(plugin_dir: Path, manifest: dict, repo_root: Path | None = No
     if not servers:
         return None
     name, server_cfg = next(iter(servers.items()))
-    # config payload excludes the name (passed as separate URL param)
-    payload = json.dumps(server_cfg, separators=(",", ":"))
+    # config payload includes name; entire JSON is the query string per VS Code docs:
+    # vscode:mcp/install?${encodeURIComponent(JSON.stringify({name, ...serverConfig}))}
+    payload = json.dumps({"name": name, **server_cfg}, separators=(",", ":"))
     if len(payload.encode()) > DEEPLINK_MAX_BYTES:
         return None
-    name_enc = urllib.parse.quote(name, safe="")
-    config_enc = urllib.parse.quote(payload, safe="")
-    return f"https://vscode.dev/redirect/mcp/install?name={name_enc}&config={config_enc}"
+    encoded = urllib.parse.quote(payload, safe="")
+    return f"vscode:mcp/install?{encoded}"
 
 
 def raw_files(plugin_dir: Path, components: dict, manifest: dict | None = None) -> list[str]:
@@ -252,13 +252,13 @@ def _deeplink_from_mcp_path(mcp_path: Path) -> str | None:
     if not servers:
         return None
     name, server_cfg = next(iter(servers.items()))
-    # config payload excludes the name (passed as separate URL param)
-    payload = json.dumps(server_cfg, separators=(",", ":"))
+    # config payload includes name; entire JSON is the query string per VS Code docs:
+    # vscode:mcp/install?${encodeURIComponent(JSON.stringify({name, ...serverConfig}))}
+    payload = json.dumps({"name": name, **server_cfg}, separators=(",", ":"))
     if len(payload.encode()) > DEEPLINK_MAX_BYTES:
         return None
-    name_enc = urllib.parse.quote(name, safe="")
-    config_enc = urllib.parse.quote(payload, safe="")
-    return f"https://vscode.dev/redirect/mcp/install?name={name_enc}&config={config_enc}"
+    encoded = urllib.parse.quote(payload, safe="")
+    return f"vscode:mcp/install?{encoded}"
 
 
 def build_top_level_entries(
