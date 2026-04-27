@@ -33,6 +33,28 @@
       "mcpServers": ".mcp.json"
     },
     {
+      "name": "aws-documentation-mcp",
+      "source": "catalog/plugins/aws-documentation-mcp/.copilot-plugin",
+      "description": "AWS Documentation MCP Server — search and read AWS docs directly from your AI assistant.",
+      "version": "1.0.0",
+      "author": {
+        "name": "danforceDJ"
+      },
+      "license": "MIT",
+      "keywords": [
+        "aws",
+        "documentation",
+        "mcp",
+        "cloud"
+      ],
+      "category": "integrations",
+      "tags": [
+        "aws",
+        "mcp"
+      ],
+      "mcpServers": ".mcp.json"
+    },
+    {
       "name": "default-agent",
       "source": "catalog/plugins/default-agent/.copilot-plugin",
       "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
