@@ -57,7 +57,7 @@ def test_catalog_install_fields(fake_repo):
     assert mcp["install"]["copilot"] == "fixture-mcp@ai-catalog"
     assert mcp["install"]["zip"] == "dl/fixture-mcp.zip"
     assert mcp["install"]["repoPath"] == "catalog/plugins/fixture-mcp"
-    assert mcp["install"]["vscodeMcpDeeplink"].startswith("vscode:mcp/install?config=%7B%22name%22%3A%22fixture-server%22")
+    assert mcp["install"]["vscodeMcpDeeplink"].startswith("vscode:mcp/install?%7B%22name%22%3A%22fixture-server%22")
     skill = next(p for p in catalog["plugins"] if p["name"] == "fixture-skill")
     assert skill["install"]["vscodeMcpDeeplink"] is None
     assert skill["install"]["rawFiles"] == ["skills/fixture-skill/SKILL.md"]
@@ -127,7 +127,7 @@ def test_catalog_list_ref_bundle_deeplink(fake_repo):
     bundle = next(p for p in catalog["plugins"] if p["name"] == "fixture-list-bundle")
     # Single top-level MCP reference → deeplink generated
     assert bundle["install"]["vscodeMcpDeeplink"] is not None
-    assert bundle["install"]["vscodeMcpDeeplink"].startswith("vscode:mcp/install?config=%7B%22name%22%3A%22fixture-top-server%22")
+    assert bundle["install"]["vscodeMcpDeeplink"].startswith("vscode:mcp/install?%7B%22name%22%3A%22fixture-top-server%22")
 
 
 def test_catalog_standalone_entries_for_uncovered_primitives(fake_repo):
