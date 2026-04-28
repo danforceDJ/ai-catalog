@@ -23,7 +23,7 @@ def load_mcp_servers(repo_root: Path, names: list[str]) -> dict:
     """Resolve a list of MCP server names to their actual server config objects."""
     merged: dict = {}
     for name in names:
-        mcp_path = repo_root / "catalog" / "mcp" / name / ".mcp.json"
+        mcp_path = repo_root / "mcp" / name / ".mcp.json"
         if mcp_path.is_file():
             data = json.loads(mcp_path.read_text())
             merged.update(data.get("servers", {}))
@@ -45,7 +45,7 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
     skills = manifest.get("skills")
     if isinstance(skills, list):
         for name in skills:
-            src = repo_root / "catalog" / "skills" / name / "SKILL.md"
+            src = repo_root / "skills" / name / "SKILL.md"
             if src.is_file():
                 dst = compat_dir / "skills" / name / "SKILL.md"
                 dst.parent.mkdir(parents=True, exist_ok=True)
@@ -55,7 +55,7 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
     agents = manifest.get("agents")
     if isinstance(agents, list):
         for name in agents:
-            src = repo_root / "catalog" / "agents" / f"{name}.agent.md"
+            src = repo_root / "agents" / f"{name}.agent.md"
             if src.is_file():
                 dst = compat_dir / "agents" / src.name
                 dst.parent.mkdir(parents=True, exist_ok=True)
@@ -65,7 +65,7 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
     commands = manifest.get("commands")
     if isinstance(commands, list):
         for name in commands:
-            src = repo_root / "catalog" / "prompts" / f"{name}.md"
+            src = repo_root / "prompts" / f"{name}.md"
             if src.is_file():
                 dst = compat_dir / "commands" / src.name
                 dst.parent.mkdir(parents=True, exist_ok=True)
@@ -83,12 +83,12 @@ def _write_compatibility_plugin(repo_root: Path, plugin_dir: Path, manifest: dic
 
 
 def _auto_create_plugin_from_mcp(repo_root: Path) -> list[Path]:
-    """For every catalog/mcp/<name>/.mcp.json that has x-catalog metadata but no
-    corresponding catalog/plugins/<name>/plugin.json, auto-generate plugin.json.
+    """For every mcp/<name>/.mcp.json that has x-catalog metadata but no
+    corresponding plugins/<name>/plugin.json, auto-generate plugin.json.
     Returns list of plugin dirs that were created."""
     created: list[Path] = []
-    mcp_root = repo_root / "catalog" / "mcp"
-    plugins_root = repo_root / "catalog" / "plugins"
+    mcp_root = repo_root / "mcp"
+    plugins_root = repo_root / "plugins"
     if not mcp_root.is_dir():
         return created
     for mcp_dir in sorted(mcp_root.iterdir()):
@@ -129,7 +129,7 @@ def build_marketplace(repo_root: Path) -> dict:
     _auto_create_plugin_from_mcp(repo_root)
 
     config = json.loads((repo_root / "system" / "config" / "marketplace.config.json").read_text())
-    plugins_dir = repo_root / "catalog" / "plugins"
+    plugins_dir = repo_root / "plugins"
     entries: list[dict] = []
     if plugins_dir.is_dir():
         for plugin_dir in sorted(plugins_dir.iterdir()):

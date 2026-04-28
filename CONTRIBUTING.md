@@ -58,18 +58,18 @@ uv run --script system/scripts/validate_catalog.py
 Use `scaffold.py` to create all required files with a single command:
 
 ```bash
-# MCP server (creates catalog/mcp/<name>/.mcp.json + catalog/plugins/<name>/plugin.json)
+# MCP server (creates mcp/<name>/.mcp.json + plugins/<name>/plugin.json)
 uv run --script system/scripts/scaffold.py mcp --name my-mcp \
     --description "My MCP server" --category integrations --tags "my-tag,mcp"
 
-# Skill (creates catalog/skills/<name>/SKILL.md + catalog/plugins/<name>/plugin.json)
+# Skill (creates skills/<name>/SKILL.md + plugins/<name>/plugin.json)
 uv run --script system/scripts/scaffold.py skill --name my-skill \
     --description "What this skill does"
 
-# Agent profile (creates catalog/agents/<name>.agent.md + catalog/plugins/<name>/plugin.json)
+# Agent profile (creates agents/<name>.agent.md + plugins/<name>/plugin.json)
 uv run --script system/scripts/scaffold.py agent --name my-agent
 
-# Slash command / prompt (creates catalog/prompts/<name>.md + catalog/plugins/<name>/plugin.json)
+# Slash command / prompt (creates prompts/<name>.md + plugins/<name>/plugin.json)
 uv run --script system/scripts/scaffold.py prompt --name my-prompt
 ```
 
@@ -86,17 +86,17 @@ The manual steps below are still valid if you prefer to create files by hand.
 ## Catalog layout
 
 ```
-catalog/skills/<name>/SKILL.md          ← reusable skills
-catalog/agents/<name>.agent.md          ← agent profiles
-catalog/prompts/<name>.md               ← slash commands (filename stem must equal frontmatter name)
-catalog/mcp/<name>/.mcp.json   ← MCP server configs
-catalog/plugins/<name>/plugin.json      ← wrapper or bundle referencing primitives by name list
-catalog/templates/<name>/TEMPLATE.md    ← raw-download-only templates
+skills/<name>/SKILL.md          ← reusable skills
+agents/<name>.agent.md          ← agent profiles
+prompts/<name>.md               ← slash commands (filename stem must equal frontmatter name)
+mcp/<name>/.mcp.json   ← MCP server configs
+plugins/<name>/plugin.json      ← wrapper or bundle referencing primitives by name list
+templates/<name>/TEMPLATE.md    ← raw-download-only templates
 ```
 
 ## Adding a standalone skill
 
-1. Create `catalog/skills/<kebab-case-name>/SKILL.md` with frontmatter `name`, `description`, `version`.
+1. Create `skills/<kebab-case-name>/SKILL.md` with frontmatter `name`, `description`, `version`.
    - **`name` must be the kebab-case slug** — matching the directory name (e.g. `jira-ticket-from-code`). Use the Markdown heading for the human-readable title.
 2. Run `uv run --script system/scripts/validate_catalog.py` — fix any errors.
 3. Regenerate artefacts and commit (see **Committing artefacts** below).
@@ -105,20 +105,20 @@ The skill appears in the web catalog with "Copy raw" and "Download zip" buttons.
 
 ## Adding a standalone agent
 
-1. Create `catalog/agents/<kebab-case-name>.agent.md` with frontmatter `name`, `description`.
+1. Create `agents/<kebab-case-name>.agent.md` with frontmatter `name`, `description`.
    - **`name` must be the kebab-case slug** — the same value as the filename stem (e.g. `senior-cloud-architect`), not a human-readable label. The human-readable title belongs in the Markdown heading inside the file body.
 2. Validate, regenerate, commit.
 
 ## Adding a standalone command (slash command)
 
-1. Create `catalog/prompts/<name>.md` with frontmatter `name`, `description`. **Filename stem must equal frontmatter `name`.**
+1. Create `prompts/<name>.md` with frontmatter `name`, `description`. **Filename stem must equal frontmatter `name`.**
 2. Validate, regenerate, commit.
 
 ## Adding a standalone MCP server config
 
 ### Option A — x-catalog (single file, fully installable)
 
-Add an `x-catalog` metadata block inside `.mcp.json`. When you run `sync_catalog.py`, the generator **automatically creates** `catalog/plugins/<name>/plugin.json` and the Copilot CLI–compatible `.copilot-plugin/` package from that metadata — no separate `plugin.json` to write by hand.
+Add an `x-catalog` metadata block inside `.mcp.json`. When you run `sync_catalog.py`, the generator **automatically creates** `plugins/<name>/plugin.json` and the Copilot CLI–compatible `.copilot-plugin/` package from that metadata — no separate `plugin.json` to write by hand.
 
 ```json
 {
@@ -163,26 +163,26 @@ This creates both `.mcp.json` and `plugin.json` immediately — no need for `x-c
 
 ### Option C — manual
 
-1. Create `catalog/mcp/<kebab-case-name>/.mcp.json` in the `{"servers": {...}}` shape.
-2. Create `catalog/plugins/<name>/plugin.json` referencing the MCP by name.
+1. Create `mcp/<kebab-case-name>/.mcp.json` in the `{"servers": {...}}` shape.
+2. Create `plugins/<name>/plugin.json` referencing the MCP by name.
 3. Validate (secret scan runs automatically), regenerate, commit.
 
 ## Adding a plugin wrapper (single primitive, Copilot CLI installable)
 
-1. Create `catalog/plugins/<name>/plugin.json` with a **name list** referencing your top-level primitive(s). Required field: `name` (must match directory name, kebab-case, ≤64 chars).
+1. Create `plugins/<name>/plugin.json` with a **name list** referencing your top-level primitive(s). Required field: `name` (must match directory name, kebab-case, ≤64 chars).
 2. Reference the primitive by name:
-   - **Skill** — `"skills": ["<name>"]` (resolves to `catalog/skills/<name>/SKILL.md`)
-   - **Agent** — `"agents": ["<name>"]` (resolves to `catalog/agents/<name>.agent.md`)
-   - **Command** — `"commands": ["<name>"]` (resolves to `catalog/prompts/<name>.md`)
-   - **MCP** — `"mcpServers": ["<name>"]` (resolves to `catalog/mcp/<name>/.mcp.json`)
-3. Regenerate marketplace metadata. This also materializes a Copilot-compatible plugin package at `catalog/plugins/<name>/.copilot-plugin/`.
+   - **Skill** — `"skills": ["<name>"]` (resolves to `skills/<name>/SKILL.md`)
+   - **Agent** — `"agents": ["<name>"]` (resolves to `agents/<name>.agent.md`)
+   - **Command** — `"commands": ["<name>"]` (resolves to `prompts/<name>.md`)
+   - **MCP** — `"mcpServers": ["<name>"]` (resolves to `mcp/<name>/.mcp.json`)
+3. Regenerate marketplace metadata. This also materializes a Copilot-compatible plugin package at `plugins/<name>/.copilot-plugin/`.
 4. Validate, regenerate, commit, and open a PR.
 
 ## Adding a bundle plugin
 
 A bundle composes multiple primitives (≥2 component kinds) in a single installable plugin.
 
-1. Create `catalog/plugins/<name>/plugin.json` with list-based references:
+1. Create `plugins/<name>/plugin.json` with list-based references:
 
 ```json
 {
@@ -195,12 +195,12 @@ A bundle composes multiple primitives (≥2 component kinds) in a single install
 }
 ```
 
-2. Ensure all referenced primitives exist in their `catalog/` directories.
+2. Ensure all referenced primitives exist in their root directories.
 3. Validate, regenerate, commit, and open a PR.
 
 ## Adding a template (raw-download only)
 
-1. Create `catalog/templates/<kebab-case-name>/TEMPLATE.md` with frontmatter `name`, `description`, `version`, `category`.
+1. Create `templates/<kebab-case-name>/TEMPLATE.md` with frontmatter `name`, `description`, `version`, `category`.
 2. Optional supporting assets go alongside the `TEMPLATE.md`.
 3. Validate, regenerate, and PR. Templates are NOT exposed to Copilot CLI; they appear in the web marketplace with download-only affordances.
 
@@ -236,7 +236,7 @@ uv run --script system/scripts/sync_catalog.py
 git add system/artifacts/catalog.json .github/plugin/marketplace.json \
         system/artifacts/claude.marketplace.json .vscode/mcp.json \
         .github/prompts/ .github/instructions/catalog-agent.instructions.md \
-        catalog/plugins/
+        plugins/
 ```
 
 Open a PR. CI validates and checks that the tracked artefacts match the generated output; on merge the deploy workflow publishes `docs/` to GitHub Pages.

@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "atlassian-mcp",
-      "source": "catalog/plugins/atlassian-mcp/.copilot-plugin",
+      "source": "plugins/atlassian-mcp/.copilot-plugin",
       "description": "Atlassian Rovo MCP Server via OAuth 2.1 (SSO). No API tokens required in this repository.",
       "version": "1.0.0",
       "author": {
@@ -34,7 +34,7 @@
     },
     {
       "name": "aws-documentation-mcp",
-      "source": "catalog/plugins/aws-documentation-mcp/.copilot-plugin",
+      "source": "plugins/aws-documentation-mcp/.copilot-plugin",
       "description": "AWS Documentation MCP Server — search and read AWS docs directly from your AI assistant.",
       "version": "1.0.0",
       "author": {
@@ -56,7 +56,7 @@
     },
     {
       "name": "default-agent",
-      "source": "catalog/plugins/default-agent/.copilot-plugin",
+      "source": "plugins/default-agent/.copilot-plugin",
       "description": "Company-wide default agent profile enforcing git workflow, security, and conventional commit conventions.",
       "version": "1.0.0",
       "author": {
@@ -77,7 +77,7 @@
     },
     {
       "name": "jira-ticket-from-code",
-      "source": "catalog/plugins/jira-ticket-from-code/.copilot-plugin",
+      "source": "plugins/jira-ticket-from-code/.copilot-plugin",
       "description": "Create Jira tickets from TODO/FIXME/BUG code comments by extracting intent and nearby implementation context.",
       "version": "1.0.0",
       "author": {
@@ -99,7 +99,7 @@
     },
     {
       "name": "pr-description-prompt",
-      "source": "catalog/plugins/pr-description-prompt/.copilot-plugin",
+      "source": "plugins/pr-description-prompt/.copilot-plugin",
       "description": "Slash command that emits a standard PR description with summary, test plan, and checklist.",
       "version": "1.0.0",
       "author": {
@@ -121,7 +121,7 @@
     },
     {
       "name": "senior-cloud-architect",
-      "source": "catalog/plugins/senior-cloud-architect/.copilot-plugin",
+      "source": "plugins/senior-cloud-architect/.copilot-plugin",
       "description": "Expert in modern architecture design patterns, NFR requirements, and creating comprehensive architectural diagrams and documentation",
       "version": "1.0.0",
       "author": {
@@ -146,7 +146,7 @@
     },
     {
       "name": "value-stream-1-default",
-      "source": "catalog/plugins/value-stream-1-default/.copilot-plugin",
+      "source": "plugins/value-stream-1-default/.copilot-plugin",
       "description": "Default bundle for value stream 1: Confluence publishing, architecture doc generation, Jira ticketing from code, and Atlassian MCP.",
       "version": "1.0.0",
       "author": {

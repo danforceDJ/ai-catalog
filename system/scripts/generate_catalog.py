@@ -56,7 +56,7 @@ def plugin_components(plugin_dir: Path, manifest: dict, repo_root: Path | None =
 
     # Skills: list of top-level names or a string path relative to plugin_dir
     if isinstance(skills_value, list) and repo_root is not None:
-        skills = [n for n in skills_value if (repo_root / "catalog" / "skills" / n / "SKILL.md").is_file()]
+        skills = [n for n in skills_value if (repo_root / "skills" / n / "SKILL.md").is_file()]
     else:
         skills_path = plugin_dir / _first(skills_value, "skills")
         skills = sorted(s.name for s in skills_path.iterdir() if s.is_dir() and (s / "SKILL.md").is_file()) \
@@ -64,7 +64,7 @@ def plugin_components(plugin_dir: Path, manifest: dict, repo_root: Path | None =
 
     # Agents: list of top-level names or a string path relative to plugin_dir
     if isinstance(agents_value, list) and repo_root is not None:
-        agents = [n for n in agents_value if (repo_root / "catalog" / "agents" / f"{n}.agent.md").is_file()]
+        agents = [n for n in agents_value if (repo_root / "agents" / f"{n}.agent.md").is_file()]
     else:
         agents_path = plugin_dir / _first(agents_value, "agents")
         agents = sorted(p.stem.removesuffix(".agent") for p in agents_path.glob("*.agent.md")) \
@@ -72,7 +72,7 @@ def plugin_components(plugin_dir: Path, manifest: dict, repo_root: Path | None =
 
     # Commands: list of top-level names or a string path relative to plugin_dir
     if isinstance(commands_value, list) and repo_root is not None:
-        commands = [n for n in commands_value if (repo_root / "catalog" / "prompts" / f"{n}.md").is_file()]
+        commands = [n for n in commands_value if (repo_root / "prompts" / f"{n}.md").is_file()]
     else:
         commands_path = plugin_dir / _first(commands_value, "commands")
         commands = sorted(p.stem for p in commands_path.glob("*.md")) \
@@ -80,7 +80,7 @@ def plugin_components(plugin_dir: Path, manifest: dict, repo_root: Path | None =
 
     # MCP servers: list of top-level dir names or a string .mcp.json path relative to plugin_dir
     if isinstance(mcp_value, list) and repo_root is not None:
-        mcp_paths = [repo_root / "catalog" / "mcp" / name / ".mcp.json" for name in mcp_value]
+        mcp_paths = [repo_root / "mcp" / name / ".mcp.json" for name in mcp_value]
     elif isinstance(mcp_value, str):
         mcp_paths = [plugin_dir / mcp_value]
     else:
@@ -116,7 +116,7 @@ def build_deeplink(plugin_dir: Path, manifest: dict, repo_root: Path | None = No
     if isinstance(mcp_value, list) and repo_root is not None:
         if len(mcp_value) != 1:
             return None
-        mcp_path = repo_root / "catalog" / "mcp" / mcp_value[0] / ".mcp.json"
+        mcp_path = repo_root / "mcp" / mcp_value[0] / ".mcp.json"
     elif isinstance(mcp_value, str):
         mcp_path = plugin_dir / mcp_value
     else:
@@ -220,7 +220,7 @@ def build_plugin_entry(plugin_dir: Path, repo_root: Path | None = None) -> dict 
             "vscodeMcpDeeplink": deeplink,
             "rawFiles": raw_files(plugin_dir, components, manifest),
             "zip": f"dl/{plugin_dir.name}.zip",
-            "repoPath": f"catalog/plugins/{plugin_dir.name}",
+            "repoPath": f"plugins/{plugin_dir.name}",
         },
     }
 
@@ -241,7 +241,7 @@ def build_template_entry(template_dir: Path) -> dict | None:
         "install": {
             "rawFiles": ["TEMPLATE.md"],
             "zip": f"dl/{template_dir.name}.zip",
-            "repoPath": f"catalog/templates/{template_dir.name}",
+            "repoPath": f"templates/{template_dir.name}",
         },
     }
 
@@ -279,7 +279,7 @@ def build_top_level_entries(
     entries: list[dict] = []
 
     # Standalone skills
-    skills_dir = repo_root / "catalog" / "skills"
+    skills_dir = repo_root / "skills"
     if skills_dir.is_dir():
         for skill_dir in sorted(d for d in skills_dir.iterdir() if d.is_dir()):
             if skill_dir.name in covered_skills:
@@ -304,12 +304,12 @@ def build_top_level_entries(
                     "vscodeMcpDeeplink": None,
                     "rawFiles": ["SKILL.md"],
                     "zip": f"dl/{skill_dir.name}.zip",
-                    "repoPath": f"catalog/skills/{skill_dir.name}",
+                    "repoPath": f"skills/{skill_dir.name}",
                 },
             })
 
     # Standalone agents
-    agents_dir = repo_root / "catalog" / "agents"
+    agents_dir = repo_root / "agents"
     if agents_dir.is_dir():
         for agent_path in sorted(agents_dir.glob("*.agent.md")):
             agent_name = agent_path.stem.removesuffix(".agent")
@@ -332,12 +332,12 @@ def build_top_level_entries(
                     "vscodeMcpDeeplink": None,
                     "rawFiles": [agent_path.name],
                     "zip": f"dl/{agent_name}.zip",
-                    "repoPath": "catalog/agents",
+                    "repoPath": "agents",
                 },
             })
 
     # Standalone commands
-    commands_dir = repo_root / "catalog" / "prompts"
+    commands_dir = repo_root / "prompts"
     if commands_dir.is_dir():
         for cmd_path in sorted(commands_dir.glob("*.md")):
             cmd_name = cmd_path.stem
@@ -360,12 +360,12 @@ def build_top_level_entries(
                     "vscodeMcpDeeplink": None,
                     "rawFiles": [cmd_path.name],
                     "zip": f"dl/{cmd_name}.zip",
-                    "repoPath": "catalog/prompts",
+                    "repoPath": "prompts",
                 },
             })
 
     # Standalone MCP server configs
-    mcp_dir = repo_root / "catalog" / "mcp"
+    mcp_dir = repo_root / "mcp"
     if mcp_dir.is_dir():
         for mcp_server_dir in sorted(d for d in mcp_dir.iterdir() if d.is_dir()):
             if covered_mcp_dirs and mcp_server_dir.name in covered_mcp_dirs:
@@ -399,7 +399,7 @@ def build_top_level_entries(
                     "vscodeMcpDeeplink": deeplink,
                     "rawFiles": [],
                     "zip": f"dl/{mcp_server_dir.name}.zip",
-                    "repoPath": f"catalog/mcp/{mcp_server_dir.name}",
+                    "repoPath": f"mcp/{mcp_server_dir.name}",
                 },
             })
 
@@ -408,7 +408,7 @@ def build_top_level_entries(
 
 def build_catalog(repo_root: Path) -> dict:
     plugins: list[dict] = []
-    plugins_dir = repo_root / "catalog" / "plugins"
+    plugins_dir = repo_root / "plugins"
     if plugins_dir.is_dir():
         for d in sorted(plugins_dir.iterdir()):
             if d.is_dir():
@@ -425,7 +425,7 @@ def build_catalog(repo_root: Path) -> dict:
         covered_skills.update(entry["components"]["skills"])
         covered_agents.update(entry["components"]["agents"])
         covered_commands.update(entry["components"]["commands"])
-    # Track which catalog/mcp/<name> dirs are already wrapped by a plugin via list-reference
+    # Track which mcp/<name> dirs are already wrapped by a plugin via list-reference
     if plugins_dir.is_dir():
         for d in sorted(plugins_dir.iterdir()):
             manifest_path = d / "plugin.json"
@@ -444,7 +444,7 @@ def build_catalog(repo_root: Path) -> dict:
     plugins.sort(key=lambda p: p["name"])
 
     templates: list[dict] = []
-    templates_dir = repo_root / "catalog" / "templates"
+    templates_dir = repo_root / "templates"
     if templates_dir.is_dir():
         for d in sorted(templates_dir.iterdir()):
             if d.is_dir():

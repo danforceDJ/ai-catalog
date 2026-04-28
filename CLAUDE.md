@@ -9,7 +9,7 @@ A convention-based AI configuration marketplace that doubles as a **GitHub Copil
 1. **A Copilot CLI marketplace** — `copilot plugin marketplace add danforceDJ/ai-catalog`, consumes `.github/plugin/marketplace.json`.
 2. **A static web marketplace** — GitHub Pages site with live search + four install paths per card (Copilot CLI, VSCode MCP deeplink, raw-file copy, `.zip` download).
 
-The web UI and marketplace manifest are both auto-generated from a single source of truth: the `catalog/` directory.
+The web UI and marketplace manifest are both auto-generated from a single source of truth: the root-level catalog directories.
 
 ## Development Commands
 
@@ -53,7 +53,7 @@ GitHub Actions runs `validate_catalog.py` + `pytest` + a freshness check on ever
 **Data flow:**
 
 ```
-Filesystem (catalog/mcp/ + catalog/plugins/ + catalog/templates/ + system/config/marketplace.config.json)
+Filesystem (mcp/ + plugins/ + templates/ + system/config/marketplace.config.json)
     ↓  generate_marketplace.py  (auto-creates plugin.json from x-catalog metadata if absent; emits .github/plugin/marketplace.json)
 .github/plugin/marketplace.json  (Copilot CLI manifest)
     ↓  generate_catalog.py
@@ -70,12 +70,12 @@ Web UI + Copilot CLI install
 
 | Type | Path | Metadata source |
 |------|------|-----------------|
-| MCP Server | `catalog/mcp/<name>/.mcp.json` | `plugin.json` at `catalog/plugins/<name>/` **or** `x-catalog` block inside `.mcp.json` (auto-generates `plugin.json`) |
-| Skill | `catalog/skills/<skill-name>/SKILL.md` | `plugin.json` (authoritative) + SKILL.md frontmatter (cross-checked) |
-| Agent Profile | `catalog/agents/<agent-name>.agent.md` | `plugin.json` + agent frontmatter |
-| Prompt (Command) | `catalog/prompts/<cmd-name>.md` | `plugin.json` + command frontmatter |
-| Template (raw-download only) | `catalog/templates/<name>/TEMPLATE.md` | YAML frontmatter |
-| Bundle | `catalog/plugins/<name>/` with ≥2 component kinds | `plugin.json` |
+| MCP Server | `mcp/<name>/.mcp.json` | `plugin.json` at `plugins/<name>/` **or** `x-catalog` block inside `.mcp.json` (auto-generates `plugin.json`) |
+| Skill | `skills/<skill-name>/SKILL.md` | `plugin.json` (authoritative) + SKILL.md frontmatter (cross-checked) |
+| Agent Profile | `agents/<agent-name>.agent.md` | `plugin.json` + agent frontmatter |
+| Prompt (Command) | `prompts/<cmd-name>.md` | `plugin.json` + command frontmatter |
+| Template (raw-download only) | `templates/<name>/TEMPLATE.md` | YAML frontmatter |
+| Bundle | `plugins/<name>/` with ≥2 component kinds | `plugin.json` |
 
 **Naming & invariants (enforced by `validate_catalog.py`):**
 

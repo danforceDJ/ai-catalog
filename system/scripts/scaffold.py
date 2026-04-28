@@ -96,7 +96,7 @@ def _next_steps(*lines: str) -> None:
 # ---------------------------------------------------------------------------
 
 def scaffold_mcp(args: argparse.Namespace) -> None:
-    """Create catalog/mcp/<name>/.mcp.json + catalog/plugins/<name>/plugin.json."""
+    """Create mcp/<name>/.mcp.json + plugins/<name>/plugin.json."""
     name = _kebab(args.name)
 
     # --- .mcp.json template --------------------------------------------------
@@ -111,28 +111,28 @@ def scaffold_mcp(args: argparse.Namespace) -> None:
         }
     }
     _write(
-        REPO_ROOT / "catalog" / "mcp" / name / ".mcp.json",
+        REPO_ROOT / "mcp" / name / ".mcp.json",
         json.dumps(mcp_template, indent=2, ensure_ascii=False) + "\n",
         args.force,
     )
 
     # --- plugin.json ----------------------------------------------------------
     _write(
-        REPO_ROOT / "catalog" / "plugins" / name / "plugin.json",
+        REPO_ROOT / "plugins" / name / "plugin.json",
         _plugin_json(name, args, mcpServers=[name]),
         args.force,
     )
 
     _next_steps(
-        f"Edit  catalog/mcp/{name}/.mcp.json  — set the real server command/args",
-        f"Edit  catalog/plugins/{name}/plugin.json  — update description, tags, keywords",
+        f"Edit  mcp/{name}/.mcp.json  — set the real server command/args",
+        f"Edit  plugins/{name}/plugin.json  — update description, tags, keywords",
         "uv run --script system/scripts/validate_catalog.py",
         "uv run --script system/scripts/sync_catalog.py",
     )
 
 
 def scaffold_skill(args: argparse.Namespace) -> None:
-    """Create catalog/skills/<name>/SKILL.md + catalog/plugins/<name>/plugin.json."""
+    """Create skills/<name>/SKILL.md + plugins/<name>/plugin.json."""
     name = _kebab(args.name)
     desc = args.description or f"TODO: describe {name}."
     version = args.version or "1.0.0"
@@ -159,24 +159,24 @@ def scaffold_skill(args: argparse.Namespace) -> None:
 
         TODO: add examples.
     """)
-    _write(REPO_ROOT / "catalog" / "skills" / name / "SKILL.md", skill_md, args.force)
+    _write(REPO_ROOT / "skills" / name / "SKILL.md", skill_md, args.force)
 
     _write(
-        REPO_ROOT / "catalog" / "plugins" / name / "plugin.json",
+        REPO_ROOT / "plugins" / name / "plugin.json",
         _plugin_json(name, args, skills=[name]),
         args.force,
     )
 
     _next_steps(
-        f"Edit  catalog/skills/{name}/SKILL.md  — fill in instructions and examples",
-        f"Edit  catalog/plugins/{name}/plugin.json  — update description, tags, keywords",
+        f"Edit  skills/{name}/SKILL.md  — fill in instructions and examples",
+        f"Edit  plugins/{name}/plugin.json  — update description, tags, keywords",
         "uv run --script system/scripts/validate_catalog.py",
         "uv run --script system/scripts/sync_catalog.py",
     )
 
 
 def scaffold_agent(args: argparse.Namespace) -> None:
-    """Create catalog/agents/<name>.agent.md + catalog/plugins/<name>/plugin.json."""
+    """Create agents/<name>.agent.md + plugins/<name>/plugin.json."""
     name = _kebab(args.name)
     desc = args.description or f"TODO: describe {name}."
     version = args.version or "1.0.0"
@@ -200,24 +200,24 @@ def scaffold_agent(args: argparse.Namespace) -> None:
 
         - TODO: list constraints and guardrails.
     """)
-    _write(REPO_ROOT / "catalog" / "agents" / f"{name}.agent.md", agent_md, args.force)
+    _write(REPO_ROOT / "agents" / f"{name}.agent.md", agent_md, args.force)
 
     _write(
-        REPO_ROOT / "catalog" / "plugins" / name / "plugin.json",
+        REPO_ROOT / "plugins" / name / "plugin.json",
         _plugin_json(name, args, agents=[name]),
         args.force,
     )
 
     _next_steps(
-        f"Edit  catalog/agents/{name}.agent.md  — fill in the agent instructions",
-        f"Edit  catalog/plugins/{name}/plugin.json  — update description, tags, keywords",
+        f"Edit  agents/{name}.agent.md  — fill in the agent instructions",
+        f"Edit  plugins/{name}/plugin.json  — update description, tags, keywords",
         "uv run --script system/scripts/validate_catalog.py",
         "uv run --script system/scripts/sync_catalog.py",
     )
 
 
 def scaffold_prompt(args: argparse.Namespace) -> None:
-    """Create catalog/prompts/<name>.md + catalog/plugins/<name>/plugin.json."""
+    """Create prompts/<name>.md + plugins/<name>/plugin.json."""
     name = _kebab(args.name)
     desc = args.description or f"TODO: describe {name}."
     version = args.version or "1.0.0"
@@ -233,17 +233,17 @@ def scaffold_prompt(args: argparse.Namespace) -> None:
 
         ${{input}}
     """)
-    _write(REPO_ROOT / "catalog" / "prompts" / f"{name}.md", prompt_md, args.force)
+    _write(REPO_ROOT / "prompts" / f"{name}.md", prompt_md, args.force)
 
     _write(
-        REPO_ROOT / "catalog" / "plugins" / name / "plugin.json",
+        REPO_ROOT / "plugins" / name / "plugin.json",
         _plugin_json(name, args, commands=[name]),
         args.force,
     )
 
     _next_steps(
-        f"Edit  catalog/prompts/{name}.md  — write the actual prompt",
-        f"Edit  catalog/plugins/{name}/plugin.json  — update description, tags, keywords",
+        f"Edit  prompts/{name}.md  — write the actual prompt",
+        f"Edit  plugins/{name}/plugin.json  — update description, tags, keywords",
         "uv run --script system/scripts/validate_catalog.py",
         "uv run --script system/scripts/sync_catalog.py",
     )

@@ -38,7 +38,7 @@
         "vscodeMcpDeeplink": "vscode:mcp/install?%7B%22name%22%3A%22atlassian%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22mcp-remote%40latest%22%2C%22https%3A%2F%2Fmcp.atlassian.com%2Fv1%2Fsse%22%5D%7D",
         "rawFiles": [],
         "zip": "dl/atlassian-mcp.zip",
-        "repoPath": "catalog/plugins/atlassian-mcp"
+        "repoPath": "plugins/atlassian-mcp"
       }
     },
     {
@@ -78,7 +78,7 @@
         "vscodeMcpDeeplink": "vscode:mcp/install?%7B%22name%22%3A%22AWS%20Documentation%20MCP%20Server%22%2C%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22awslabs.aws-documentation-mcp-server%40latest%22%5D%2C%22env%22%3A%7B%22FASTMCP_LOG_LEVEL%22%3A%22ERROR%22%2C%22AWS_DOCUMENTATION_PARTITION%22%3A%22aws%22%7D%2C%22type%22%3A%22stdio%22%7D",
         "rawFiles": [],
         "zip": "dl/aws-documentation-mcp.zip",
-        "repoPath": "catalog/plugins/aws-documentation-mcp"
+        "repoPath": "plugins/aws-documentation-mcp"
       }
     },
     {
@@ -116,7 +116,7 @@
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/default-agent.zip",
-        "repoPath": "catalog/plugins/default-agent"
+        "repoPath": "plugins/default-agent"
       }
     },
     {
@@ -154,7 +154,7 @@
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/jira-ticket-from-code.zip",
-        "repoPath": "catalog/plugins/jira-ticket-from-code"
+        "repoPath": "plugins/jira-ticket-from-code"
       }
     },
     {
@@ -193,7 +193,7 @@
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/pr-description-prompt.zip",
-        "repoPath": "catalog/plugins/pr-description-prompt"
+        "repoPath": "plugins/pr-description-prompt"
       }
     },
     {
@@ -235,7 +235,7 @@
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/senior-cloud-architect.zip",
-        "repoPath": "catalog/plugins/senior-cloud-architect"
+        "repoPath": "plugins/senior-cloud-architect"
       }
     },
     {
@@ -282,7 +282,7 @@
         "vscodeMcpDeeplink": null,
         "rawFiles": [],
         "zip": "dl/value-stream-1-default.zip",
-        "repoPath": "catalog/plugins/value-stream-1-default"
+        "repoPath": "plugins/value-stream-1-default"
       }
     }
   ],
@@ -308,7 +308,7 @@
           "TEMPLATE.md"
         ],
         "zip": "dl/solution-architecture.zip",
-        "repoPath": "catalog/templates/solution-architecture"
+        "repoPath": "templates/solution-architecture"
       }
     }
   ]

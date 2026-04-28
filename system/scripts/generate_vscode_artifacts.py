@@ -19,7 +19,7 @@ FRONTMATTER_PATTERN = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 
 def write_vscode_mcp_json() -> None:
     """Merge all mcpServers/*/.mcp.json files into .vscode/mcp.json."""
-    mcp_servers_dir = REPO_ROOT / "catalog" / "mcp"
+    mcp_servers_dir = REPO_ROOT / "mcp"
     merged_servers = {}
 
     if not mcp_servers_dir.exists():
@@ -59,7 +59,7 @@ def write_vscode_mcp_json() -> None:
 
 def write_github_prompts() -> None:
     """Convert commands/*.md to .github/prompts/*.prompt.md with VS Code format."""
-    commands_dir = REPO_ROOT / "catalog" / "prompts"
+    commands_dir = REPO_ROOT / "prompts"
     if not commands_dir.exists():
         return
 
@@ -98,7 +98,7 @@ def write_github_prompts() -> None:
 
 def write_github_instructions() -> None:
     """Concatenate all agents/*.agent.md bodies into .github/instructions/catalog-agent.instructions.md."""
-    agents_dir = REPO_ROOT / "catalog" / "agents"
+    agents_dir = REPO_ROOT / "agents"
     if not agents_dir.exists():
         return
 
