@@ -13,4 +13,4 @@ git -C "$REPO_ROOT" add \
   .vscode/mcp.json \
   ".github/prompts/" \
   ".github/instructions/catalog-agent.instructions.md" \
-  "catalog/plugins/"
+  "plugins/"

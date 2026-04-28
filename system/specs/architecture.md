@@ -17,14 +17,14 @@ A company-wide AI configuration marketplace serving two outputs from one filesys
 ## Data Flow
 
 ```
-catalog/plugins/  +  catalog/skills/  +  catalog/agents/
-catalog/prompts/  +  catalog/mcp/  +  catalog/templates/
+plugins/  +  skills/  +  agents/
+prompts/  +  mcp/  +  templates/
 system/config/marketplace.config.json
       │
       ▼
   generate_catalog.py      →  system/artifacts/catalog.json  (tracked)
   generate_marketplace.py  →  .github/plugin/marketplace.json  (tracked)
-                               catalog/plugins/<name>/.copilot-plugin/  (generated)
+                               plugins/<name>/.copilot-plugin/  (generated)
       │
       ▼
   generate_site.py         →  docs/index.html  (not committed)
@@ -49,17 +49,17 @@ system/config/marketplace.config.json
 
 | Type | Path | File |
 |---|---|---|
-| Skill | `catalog/skills/<name>/` | `SKILL.md` |
-| Agent | `catalog/agents/` | `<name>.agent.md` |
-| Command | `catalog/prompts/` | `<name>.md` |
-| MCP Server | `catalog/mcp/<name>/` | `.mcp.json` |
-| Template | `catalog/templates/<name>/` | `TEMPLATE.md` |
+| Skill | `skills/<name>/` | `SKILL.md` |
+| Agent | `agents/` | `<name>.agent.md` |
+| Command | `prompts/` | `<name>.md` |
+| MCP Server | `mcp/<name>/` | `.mcp.json` |
+| Template | `templates/<name>/` | `TEMPLATE.md` |
 
 Discoverable in the web UI. Not directly Copilot CLI installable unless wrapped in a plugin.
 
 ### Plugins — Copilot CLI installable
 
-Every plugin lives at `catalog/plugins/<name>/plugin.json`. References primitives by name list:
+Every plugin lives at `plugins/<name>/plugin.json`. References primitives by name list:
 
 ```json
 {
@@ -82,7 +82,7 @@ Derived type from component composition:
 
 ## `.copilot-plugin/` Package Generation
 
-`generate_marketplace.py` creates `catalog/plugins/<name>/.copilot-plugin/` for list-reference plugins:
+`generate_marketplace.py` creates `plugins/<name>/.copilot-plugin/` for list-reference plugins:
 1. Copies primitive files in (`SKILL.md`, `*.agent.md`, `*.md`, `.mcp.json`)
 2. Merges multiple MCP server configs into one `.mcp.json`
 3. Converts list refs → string paths in the output `plugin.json`

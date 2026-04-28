@@ -2,7 +2,7 @@
 
 ## Item Schemas
 
-### Plugin (`catalog/plugins/<name>/plugin.json`)
+### Plugin (`plugins/<name>/plugin.json`)
 
 Directory name must equal the `name` field.
 
@@ -18,7 +18,7 @@ Directory name must equal the `name` field.
 | `commands` | string \| array[string] | No | Same as `skills` |
 | `mcpServers` | string \| array[string] | No | Array = top-level integration names (preferred) |
 
-### Skill (`catalog/skills/<name>/SKILL.md`)
+### Skill (`skills/<name>/SKILL.md`)
 
 YAML frontmatter:
 
@@ -30,15 +30,15 @@ YAML frontmatter:
 
 Body: `## Instructions` and optional `## Example` sections.
 
-### Agent (`catalog/agents/<name>.agent.md`)
+### Agent (`agents/<name>.agent.md`)
 
 Frontmatter: `name` (**required**), `description` (**required**). Body: behavioral rules in Markdown.
 
-### Command / Slash Command (`catalog/prompts/<name>.md`)
+### Command / Slash Command (`prompts/<name>.md`)
 
 Frontmatter: `name` (**required**, **must equal the filename stem**), `description` (**required**). Body: prompt template text.
 
-### MCP Server Config (`catalog/mcp/<name>/.mcp.json`)
+### MCP Server Config (`mcp/<name>/.mcp.json`)
 
 ```json
 {
@@ -48,7 +48,7 @@ Frontmatter: `name` (**required**, **must equal the filename stem**), `descripti
 }
 ```
 
-An optional `x-catalog` top-level key can carry catalog metadata. When present and no corresponding `catalog/plugins/<name>/plugin.json` exists, `generate_marketplace.py` **auto-creates** one (and the full `.copilot-plugin/` package), making the MCP fully installable via Copilot CLI from a single file:
+An optional `x-catalog` top-level key can carry catalog metadata. When present and no corresponding `plugins/<name>/plugin.json` exists, `generate_marketplace.py` **auto-creates** one (and the full `.copilot-plugin/` package), making the MCP fully installable via Copilot CLI from a single file:
 
 > **Why `x-catalog`?** The `x-` prefix is a standard convention for *extension fields* — custom keys that are outside the official spec of the file format. Since `.mcp.json` only officially defines `servers`, prefixing with `x-` signals that this metadata is catalog-specific and will be silently ignored by any other tool that processes `.mcp.json` (e.g. VS Code, Claude Desktop). It's the same pattern used in OpenAPI (`x-logo`, `x-internal`), HTTP headers (`X-Request-ID`), and JSON Schema extensions.
 
@@ -71,7 +71,7 @@ An optional `x-catalog` top-level key can carry catalog metadata. When present a
 
 Never hardcode credentials. All `.mcp.json` files are secret-scanned on every validate/generate run.
 
-### Template (`catalog/templates/<name>/TEMPLATE.md`)
+### Template (`templates/<name>/TEMPLATE.md`)
 
 Frontmatter: `name`, `description`, `version`, `category` — all **required**. Templates are web-only (no Copilot CLI install).
 
@@ -95,7 +95,7 @@ Frontmatter: `name`, `description`, `version`, `category` — all **required**. 
 
 | Rule | Level |
 |---|---|
-| No duplicate plugin `name` across `catalog/plugins/` | Error |
+| No duplicate plugin `name` across `plugins/` | Error |
 | No duplicate command filename stem across all plugin command dirs | Error |
 | No duplicate MCP server name (string-path only; list refs may share top-level configs) | Error |
 

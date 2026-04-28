@@ -17,19 +17,17 @@ def _load(name: str):
 
 @pytest.fixture
 def fake_repo(tmp_path, fixtures_dir):
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").symlink_to(fixtures_dir / "catalog" / "plugins")
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
+    (tmp_path / "plugins").symlink_to(fixtures_dir / "plugins")
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
     config_dir = tmp_path / "system" / "config"
     config_dir.mkdir(parents=True)
     (config_dir / "marketplace.config.json").write_text(
         (fixtures_dir / "marketplace.config.json").read_text()
     )
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
-        src = fixtures_dir / "catalog" / newname
+    for newname in ["skills", "agents", "prompts", "mcp"]:
+        src = fixtures_dir / newname
         if src.exists():
-            (catalog_dir / newname).symlink_to(src)
+            (tmp_path / newname).symlink_to(src)
     return tmp_path
 
 
@@ -43,11 +41,9 @@ def test_fixtures_pass_validation(fake_repo):
 
 def test_bad_name_fails(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    bad = catalog_dir / "plugins" / "bad-name"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    bad = tmp_path / "plugins" / "bad-name"
     bad.mkdir()
     (bad / "plugin.json").write_text(json.dumps({"name": "Bad_Name"}))
     v = mod.Validator(tmp_path)
@@ -57,7 +53,7 @@ def test_bad_name_fails(tmp_path, fixtures_dir):
 
 def test_duplicate_mcp_server_fails(fake_repo):
     mod = _load("validate_catalog")
-    plugins = fake_repo / "catalog" / "plugins"
+    plugins = fake_repo / "plugins"
     # symlink has fixtures mode; copy to a writable dir
     import shutil
     real_plugins = fake_repo / "plugins_real"
@@ -65,8 +61,8 @@ def test_duplicate_mcp_server_fails(fake_repo):
     for p in plugins.iterdir():
         shutil.copytree(p, real_plugins / p.name)
     plugins.unlink()
-    real_plugins.rename(fake_repo / "catalog" / "plugins")
-    dup = fake_repo / "catalog" / "plugins" / "fixture-dup-mcp"
+    real_plugins.rename(fake_repo / "plugins")
+    dup = fake_repo / "plugins" / "fixture-dup-mcp"
     dup.mkdir()
     (dup / "plugin.json").write_text(json.dumps({"name": "fixture-dup-mcp", "mcpServers": ".mcp.json"}))
     (dup / ".mcp.json").write_text(json.dumps({"servers": {"fixture-server": {"command": "echo"}}}))
@@ -77,11 +73,9 @@ def test_duplicate_mcp_server_fails(fake_repo):
 
 def test_secret_scan_fails(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    leaky = catalog_dir / "plugins" / "fixture-leaky"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    leaky = tmp_path / "plugins" / "fixture-leaky"
     leaky.mkdir()
     (leaky / "plugin.json").write_text(json.dumps({"name": "fixture-leaky", "mcpServers": ".mcp.json"}))
     (leaky / ".mcp.json").write_text(json.dumps({
@@ -94,11 +88,9 @@ def test_secret_scan_fails(tmp_path, fixtures_dir):
 
 def test_frontmatter_drift_is_warning_not_error(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    drifted = catalog_dir / "plugins" / "fixture-drift"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    drifted = tmp_path / "plugins" / "fixture-drift"
     drifted.mkdir()
     (drifted / "plugin.json").write_text(json.dumps({
         "name": "fixture-drift", "version": "2.0.0", "skills": "skills"
@@ -122,11 +114,9 @@ def test_fixtures_pass_validation_with_top_level_dirs(fake_repo):
 
 def test_list_ref_missing_skill_fails(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    bad = catalog_dir / "plugins" / "fixture-bad-ref"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    bad = tmp_path / "plugins" / "fixture-bad-ref"
     bad.mkdir()
     (bad / "plugin.json").write_text(json.dumps({
         "name": "fixture-bad-ref",
@@ -139,11 +129,9 @@ def test_list_ref_missing_skill_fails(tmp_path, fixtures_dir):
 
 def test_list_ref_missing_agent_fails(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    bad = catalog_dir / "plugins" / "fixture-bad-agent-ref"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    bad = tmp_path / "plugins" / "fixture-bad-agent-ref"
     bad.mkdir()
     (bad / "plugin.json").write_text(json.dumps({
         "name": "fixture-bad-agent-ref",
@@ -156,11 +144,9 @@ def test_list_ref_missing_agent_fails(tmp_path, fixtures_dir):
 
 def test_list_ref_missing_command_fails(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    bad = catalog_dir / "plugins" / "fixture-bad-cmd-ref"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    bad = tmp_path / "plugins" / "fixture-bad-cmd-ref"
     bad.mkdir()
     (bad / "plugin.json").write_text(json.dumps({
         "name": "fixture-bad-cmd-ref",
@@ -173,11 +159,9 @@ def test_list_ref_missing_command_fails(tmp_path, fixtures_dir):
 
 def test_list_ref_missing_mcp_fails(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    bad = catalog_dir / "plugins" / "fixture-bad-mcp-ref"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    bad = tmp_path / "plugins" / "fixture-bad-mcp-ref"
     bad.mkdir()
     (bad / "plugin.json").write_text(json.dumps({
         "name": "fixture-bad-mcp-ref",
@@ -190,11 +174,9 @@ def test_list_ref_missing_mcp_fails(tmp_path, fixtures_dir):
 
 def test_standalone_skill_missing_description_fails(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    skills_dir = catalog_dir / "skills" / "no-desc-skill"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    skills_dir = tmp_path / "skills" / "no-desc-skill"
     skills_dir.mkdir(parents=True)
     (skills_dir / "SKILL.md").write_text("---\nname: no-desc-skill\n---\nbody")
     v = mod.Validator(tmp_path)
@@ -204,11 +186,9 @@ def test_standalone_skill_missing_description_fails(tmp_path, fixtures_dir):
 
 def test_standalone_mcp_secret_scan_fails(tmp_path, fixtures_dir):
     mod = _load("validate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").mkdir()
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    mcp_dir = catalog_dir / "mcp" / "leaky-top-mcp"
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    mcp_dir = tmp_path / "mcp" / "leaky-top-mcp"
     mcp_dir.mkdir(parents=True)
     (mcp_dir / ".mcp.json").write_text(json.dumps({
         "servers": {"leaky": {"command": "echo", "env": {"API_TOKEN": "ghp_" + "a" * 36}}}

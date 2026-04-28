@@ -150,9 +150,9 @@ class Validator:
         # Skills
         if isinstance(skills_value, list):
             for skill_name in skills_value:
-                skill_md = self.repo / "catalog" / "skills" / skill_name / "SKILL.md"
+                skill_md = self.repo / "skills" / skill_name / "SKILL.md"
                 if not skill_md.is_file():
-                    self.fail(f"{plugin_dir}: referenced skill '{skill_name}' not found at catalog/skills/{skill_name}/SKILL.md")
+                    self.fail(f"{plugin_dir}: referenced skill '{skill_name}' not found at skills/{skill_name}/SKILL.md")
         else:
             skills_path = plugin_dir / _first(skills_value, "skills")
             if "skills" in manifest or skills_path.is_dir():
@@ -164,9 +164,9 @@ class Validator:
         # Agents
         if isinstance(agents_value, list):
             for agent_name in agents_value:
-                agent_path = self.repo / "catalog" / "agents" / f"{agent_name}.agent.md"
+                agent_path = self.repo / "agents" / f"{agent_name}.agent.md"
                 if not agent_path.is_file():
-                    self.fail(f"{plugin_dir}: referenced agent '{agent_name}' not found at catalog/agents/{agent_name}.agent.md")
+                    self.fail(f"{plugin_dir}: referenced agent '{agent_name}' not found at agents/{agent_name}.agent.md")
         else:
             agents_path = plugin_dir / _first(agents_value, "agents")
             if "agents" in manifest or agents_path.is_dir():
@@ -178,9 +178,9 @@ class Validator:
         # Commands
         if isinstance(commands_value, list):
             for cmd_name in commands_value:
-                cmd_path = self.repo / "catalog" / "prompts" / f"{cmd_name}.md"
+                cmd_path = self.repo / "prompts" / f"{cmd_name}.md"
                 if not cmd_path.is_file():
-                    self.fail(f"{plugin_dir}: referenced command '{cmd_name}' not found at catalog/prompts/{cmd_name}.md")
+                    self.fail(f"{plugin_dir}: referenced command '{cmd_name}' not found at prompts/{cmd_name}.md")
         else:
             commands_path = plugin_dir / _first(commands_value, "commands")
             if "commands" in manifest or commands_path.is_dir():
@@ -198,9 +198,9 @@ class Validator:
         mcp_value = manifest.get("mcpServers", ".mcp.json")
         if isinstance(mcp_value, list):
             for mcp_name in mcp_value:
-                mcp_path = self.repo / "catalog" / "mcp" / mcp_name / ".mcp.json"
+                mcp_path = self.repo / "mcp" / mcp_name / ".mcp.json"
                 if not mcp_path.is_file():
-                    self.fail(f"{plugin_dir}: referenced mcpServer '{mcp_name}' not found at catalog/mcp/{mcp_name}/.mcp.json")
+                    self.fail(f"{plugin_dir}: referenced mcpServer '{mcp_name}' not found at mcp/{mcp_name}/.mcp.json")
                 else:
                     self._scan_mcp_secrets(mcp_path)
 
@@ -209,7 +209,7 @@ class Validator:
         if isinstance(skills_value, list):
             # Top-level refs: check drift against each referenced SKILL.md
             for skill_name in skills_value:
-                skill_md = self.repo / "catalog" / "skills" / skill_name / "SKILL.md"
+                skill_md = self.repo / "skills" / skill_name / "SKILL.md"
                 if not skill_md.is_file():
                     continue
                 fm = parse_frontmatter(skill_md.read_text())
@@ -363,30 +363,30 @@ class Validator:
                 self.fail(f"{tpl}: missing frontmatter '{key}'")
 
     def run(self) -> int:
-        plugins_dir = self.repo / "catalog" / "plugins"
+        plugins_dir = self.repo / "plugins"
         plugin_dirs = sorted(d for d in plugins_dir.iterdir() if d.is_dir()) if plugins_dir.is_dir() else []
         for d in plugin_dirs:
             self.validate_plugin(d)
         self.check_global_uniqueness(plugin_dirs)
         self.validate_marketplace()
-        templates_dir = self.repo / "catalog" / "templates"
+        templates_dir = self.repo / "templates"
         if templates_dir.is_dir():
             for d in sorted(t for t in templates_dir.iterdir() if t.is_dir()):
                 self.validate_template(d)
         # Top-level primitive directories
-        skills_dir = self.repo / "catalog" / "skills"
+        skills_dir = self.repo / "skills"
         if skills_dir.is_dir():
             for d in sorted(s for s in skills_dir.iterdir() if s.is_dir()):
                 self.validate_standalone_skill(d)
-        agents_dir = self.repo / "catalog" / "agents"
+        agents_dir = self.repo / "agents"
         if agents_dir.is_dir():
             for p in sorted(agents_dir.glob("*.agent.md")):
                 self.validate_standalone_agent(p)
-        commands_dir = self.repo / "catalog" / "prompts"
+        commands_dir = self.repo / "prompts"
         if commands_dir.is_dir():
             for p in sorted(commands_dir.glob("*.md")):
                 self.validate_standalone_command(p)
-        mcp_dir = self.repo / "catalog" / "mcp"
+        mcp_dir = self.repo / "mcp"
         if mcp_dir.is_dir():
             for d in sorted(s for s in mcp_dir.iterdir() if s.is_dir()):
                 self.validate_standalone_mcp(d)

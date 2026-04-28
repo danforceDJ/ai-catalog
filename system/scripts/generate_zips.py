@@ -25,7 +25,7 @@ def main() -> None:
     out_dir = REPO_ROOT / "docs" / "dl"
     out_dir.mkdir(parents=True, exist_ok=True)
     sources: list[Path] = []
-    for parent in (("catalog", "plugins"), ("catalog", "templates")):
+    for parent in (("plugins",), ("templates",)):
         base = REPO_ROOT / Path(*parent)
         if base.is_dir():
             sources.extend(sorted(d for d in base.iterdir() if d.is_dir()))

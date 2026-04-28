@@ -20,13 +20,11 @@ def _load(name: str):
 @pytest.fixture
 def claude_fake_repo(tmp_path, fixtures_dir):
     """Create a temporary repo with all necessary fixtures for Claude marketplace generation."""
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    shutil.copytree(fixtures_dir / "catalog" / "plugins", catalog_dir / "plugins")
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
-        src = fixtures_dir / "catalog" / newname
+    shutil.copytree(fixtures_dir / "plugins", tmp_path / "plugins")
+    for newname in ["skills", "agents", "prompts", "mcp"]:
+        src = fixtures_dir / newname
         if src.exists():
-            shutil.copytree(src, catalog_dir / newname)
+            shutil.copytree(src, tmp_path / newname)
     config_dir = tmp_path / "system" / "config"
     config_dir.mkdir(parents=True)
     (tmp_path / "system" / "artifacts").mkdir(parents=True, exist_ok=True)
@@ -41,7 +39,7 @@ def test_mcp_transform_drops_type(claude_fake_repo):
     mod = _load("generate_claude_marketplace")
     
     # Create a test plugin with inline MCP that includes a 'type' field
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "test-mcp-type"
+    plugin_dir = claude_fake_repo / "plugins" / "test-mcp-type"
     plugin_dir.mkdir()
     (plugin_dir / "plugin.json").write_text(json.dumps({
         "name": "test-mcp-type",
@@ -78,7 +76,7 @@ def test_claude_plugin_json_generated(claude_fake_repo):
     mod = _load("generate_claude_marketplace")
     mod.build_claude_marketplace(claude_fake_repo)
     
-    plugins_dir = claude_fake_repo / "catalog" / "plugins"
+    plugins_dir = claude_fake_repo / "plugins"
     generated_files = []
     for plugin_dir in plugins_dir.iterdir():
         if plugin_dir.is_dir() and (plugin_dir / "claude-plugin.json").exists():
@@ -139,7 +137,7 @@ def test_list_reference_mcp_resolved(claude_fake_repo):
     mod.build_claude_marketplace(claude_fake_repo)
     
     # fixture-list-bundle has mcpServers: ["fixture-top-mcp"]
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "fixture-list-bundle"
+    plugin_dir = claude_fake_repo / "plugins" / "fixture-list-bundle"
     claude_manifest = json.loads((plugin_dir / "claude-plugin.json").read_text())
     
     # Should have resolved MCP servers
@@ -155,7 +153,7 @@ def test_claude_plugin_with_commands(claude_fake_repo):
     mod.build_claude_marketplace(claude_fake_repo)
     
     # fixture-prompt has commands
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "fixture-prompt"
+    plugin_dir = claude_fake_repo / "plugins" / "fixture-prompt"
     claude_manifest = json.loads((plugin_dir / "claude-plugin.json").read_text())
     
     assert "slashCommands" in claude_manifest
@@ -175,7 +173,7 @@ def test_claude_plugin_with_agents(claude_fake_repo):
     mod.build_claude_marketplace(claude_fake_repo)
     
     # fixture-agent has agents
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "fixture-agent"
+    plugin_dir = claude_fake_repo / "plugins" / "fixture-agent"
     claude_manifest = json.loads((plugin_dir / "claude-plugin.json").read_text())
     
     assert "instructions" in claude_manifest
@@ -189,7 +187,7 @@ def test_claude_plugin_passthrough_fields(claude_fake_repo):
     mod = _load("generate_claude_marketplace")
     mod.build_claude_marketplace(claude_fake_repo)
     
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "fixture-mcp"
+    plugin_dir = claude_fake_repo / "plugins" / "fixture-mcp"
     claude_manifest = json.loads((plugin_dir / "claude-plugin.json").read_text())
     
     # Check that passthrough fields are present
@@ -216,7 +214,7 @@ def test_claude_marketplace_plugin_entries(claude_fake_repo):
     source = entry["source"]
     assert source["type"] == "git"
     assert "path" in source
-    assert source["path"].startswith("catalog/plugins/")
+    assert source["path"].startswith("plugins/")
     
     # Manifest file should be specified
     assert entry["manifest"] == "claude-plugin.json"
@@ -228,7 +226,7 @@ def test_claude_plugin_materialized_directory(claude_fake_repo):
     mod.build_claude_marketplace(claude_fake_repo)
     
     # fixture-prompt should have .claude-plugin with commands
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "fixture-prompt"
+    plugin_dir = claude_fake_repo / "plugins" / "fixture-prompt"
     claude_plugin_dir = plugin_dir / ".claude-plugin"
     
     assert claude_plugin_dir.exists()
@@ -245,7 +243,7 @@ def test_inline_mcp_servers_transformed(claude_fake_repo):
     mod.build_claude_marketplace(claude_fake_repo)
     
     # fixture-mcp uses inline .mcp.json
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "fixture-mcp"
+    plugin_dir = claude_fake_repo / "plugins" / "fixture-mcp"
     claude_manifest = json.loads((plugin_dir / "claude-plugin.json").read_text())
     
     assert "mcpServers" in claude_manifest
@@ -259,7 +257,7 @@ def test_list_reference_commands_from_topLevel(claude_fake_repo):
     mod = _load("generate_claude_marketplace")
     
     # Create a test plugin with list-reference commands
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "test-list-cmd"
+    plugin_dir = claude_fake_repo / "plugins" / "test-list-cmd"
     plugin_dir.mkdir()
     (plugin_dir / "plugin.json").write_text(json.dumps({
         "name": "test-list-cmd",
@@ -282,7 +280,7 @@ def test_list_reference_agents_from_topLevel(claude_fake_repo):
     mod = _load("generate_claude_marketplace")
     
     # Create a test plugin with list-reference agents
-    plugin_dir = claude_fake_repo / "catalog" / "plugins" / "test-list-agent"
+    plugin_dir = claude_fake_repo / "plugins" / "test-list-agent"
     plugin_dir.mkdir()
     (plugin_dir / "plugin.json").write_text(json.dumps({
         "name": "test-list-agent",

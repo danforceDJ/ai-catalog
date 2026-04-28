@@ -17,14 +17,12 @@ def _load(name: str):
 
 @pytest.fixture
 def fake_repo(tmp_path, fixtures_dir):
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    (catalog_dir / "plugins").symlink_to(fixtures_dir / "catalog" / "plugins")
-    (catalog_dir / "templates").symlink_to(fixtures_dir / "catalog" / "templates")
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
-        src = fixtures_dir / "catalog" / newname
+    (tmp_path / "plugins").symlink_to(fixtures_dir / "plugins")
+    (tmp_path / "templates").symlink_to(fixtures_dir / "templates")
+    for newname in ["skills", "agents", "prompts", "mcp"]:
+        src = fixtures_dir / newname
         if src.exists():
-            (catalog_dir / newname).symlink_to(src)
+            (tmp_path / newname).symlink_to(src)
     return tmp_path
 
 
@@ -56,7 +54,7 @@ def test_catalog_install_fields(fake_repo):
     mcp = next(p for p in catalog["plugins"] if p["name"] == "fixture-mcp")
     assert mcp["install"]["copilot"] == "fixture-mcp@ai-catalog"
     assert mcp["install"]["zip"] == "dl/fixture-mcp.zip"
-    assert mcp["install"]["repoPath"] == "catalog/plugins/fixture-mcp"
+    assert mcp["install"]["repoPath"] == "plugins/fixture-mcp"
     assert mcp["install"]["vscodeMcpDeeplink"].startswith("vscode:mcp/install?%7B%22name%22%3A%22fixture-server%22")
     skill = next(p for p in catalog["plugins"] if p["name"] == "fixture-skill")
     assert skill["install"]["vscodeMcpDeeplink"] is None
@@ -78,12 +76,10 @@ def test_catalog_templates(fake_repo):
 def test_catalog_deeplink_size_cap(tmp_path, fixtures_dir):
     mod = _load("generate_catalog")
     # Build a synthetic repo: copy fixtures then add an oversized MCP plugin
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    plugins_root = catalog_dir / "plugins"
+    plugins_root = tmp_path / "plugins"
     plugins_root.mkdir()
     import shutil
-    for p in (fixtures_dir / "catalog" / "plugins").iterdir():
+    for p in (fixtures_dir / "plugins").iterdir():
         shutil.copytree(p, plugins_root / p.name)
     big_plugin = plugins_root / "fixture-giant-mcp"
     big_plugin.mkdir()
@@ -92,11 +88,11 @@ def test_catalog_deeplink_size_cap(tmp_path, fixtures_dir):
     }))
     huge_args = ["x" * 3000]
     (big_plugin / ".mcp.json").write_text(json.dumps({"servers": {"big": {"command": "echo", "args": huge_args}}}))
-    (catalog_dir / "templates").mkdir()
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
-        src = fixtures_dir / "catalog" / newname
+    (tmp_path / "templates").mkdir()
+    for newname in ["skills", "agents", "prompts", "mcp"]:
+        src = fixtures_dir / newname
         if src.exists():
-            (catalog_dir / newname).symlink_to(src)
+            (tmp_path / newname).symlink_to(src)
     catalog = mod.build_catalog(tmp_path)
     big = next(p for p in catalog["plugins"] if p["name"] == "fixture-giant-mcp")
     assert big["install"]["vscodeMcpDeeplink"] is None, "deeplink must be None when >2KB"
@@ -150,7 +146,7 @@ def test_catalog_standalone_agent_install(fake_repo):
     assert agent["type"] == "agent"
     assert agent["install"]["copilot"] is None
     assert agent["install"]["rawFiles"] == ["fixture-top-agent.agent.md"]
-    assert agent["install"]["repoPath"] == "catalog/agents"
+    assert agent["install"]["repoPath"] == "agents"
 
 
 def test_catalog_standalone_command_install(fake_repo):
@@ -175,7 +171,7 @@ def test_catalog_standalone_mcp_xcatalog_fields(fake_repo):
     assert entry["tags"] == ["fixture", "xcatalog"]
     assert entry["keywords"] == ["test", "metadata"]
     assert entry["components"]["mcpServers"] == ["fixture-xcatalog-server"]
-    assert entry["install"]["repoPath"] == "catalog/mcp/fixture-xcatalog-mcp"
+    assert entry["install"]["repoPath"] == "mcp/fixture-xcatalog-mcp"
     assert entry["install"]["zip"] == "dl/fixture-xcatalog-mcp.zip"
     assert entry["install"]["copilot"] is None
 
@@ -197,9 +193,7 @@ def test_catalog_standalone_mcp_no_xcatalog_defaults(fake_repo):
 
 def test_catalog_missing_top_level_ref_resolves_gracefully(tmp_path, fixtures_dir):
     mod = _load("generate_catalog")
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    plugins_root = catalog_dir / "plugins"
+    plugins_root = tmp_path / "plugins"
     plugins_root.mkdir()
     bad = plugins_root / "fixture-bad-ref"
     bad.mkdir()
@@ -207,7 +201,7 @@ def test_catalog_missing_top_level_ref_resolves_gracefully(tmp_path, fixtures_di
         "name": "fixture-bad-ref",
         "skills": ["nonexistent-skill"],
     }))
-    (catalog_dir / "templates").mkdir()
+    (tmp_path / "templates").mkdir()
     catalog = mod.build_catalog(tmp_path)
     entry = next(p for p in catalog["plugins"] if p["name"] == "fixture-bad-ref")
     # Missing referenced skill → resolved as empty list, entry still generated

@@ -22,13 +22,11 @@ def _load(name: str):
 @pytest.fixture
 def vscode_fake_repo(tmp_path, fixtures_dir):
     """Create a temporary repo with all necessary fixtures for VS Code artifacts generation."""
-    catalog_dir = tmp_path / "catalog"
-    catalog_dir.mkdir()
-    shutil.copytree(fixtures_dir / "catalog" / "plugins", catalog_dir / "plugins")
-    for name, newname in [("skills", "skills"), ("agents", "agents"), ("commands", "prompts"), ("mcpServers", "mcp")]:
-        src = fixtures_dir / "catalog" / newname
+    shutil.copytree(fixtures_dir / "plugins", tmp_path / "plugins")
+    for newname in ["skills", "agents", "prompts", "mcp"]:
+        src = fixtures_dir / newname
         if src.exists():
-            shutil.copytree(src, catalog_dir / newname)
+            shutil.copytree(src, tmp_path / newname)
     return tmp_path
 
 
@@ -71,8 +69,8 @@ def test_vscode_mcp_json_servers_format(vscode_fake_repo):
         assert "servers" in data
         assert isinstance(data["servers"], dict)
         
-        # fixture-top-server should be present (from fixtures/mcpServers/fixture-top-mcp)
-        if vscode_fake_repo / "catalog" / "mcp" / "fixture-top-mcp" / ".mcp.json" in (vscode_fake_repo / "catalog" / "mcp").rglob(".mcp.json"):
+        # fixture-top-server should be present (from fixtures/mcp/fixture-top-mcp)
+        if vscode_fake_repo / "mcp" / "fixture-top-mcp" / ".mcp.json" in (vscode_fake_repo / "mcp").rglob(".mcp.json"):
             # The server should keep its original fields including 'type' if present
             for server_name, server_config in data["servers"].items():
                 # Unlike Claude format, VS Code format should keep 'type' if present
@@ -126,7 +124,7 @@ def test_github_prompt_frontmatter(vscode_fake_repo):
         assert frontmatter["mode"] == "ask"
         
         # Description from original command should be preserved
-        original_file = vscode_fake_repo / "catalog" / "prompts" / "fixture-top-command.md"
+        original_file = vscode_fake_repo / "prompts" / "fixture-top-command.md"
         original_content = original_file.read_text()
         original_match = re.match(r"^---\s*\n(.*?)\n---\s*\n", original_content, re.DOTALL)
         if original_match:
@@ -182,7 +180,7 @@ def test_github_instructions_multiple_agents(vscode_fake_repo):
     
     try:
         # Create additional agent file
-        agents_dir = vscode_fake_repo / "catalog" / "agents"
+        agents_dir = vscode_fake_repo / "agents"
         agents_dir.mkdir(exist_ok=True)
         
         (agents_dir / "second-agent.agent.md").write_text(
@@ -212,7 +210,7 @@ def test_prompt_body_preserved(vscode_fake_repo):
         mod.write_github_prompts()
         
         # Get original body
-        original_file = vscode_fake_repo / "catalog" / "prompts" / "fixture-top-command.md"
+        original_file = vscode_fake_repo / "prompts" / "fixture-top-command.md"
         original_content = original_file.read_text()
         original_match = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)", original_content, re.DOTALL)
         original_body = original_match.group(2) if original_match else original_content
@@ -234,7 +232,7 @@ def test_vscode_mcp_json_multiple_servers(vscode_fake_repo):
     mod = _load("generate_vscode_artifacts")
     
     # Create additional MCP server
-    mcp_dir = vscode_fake_repo / "catalog" / "mcp" / "additional-server"
+    mcp_dir = vscode_fake_repo / "mcp" / "additional-server"
     mcp_dir.mkdir(parents=True, exist_ok=True)
     (mcp_dir / ".mcp.json").write_text(json.dumps({
         "servers": {
@@ -267,7 +265,7 @@ def test_vscode_artifacts_no_crash_missing_dirs(vscode_fake_repo):
     
     # Use a minimal fake repo without commands/agents dirs
     minimal_repo = vscode_fake_repo
-    for d in ["catalog/prompts", "catalog/agents"]:
+    for d in ["prompts", "agents"]:
         path = minimal_repo / d
         if path.exists():
             shutil.rmtree(path)
@@ -283,7 +281,7 @@ def test_vscode_artifacts_no_crash_missing_dirs(vscode_fake_repo):
         
         # These should succeed without errors even with missing dirs
         # write_vscode_mcp_json creates .vscode if mcpServers exist
-        if (minimal_repo / "catalog" / "mcp").exists():
+        if (minimal_repo / "mcp").exists():
             assert (minimal_repo / ".vscode").exists()
     finally:
         mod.REPO_ROOT = original_root
@@ -378,7 +376,7 @@ def test_prompt_description_from_frontmatter(vscode_fake_repo):
     mod = _load("generate_vscode_artifacts")
     
     # Create a command with description
-    commands_dir = vscode_fake_repo / "catalog" / "prompts"
+    commands_dir = vscode_fake_repo / "prompts"
     commands_dir.mkdir(exist_ok=True)
     (commands_dir / "test-with-desc.md").write_text(
         "---\nname: test-with-desc\ndescription: This is a test description\n---\n\nBody text"
@@ -407,7 +405,7 @@ def test_vscode_mcp_json_handles_invalid_json(vscode_fake_repo, capsys):
     mod = _load("generate_vscode_artifacts")
     
     # Create invalid JSON file
-    mcp_dir = vscode_fake_repo / "catalog" / "mcp" / "bad-server"
+    mcp_dir = vscode_fake_repo / "mcp" / "bad-server"
     mcp_dir.mkdir(parents=True, exist_ok=True)
     (mcp_dir / ".mcp.json").write_text("{ invalid json")
     
